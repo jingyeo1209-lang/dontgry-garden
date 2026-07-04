@@ -29,6 +29,26 @@
             border-bottom: 2px dashed #1a1a1a; padding-bottom: 10px;
         }
 
+        /* 🌳 [새로 추가] 정원 대문 이미지 배너 스타일 */
+        .garden-banner {
+            position: relative; width: 100%; border: 3px solid #1a1a1a;
+            border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 2px 2px 0px #000;
+        }
+        .garden-banner img { width: 100%; display: block; }
+        
+        /* 💡 영역 조절할 때 맨 끝 숫자 '0'을 '0.3'으로 고치면 빨간 스티커가 켜집니다! */
+        .image-link {
+            position: absolute; background: rgba(255, 0, 0, 0); 
+            cursor: pointer; text-indent: -9999px; border-radius: 4px; transition: background 0.1s;
+        }
+        .image-link:hover { background: rgba(255, 255, 255, 0.2); border: 2px dashed #1a1a1a; }
+
+        /* 📍 이미지 위 캐릭터 4개 가이드 자릿수 (% 숫자는 크롬 검사로 조절 가능!) */
+        .link-weather { top: 10%; left: 10%; width: 35%; height: 35%; }  /* 선그리 돼지 */
+        .link-golden  { top: 10%; right: 10%; width: 35%; height: 35%; } /* 똔그리 돼지 */
+        .link-pink    { bottom: 10%; left: 10%; width: 35%; height: 35%; } /* 분홍 돼지 */
+        .link-oasis   { bottom: 10%; right: 10%; width: 35%; height: 35%; } /* 지혜의 샘 */
+
         .wallet-zone {
             display: flex; justify-content: space-between; background: #222; color: #fff;
             padding: 8px 15px; border-radius: 6px; font-size: 14px; border: 2px solid #000; align-items: center;
@@ -61,22 +81,7 @@
         }
         .section-title:first-child { margin-top: 0; }
 
-        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0; }
-        .metric-item { background: rgba(255, 255, 255, 0.85); border: 2px solid #1a1a1a; border-radius: 6px; padding: 6px; text-align: center; }
-        .metric-label { font-size: 10px; color: #444; font-weight: bold; margin-bottom: 2px; }
-        .metric-value { font-size: 13px; font-weight: bold; color: #111; }
-        .metric-sub { font-size: 8px; color: #777; margin-top: 1px; }
-
-        .farmer-zone { display: flex; align-items: center; gap: 15px; background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 12px; margin-top: 10px; }
-        .avatar { font-size: 42px; transition: transform 0.2s; }
-        .speech-bubble { font-size: 13px; line-height: 1.4; width: 100%; }
-        .pig-status-tag { background: #1a1a1a; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; display: inline-block; margin-bottom: 4px; }
-
         .input-group { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-        .input-row { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-size: 13px; }
-        .pixel-input { font-family: 'DungGeunMo'; padding: 5px; border: 2px solid #1a1a1a; border-radius: 4px; width: 60%; text-align: right; }
-        .weed-list { max-height: 100px; overflow-y: auto; background: #fafafa; border: 2px solid #1a1a1a; padding: 5px; border-radius: 4px; font-size: 12px; margin-top: 8px; }
-        .weed-item { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dashed #ccc; }
 
         .fortune-box { background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 15px; text-align: center; }
         #fortuneGrape { font-size: 50px; cursor: pointer; display: inline-block; transition: transform 0.2s; }
@@ -147,11 +152,13 @@
             100% { opacity: 0; transform: scale(1.4) translateY(-30px); }
         }
 
-        .placeholder-box {
-            background: #fff; border: 3px dashed #1a1a1a; border-radius: 8px;
-            padding: 40px 20px; text-align: center; color: #666;
+        .notion-frame { width: 100%; }
+        .notion-iframe {
+            width: 100%; height: 600px; display: block; box-sizing: border-box;
+            border: 3px solid #1a1a1a; border-radius: 8px; background: #fff;
         }
-        .placeholder-box .placeholder-emoji { font-size: 48px; margin-bottom: 12px; }
+        .notion-iframe--gallery { height: 800px; }
+        .notion-frame--hybrid { margin-top: 16px; }
 
         .game-btn { font-family: 'DungGeunMo'; padding: 10px; font-size: 12px; cursor: pointer; border: 2px solid #1a1a1a; background: #f5f5f5; border-radius: 6px; box-shadow: 2px 2px 0px #000; width: 100%; }
         .game-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
@@ -171,18 +178,25 @@
 <div class="wrapper-card" id="mainCard">
     <div class="app-title">🌳 똔그리 가든</div>
 
+    <div class="garden-banner">
+        <img src="garden-map.png" alt="똔그리가든 지도">
+        <div class="image-link link-weather" onclick="switchPanel('panel-weather')">선그리 돼지</div>
+        <div class="image-link link-golden" onclick="switchPanel('panel-golden')">똔그리 돼지</div>
+        <div class="image-link link-pink" onclick="switchPanel('panel-pink')">분홍 돼지</div>
+        <div class="image-link link-oasis" onclick="switchPanel('panel-oasis')">지혜의 샘</div>
+    </div>
+
     <div class="wallet-zone">
         <span>💰 나의 시드머니: <strong id="walletBalance">0</strong> 원</span>
         <span style="font-size:11px; color:#aaa;">🧃 마신 주스: <strong id="juiceCountDisplay" style="color:#ffeb3b;">0</strong>잔</span>
     </div>
 
-    <!-- 4대 메인 메뉴 -->
     <nav class="main-nav">
         <button class="nav-btn" data-panel="panel-weather" onclick="switchPanel('panel-weather', this)">
-            <span class="nav-emoji">🕶️</span>선글라스 돼지의<br>투자 기상도
+            <span class="nav-emoji">🕶️</span>선그리 돼지의<br>메타 안경
         </button>
         <button class="nav-btn" data-panel="panel-golden" onclick="switchPanel('panel-golden', this)">
-            <span class="nav-emoji">👑</span>황금 돼지의<br>재테크 한 스푼
+            <span class="nav-emoji">🐖</span>똔그리의<br>재테크 한 스푼
         </button>
         <button class="nav-btn" data-panel="panel-pink" onclick="switchPanel('panel-pink', this)">
             <span class="nav-emoji">🐷</span>분홍돼지의<br>경제 한 스푼
@@ -193,99 +207,54 @@
     </nav>
 
     <div class="panel-area">
-    <!-- 패널 1: 선글라스 돼지의 투자 기상도 -->
-    <div id="panel-weather" class="panel">
-        <div class="section-title">🌤️ 오늘의 투자 기상도 (거시 지표)</div>
-        <div class="metrics-grid">
-            <div class="metric-item">
-                <div class="metric-label">공포탐욕지수</div>
-                <div class="metric-value" id="mFG">25</div>
-                <div class="metric-sub">대중 심리</div>
-            </div>
-            <div class="metric-item">
-                <div class="metric-label">VIX 지수</div>
-                <div class="metric-value" id="mVIX">36.5</div>
-                <div class="metric-sub">시장 불안도</div>
-            </div>
-            <div class="metric-item">
-                <div class="metric-label">RSI 지수</div>
-                <div class="metric-value" id="mRSI">28.0</div>
-                <div class="metric-sub">과열/과매도</div>
-            </div>
-            <div class="metric-item">
-                <div class="metric-label">美 10년 국채금리</div>
-                <div class="metric-value" id="mUS10Y">4.21%</div>
-                <div class="metric-sub">자금 중력</div>
-            </div>
-            <div class="metric-item" style="grid-column: span 2; background: #fff3e0;">
-                <div class="metric-label">종합 기술 시그널</div>
-                <div class="metric-value" id="mTechScore">65점</div>
-                <div class="metric-sub">보조지표 끝장토론</div>
-            </div>
-            <div class="input-row" style="grid-column: span 3; background: #f1f8ff; padding: 6px; border-radius: 4px; border: 1px solid #1a1a1a; margin-top: 4px;">
-                <span style="font-size:11px; font-weight:bold;">🛠️ 기상 시그널 테스트 (0~100점):</span>
-                <input type="range" id="weatherSlider" min="0" max="100" value="65" style="width:50%;" oninput="updateWeather(this.value)">
-            </div>
-        </div>
-
-        <div class="farmer-zone">
-            <div class="avatar" id="fAvatar">🕶️🐖</div>
-            <div class="speech-bubble">
-                <span class="pig-status-tag" id="pigRankTag">🕶️ 선글라스 돼지</span>
-                <div id="fText">기상 센서 연동 중...</div>
-            </div>
-        </div>
-
-        <div class="section-title">🕶️ 마법 안경: 종목별 MDD 계산기</div>
-        <div class="input-group">
-            <div style="font-size:11px; color:#666; margin-bottom:4px;">※ 거시 기상도와 함께 특정 종목 침수율을 체크해 투자 판단하세요.</div>
-            <div class="input-row"><span>종목명:</span><input type="text" id="mddName" class="pixel-input" style="text-align:left;" placeholder="예: 삼성전자"></div>
-            <div class="input-row"><span>역대 최고가(원):</span><input type="number" id="mddHigh" class="pixel-input" placeholder="0"></div>
-            <div class="input-row"><span>현재가/최저가(원):</span><input type="number" id="mddLow" class="pixel-input" placeholder="0"></div>
-            <button class="game-btn" style="margin-top:5px; background:#e0f7fa;" onclick="calculateMDD()">🕶️ 마법 안경으로 침수율 계산</button>
-            <div id="mddResult" style="font-size:12px; margin-top:5px; text-align:center; color:#e65100; font-weight:bold;"></div>
-        </div>
-
-        <div class="section-title">🌾 가계부: 지갑 속 잡초 제거</div>
-        <div class="input-group">
-            <div class="input-row"><span>이번 달 목표 예산(원):</span><input type="number" id="budgetGoal" class="pixel-input" onchange="saveBudget()" placeholder="0"></div>
-            <div class="input-row" style="border-top: 1px dashed #ccc; padding-top:8px; margin-top:4px;">
-                <input type="text" id="weedDesc" class="pixel-input" style="width:45%; text-align:left;" placeholder="과소비 잡초명">
-                <input type="number" id="weedAmount" class="pixel-input" style="width:35%;" placeholder="금액">
-                <button class="game-btn" style="width:18%; padding:5px; background:#ffcdd2;" onclick="addWeed()">제거</button>
-            </div>
-            <div style="font-size:12px; display:flex; justify-content:space-between; margin-top:5px; font-weight:bold;">
-                <span>총 지출(잡초): <span id="totalWeedCost" style="color:red;">0</span>원</span>
-                <span>남은 자금: <span id="remainBudget" style="color:green;">0</span>원</span>
-            </div>
-            <div class="weed-list" id="weedList"></div>
+    <div id="panel-weather" class="panel panel-notion">
+        <div class="section-title">🕶️ 선그리 돼지의 메타 안경</div>
+        <div class="notion-frame">
+            <iframe
+                class="notion-iframe notion-iframe--gallery"
+                src="https://www.dontgry.com/38f8faf1-d42b-8096-9903-ec5ab181517b"
+                title="선그리 돼지의 메타 안경"
+                loading="lazy"
+            ></iframe>
         </div>
     </div>
 
-    <!-- 패널 2: 황금 돼지의 재테크 한 스푼 -->
-    <div id="panel-golden" class="panel">
-        <div class="section-title">👑 황금 돼지의 재테크 한 스푼</div>
-        <div class="placeholder-box">
-            <div class="placeholder-emoji">👑🐖</div>
-            <p>황금 돼지가 재테크 레시피를 준비 중입니다.<br>곧 한 스푼씩 올려드릴게요!</p>
+    <div id="panel-golden" class="panel panel-notion">
+        <div class="section-title">🐖 똔그리의 재테크 한 스푼</div>
+        <div class="notion-frame">
+            <iframe
+                class="notion-iframe"
+                src="https://www.dontgry.com/38f8faf1-d42b-80bd-bf30-ef78db13bb65"
+                title="똔그리의 재테크 한 스푼"
+                loading="lazy"
+            ></iframe>
         </div>
     </div>
 
-    <!-- 패널 3: 분홍돼지의 경제 한 스푼 -->
-    <div id="panel-pink" class="panel">
+    <div id="panel-pink" class="panel panel-notion">
         <div class="section-title">🐷 분홍돼지의 경제 한 스푼</div>
-        <div class="placeholder-box">
-            <div class="placeholder-emoji">🐷🍇</div>
-            <p>분홍돼지가 경제 뉴스를 정리 중입니다.<br>곧 한 스푼씩 올려드릴게요!</p>
+        <div class="notion-frame">
+            <iframe
+                class="notion-iframe"
+                src="https://www.dontgry.com/38f8faf1-d42b-8037-936e-c3cb21c31d98"
+                title="분홍돼지의 경제 한 스푼"
+                loading="lazy"
+            ></iframe>
         </div>
     </div>
 
-    <!-- 패널 4: 투자자의 지혜의 샘 -->
-    <div id="panel-oasis" class="panel">
+    <div id="panel-oasis" class="panel panel-hybrid">
         <div class="section-title">🔮 오늘의 럭키빔 돼지 운세</div>
         <div class="fortune-box">
             <div id="fortuneGrape" onclick="openFortune()">🍇</div>
             <div id="fortuneResult">포도알을 눌러 럭키빔 돼지의 투자 운세를 점쳐보세요!</div>
+        </div>
+
+        <div class="section-title">🍇 오아시스 포도 나무 (일일 배당수확)</div>
+        <div class="tree-zone">
+            <div id="tree" class="grape-tree" onclick="shakeTree()">🍇🌳</div>
+            <div id="grape" class="falling-grape">🍇</div>
+            <p id="treeStatus" style="font-size:12px; margin-top:10px; color:#555;">포도 나무를 흔들면 시드머니 보너스가 바닥에 떨어집니다!</p>
         </div>
 
         <div class="section-title">🎵 번뇌를 날리는 음악</div>
@@ -334,13 +303,6 @@
             </div>
         </div>
 
-        <div class="section-title">🍇 오아시스 포도 나무 (일일 배당수확)</div>
-        <div class="tree-zone">
-            <div id="tree" class="grape-tree" onclick="shakeTree()">🍇🌳</div>
-            <div id="grape" class="falling-grape">🍇</div>
-            <p id="treeStatus" style="font-size:12px; margin-top:10px; color:#555;">포도 나무를 흔들면 시드머니 보너스가 바닥에 떨어집니다!</p>
-        </div>
-
         <div class="section-title">🍹 오아시스 주스 상점 (돼지 벌크업)</div>
         <div class="input-group" style="background:#fffde7;">
             <div style="font-size:12px; text-align:center; color:#555; margin-bottom:5px;">주스를 사 마실수록 똔그리가 통통한 자산가 돼지로 영구 진화합니다!</div>
@@ -350,14 +312,16 @@
             </div>
         </div>
 
-        <div class="section-title">📖 지혜 한 스푼</div>
-        <div class="placeholder-box" style="padding: 30px 20px;">
-            <div class="placeholder-emoji">💧📜</div>
-            <p>지혜의 샘에서 한 스푼씩 길어 올릴<br>투자자 명언 & 마음 처방을 준비 중입니다.<br><strong>업뎃 예정!</strong></p>
+        <div class="notion-frame notion-frame--hybrid">
+            <iframe
+                class="notion-iframe"
+                src="https://www.dontgry.com/3918faf1-d42b-8003-b119-dcce1b51c9d7"
+                title="투자자의 지혜의 샘"
+                loading="lazy"
+            ></iframe>
         </div>
     </div>
-    </div><!-- /.panel-area -->
-</div>
+    </div></div>
 
 <div class="modal-overlay" id="winModal">
     <div class="modal-content">
@@ -371,17 +335,14 @@
 <script>
     let seedMoney = parseInt(localStorage.getItem('seedMoney') || '1000', 10);
     let juiceCount = parseInt(localStorage.getItem('juiceCount') || '0', 10);
-    let weeds = JSON.parse(localStorage.getItem('weeds') || '[]');
     let lastShakeDate = localStorage.getItem('lastShake');
     let progress = 0;
     let isFinished = false;
 
     document.getElementById('walletBalance').innerText = seedMoney.toLocaleString();
     document.getElementById('juiceCountDisplay').innerText = juiceCount;
-    document.getElementById('budgetGoal').value = localStorage.getItem('budgetGoal') || '';
-    renderWeeds();
-    updateWeather(document.getElementById('weatherSlider').value);
 
+    // 💡 [수정] 그림 대문을 클릭했을 때도 아래 메뉴 노란 버튼 불빛이 동기화되도록 업그레이드!
     function switchPanel(panelId, btn) {
         if (panelId !== 'panel-oasis') {
             if (grooveActive) stopGrooveMode();
@@ -390,7 +351,13 @@
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(panelId).classList.add('active');
-        btn.classList.add('active');
+        
+        if (btn) {
+            btn.classList.add('active');
+        } else {
+            const targetBtn = document.querySelector(`.nav-btn[data-panel="${panelId}"]`);
+            if (targetBtn) targetBtn.classList.add('active');
+        }
     }
 
     const fortunes = [
@@ -405,46 +372,8 @@
         { title: "🍔 오마하 본사의 점심 식사 초대! 🍔", text: "전 세계 투자자들의 꿈! <strong>버크셔 해서웨이 오마하 본사 점심 식사</strong>에 초청받았습니다!<br><br>워렌 버핏 영감님이 인자하게 웃으며 갓 구운 <strong>맥모닝 베이컨 에그 맥머핀</strong>을 건냅니다.<br><br>본사 냉장고의 체리 코카콜라는 무한 리필 가능! 거장의 비밀 노트를 전수받았습니다! 🥤" },
         { title: "🚀 도파민 최대치 돌파! 화성 이주 🚀", text: "일론 머스크가 당신이 닦던 '황금 돼지 불상' 픽셀아트를 보고 감탄해 X(트위터)에 박제했습니다!<br><br>도지코인과 자산 가치가 <strong>4,200% 폭등</strong>합니다!<br><br>스페이스X 스타십 프라이빗 좌석을 타고 화성으로 가서 최초의 '우주 돼지 감자 농장'을 개업하러 출발합니다! 🪐" },
         { title: "💾 전설의 유물 방구석 발굴! 💾", text: "목탁을 너무 세게 두들긴 나머지 방구석 서랍장 뒤로 떨어진 2010년산 구형 외장하드를 발견했습니다!<br><br>먼지를 털고 켜보니 대학생 때 재미로 캐두었던 <strong>비트코인 100개</strong>가 들어있습니다!<br><br>비밀번호가 극적으로 기억나며 전 세계 자산가 순위 등극! 사토시의 웰컴 메일이 도착합니다! 🪙" },
-        { title: "🏙️ 서울 노른자 땅 건물주 등극! 🏙️", text: "축하합니다! 주식 번뇌를 이겨내고 서울 가장 핫한 대형 빌딩의 <strong>진짜 건물주</strong>가 되었스니다!<br><br>매달 통장에 숨만 쉬어도 수억 원의 월세가 꼬박꼬박 꽂히는 떼부자의 삶이 펼쳐집니다.<br><br>똔그리 돼지도 이제 멋진 건물주 모자를 쓰고 빌딩 라운지에서 망고주스를 원샷합니다! 🏢💰" }
+        { title: "🏙️ 서울 노른자 땅 건물주 등극! 🏙️", text: "축하합니다! 주식 번뇌를 이겨내고 서울 가장 핫한 대형 빌딩의 <strong>진짜 건물주</strong>가 되었습니다!<br><br>매달 통장에 숨만 쉬어도 수억 원의 월세가 꼬박꼬박 꽂히는 떼부자의 삶이 펼쳐집니다.<br><br>똔그리 돼지도 이제 멋진 건물주 모자를 쓰고 빌딩 라운지에서 망고주스를 원샷합니다! 🏢💰" }
     ];
-
-    function updateWeather(score) {
-        score = parseInt(score, 10);
-        const card = document.getElementById('mainCard');
-        const txt = document.getElementById('fText');
-        const tag = document.getElementById('pigRankTag');
-        const avatar = document.getElementById('fAvatar');
-
-        document.getElementById('mTechScore').innerText = score + "점";
-
-        let weatherEmoji = "⛅";
-        let weatherLabel = "구름 ⛅";
-        let weatherBg = "#78909c";
-        let cardBg = '#f5f5f5';
-        let message = `<strong>[오늘의 투자 기상도: 구름 ⛅]</strong> 시장 추세가 애매합니다. 선글라스 돼지가 구름 낀 하늘 아래에서 눈치를 보며 다음 당근 파종 타이밍을 심각하게 저울질하고 있습니다.`;
-
-        if (score >= 81) {
-            weatherEmoji = "☀️";
-            weatherLabel = "맑음 ☀️";
-            weatherBg = "#29b6f6";
-            cardBg = '#e3f2fd';
-            message = `<strong>[오늘의 투자 기상도: 맑음 ☀️]</strong> 종합 기술 시그널 대풍년! 선글라스 돼지가 햇살 가득한 날씨 속에서 신나게 당근 농사를 지으며 자산을 불리는 중입니다. 씨앗을 적극적으로 파종하기 아주 좋은 타이밍입니다!`;
-        } else if (score <= 40) {
-            weatherEmoji = "⛈️";
-            weatherLabel = "폭풍우 ⛈️";
-            weatherBg = "#5e35b1";
-            cardBg = '#ede7f6';
-            message = `<strong>[오늘의 투자 기상도: 폭풍우 ⛈️]</strong> 시장 급락 경보! 선글라스 돼지가 멘탈을 필사적으로 챙기며 당근밭에 방수포를 씌우고 있습니다. 매매 버튼을 접고 샘으로 대피하세요!`;
-        }
-
-        const isBudgetBurst = weeds.reduce((a, b) => a + b.amount, 0) > parseInt(localStorage.getItem('budgetGoal') || '0', 10);
-
-        if (!isBudgetBurst) card.style.backgroundColor = cardBg;
-        tag.innerText = `🕶️ 선글라스 돼지 [${weatherLabel}]`;
-        tag.style.background = weatherBg;
-        avatar.innerText = weatherEmoji + "🕶️🐖";
-        txt.innerHTML = message;
-    }
 
     function buyJuice(type, price) {
         if (seedMoney < price) { alert("지갑에 시드머니가 부족합니다! 열심히 일해서 돈을 벌어오세요! 💸"); return; }
@@ -458,67 +387,6 @@
         document.getElementById('juiceCountDisplay').innerText = juiceCount;
 
         alert(`🍹 꺼억~! 맛있는 ${type === 'mango' ? '망고' : '포도'}주스를 충동 구매했습니다. (-${price}원 / 벌크업 진행 중)`);
-    }
-
-    function calculateMDD() {
-        const name = document.getElementById('mddName').value || "선택 종목";
-        const high = parseFloat(document.getElementById('mddHigh').value);
-        const low = parseFloat(document.getElementById('mddLow').value);
-        if (!high || !low) { alert("최고가와 현재가를 정확히 입력하세요!"); return; }
-        const mdd = ((low - high) / high) * 100;
-
-        let comment = "마법 안경 분석: 이 정도 조정은 똔그리 가든이 무럭무럭 자라나는 자연스러운 과정일 뿐입니다. 🌾";
-        if (mdd <= -30 && mdd > -50) comment = "⚠️ 침수 위험 경보! 선글라스 돼지가 방수포를 지급합니다. 분산 투자 자산을 긴급 점검하세요! ⛈️";
-        if (mdd <= -50) comment = "🚨 계좌 난파 위기! 똔그리가 즉시 샘으로 대피령을 내렸습니다. 목탁 비트를 연타해 번뇌를 씻으세요! 🥁";
-
-        document.getElementById('mddResult').innerHTML = `[${name}] 고점 대비 낙폭(MDD): ${mdd.toFixed(2)}%<br><span style='color:#333; font-weight:normal;'>💬 선글라스 돼지의 훈수: ${comment}</span>`;
-    }
-
-    function saveBudget() { localStorage.setItem('budgetGoal', document.getElementById('budgetGoal').value); renderWeeds(); }
-
-    function addWeed() {
-        const desc = document.getElementById('weedDesc').value;
-        const amount = parseInt(document.getElementById('weedAmount').value, 10);
-        if (!desc || !amount) { alert("내용과 금액을 입력하세요!"); return; }
-        weeds.push({ desc, amount });
-        localStorage.setItem('weeds', JSON.stringify(weeds));
-        document.getElementById('weedDesc').value = '';
-        document.getElementById('weedAmount').value = '';
-        renderWeeds();
-    }
-
-    function deleteWeed(index) {
-        weeds.splice(index, 1);
-        localStorage.setItem('weeds', JSON.stringify(weeds));
-        renderWeeds();
-    }
-
-    function renderWeeds() {
-        const list = document.getElementById('weedList');
-        const goal = parseInt(localStorage.getItem('budgetGoal') || '0', 10);
-        list.innerHTML = '';
-        let totalCost = 0;
-        weeds.forEach((w, i) => {
-            totalCost += w.amount;
-            list.innerHTML += `<div class="weed-item"><span>🌱 ${w.desc} (${w.amount.toLocaleString()}원)</span><span style="color:red; cursor:pointer;" onclick="deleteWeed(${i})">[제거]</span></div>`;
-        });
-        document.getElementById('totalWeedCost').innerText = totalCost.toLocaleString();
-        const remain = goal - totalCost;
-        const remainEl = document.getElementById('remainBudget');
-        remainEl.innerText = remain.toLocaleString();
-
-        const txt = document.getElementById('fText');
-        const card = document.getElementById('mainCard');
-        if (remain < 0) {
-            remainEl.style.color = 'red';
-            card.style.backgroundColor = 'var(--bg-red)';
-            txt.innerHTML = "<strong>[가계부 비상! 💢]</strong> 지갑에 과소비 잡초가 너무 무성합니다! 멧돼지 떼가 나타나 한 달 예산을 다 파헤쳐 놓았습니다! 자산 방수포 가동 불가능!";
-        } else {
-            remainEl.style.color = 'green';
-            if (document.getElementById('weatherSlider')) {
-                updateWeather(document.getElementById('weatherSlider').value);
-            }
-        }
     }
 
     function openFortune() {
@@ -696,20 +564,24 @@
     }
 
     function playGrooveKick(time) {
+        if (!grooveCtx) return;
         playGrooveSound(80, 'sine', 0.15, 0.35, time);
         playGrooveSound(40, 'square', 0.08, 0.12, time);
     }
 
     function playGrooveMoktak(time) {
+        if (!grooveCtx) return;
         playGrooveSound(320, 'triangle', 0.06, 0.2, time);
         playGrooveSound(640, 'sine', 0.04, 0.08, time + 0.02);
     }
 
     function playGrooveBass(time, note) {
+        if (!grooveCtx) return;
         playGrooveSound(note, 'sine', 0.25, 0.15, time);
     }
 
     function playGrooveHat(time) {
+        if (!grooveCtx) return;
         playGrooveSound(8000, 'square', 0.03, 0.04, time);
     }
 
@@ -727,7 +599,11 @@
             playGrooveKick(t);
             if (beatIndex % 2 === 0) playGrooveMoktak(t + 0.05);
             if (beatIndex % 4 === 2) playGrooveHat(t);
-            playGrooveBass(t, bassNotes[beatIndex % 4]);
+            if (grooveBassNotes && grooveBassNotes[beatIndex % 4]) {
+                playGrooveBass(t, bassNotes[beatIndex % 4]);
+            } else {
+                playGrooveBass(t, bassNotes[beatIndex % 4]);
+            }
             beatIndex++;
 
             const zone = document.getElementById('grooveZone');
@@ -845,7 +721,6 @@
         document.getElementById('progText').innerText = '현재 수익률: -50%';
         document.getElementById('fortuneGrape').innerText = '🍇';
         document.getElementById('fortuneResult').innerText = '포도알을 눌러 오늘의 투자 운세를 점쳐보세요!';
-        updateWeather(document.getElementById('weatherSlider').value);
     }
 </script>
 </body>
