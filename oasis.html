@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투자자의 오아시스</title>
+    <link href="https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'DungGeunMo', sans-serif; background: #f0f4f8; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .wrapper-card { width: 100%; max-width: 500px; border: 4px solid #1a1a1a; border-radius: 12px; padding: 20px; box-shadow: 4px 4px 0px #000; background-color: #fffde7; position: relative; }
+        .wallet-zone { display: flex; justify-content: space-between; background: #222; color: #fff; padding: 8px 15px; border-radius: 6px; font-size: 14px; border: 2px solid #000; align-items: center; margin-bottom: 15px; }
+        .section-title { font-size: 16px; margin: 16px 0 10px; text-align: center; border-bottom: 2px dashed #1a1a1a; padding-bottom: 8px; color: #111; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+        .fortune-box { background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 15px; text-align: center; }
+        #fortuneGrape { font-size: 50px; cursor: pointer; display: inline-block; transition: transform 0.2s; }
+        #fortuneResult { margin-top: 10px; font-size: 13px; min-height: 35px; color: #333; line-height: 1.4; }
+        .tree-zone { text-align: center; padding: 15px; background: #f3e5f5; border: 3px solid #1a1a1a; border-radius: 8px; position: relative; overflow: hidden; }
+        .grape-tree { font-size: 60px; cursor: pointer; display: inline-block; }
+        .shake { animation: shakeTree 0.5s ease-in-out; }
+        @keyframes shakeTree { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+        .falling-grape { position: absolute; font-size: 25px; top: 20px; left: 50%; transform: translateX(-50%); opacity: 0; pointer-events: none; }
+        .drop { animation: dropGrape 0.8s forwards; }
+        @keyframes dropGrape { 0% { opacity: 1; top: 20px; } 100% { opacity: 0; top: 100px; } }
+        .music-status { font-size: 12px; color: #555; margin: 10px 0; padding: 8px; background: #f9f9f9; border-radius: 4px; border: 1px dashed #aaa; min-height: 18px; }
+        .music-controls { display: flex; gap: 8px; margin-top: 8px; }
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+        .healing-center { background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 15px; }
+        .religion-select { width: 100%; font-family: 'DungGeunMo'; padding: 8px; margin-bottom: 15px; border: 2px solid #1a1a1a; }
+        .progress-container { margin: 15px 0; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+        .progress-bar-bg { background: #ff8a80; border: 2px solid #1a1a1a; height: 20px; border-radius: 4px; overflow: hidden; position: relative; }
+        .progress-bar-fill { background: #b9f6ca; width: 0%; height: 100%; transition: width 0.1s ease; }
+        .progress-text { position: absolute; width: 100%; text-align: center; font-size: 11px; top: 2px; font-weight: bold; }
+        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .action-buttons .groove-btn { grid-column: span 2; background: #fff9c4; }
+        .groove-zone { display: none; margin-top: 12px; text-align: center; background: linear-gradient(180deg, #fff8e1 0%, #ffe0b2 100%); border: 3px solid #1a1a1a; border-radius: 8px; padding: 15px; transition: box-shadow 0.1s; }
+        .groove-zone.active { display: block; }
+        .groove-zone.beat-flash { box-shadow: inset 0 0 0 4px #ff9800; }
+        .monk-head { width: 130px; height: 130px; margin: 12px auto; border-radius: 50%; background: #ffcc80; border: 4px solid #1a1a1a; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 5px 5px 0 #000; transition: transform 0.07s; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .monk-head .monk-face { font-size: 72px; line-height: 1; pointer-events: none; }
+        .monk-head.tap { transform: scale(0.9) translateY(4px); box-shadow: 2px 2px 0 #000; }
+        .monk-head.perfect { animation: monkGlow 0.3s ease; }
+        @keyframes monkGlow { 0% { box-shadow: 0 0 0 6px #ffeb3b; } 100% { box-shadow: 5px 5px 0 #000; } }
+        .groove-info { font-size: 12px; color: #555; margin: 8px 0; }
+        .groove-stats { display: flex; justify-content: center; gap: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
+        .groove-stats span { color: #e65100; }
+        .beat-indicator { height: 8px; background: #eee; border: 2px solid #1a1a1a; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+        .beat-indicator-fill { height: 100%; width: 0%; background: #ff9800; transition: width 0.05s linear; }
+        .tap-effect { position: fixed; font-weight: bold; font-size: 16px; pointer-events: none; z-index: 200; animation: tapPop 0.5s ease-out forwards; }
+        @keyframes tapPop { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.4) translateY(-30px); } }
+        .notion-frame { width: 100%; }
+        .notion-iframe { width: 100%; height: 600px; display: block; box-sizing: border-box; border: 3px solid #1a1a1a; border-radius: 8px; background: #fff; }
+        .notion-frame--hybrid { margin-top: 16px; }
+        .game-btn { font-family: 'DungGeunMo'; padding: 10px; font-size: 12px; cursor: pointer; border: 2px solid #1a1a1a; background: #f5f5f5; border-radius: 6px; box-shadow: 2px 2px 0px #000; width: 100%; text-decoration: none; color: #000; text-align: center; display: block; box-sizing: border-box; }
+        .game-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 999; }
+        .modal-content { background: #fff; border: 4px solid #000; border-radius: 12px; padding: 25px; width: 85%; max-width: 400px; box-shadow: 6px 6px 0px #ffd700; text-align: center; }
+        .modal-title { color: #d32f2f; font-size: 18px; margin-bottom: 15px; font-weight: bold; }
+        .share-btn { font-family: 'DungGeunMo'; background: #ffeb3b; padding: 10px 20px; border: 2px solid #000; box-shadow: 2px 2px 0px #000; cursor: pointer; margin-top: 15px; width: 100%; }
+        .money-effect { position: fixed; color: #2e7d32; font-weight: bold; font-size: 14px; animation: fadeUp 0.6s ease-out forwards; pointer-events: none; z-index: 100; }
+        @keyframes fadeUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-30px); } }
+    </style>
+</head>
+<body>
+    <div class="wrapper-card">
+        <a href="index.html" class="game-btn" style="width:auto; display:inline-block; margin-bottom:15px;">⬅️ 대문으로 돌아가기</a>
+        <div class="wallet-zone">
+            <span>💰 나의 시드머니: <strong id="walletBalance">0</strong> 원</span>
+            <span style="font-size:11px; color:#aaa;">🧃 마신 주스: <strong id="juiceCountDisplay" style="color:#ffeb3b;">0</strong>잔</span>
+        </div>
+        <div class="section-title">🔮 오늘의 럭키빔 돼지 운세</div>
+        <div class="fortune-box"><div id="fortuneGrape" onclick="openFortune()">🍇</div><div id="fortuneResult">포도알을 눌러 럭키빔 돼지의 투자 운세를 점쳐보세요!</div></div>
+        <div class="section-title">🍇 오아시스 포도 나무 (일일 배당수확)</div>
+        <div class="tree-zone"><div id="tree" class="grape-tree" onclick="shakeTree()">🍇🌳</div><div id="grape" class="falling-grape">🍇</div><p id="treeStatus" style="font-size:12px; margin-top:10px; color:#555;">포도 나무를 흔들면 시드머니 보너스가 바닥에 떨어집니다!</p></div>
+        <div class="section-title">🎵 번뇌를 날리는 음악</div>
+        <div class="healing-center">
+            <select class="religion-select" id="musicSelector" onchange="changeMusic()"><option value="none">🙏 나의 신앙(종교)을 선택하세요</option><option value="protestant">✝️ 개신교 — 찬송 연주</option><option value="catholic">⛪ 카톨릭 — 성가대 명상 선율</option><option value="buddhist">🧘‍♂️ 불교 — 목탁 & 사찰 종소리</option><option value="secular">🎧 무교 — 차분 뇌파음</option></select>
+            <div class="music-status" id="musicStatus">음악이 선택되지 않았습니다.</div>
+            <div class="music-controls"><button class="game-btn" style="background:#e8f5e9; display:inline-block; width:48%;" onclick="changeMusic()">▶️ 재생</button><button class="game-btn" style="background:#ffcdd2; display:inline-block; width:48%;" onclick="stopMusic()">⏹ 정지</button></div>
+        </div>
+        <div class="section-title">🧘 스트레스야 잘 가!</div>
+        <div class="healing-center">
+            <div class="progress-container"><div class="progress-bar-bg"><div class="progress-bar-fill" id="progFill"></div><div class="progress-text" id="progText">현재 수익률: -50%</div></div></div>
+            <div class="action-buttons"><button class="game-btn" onclick="playGame(event, 'buddha')">✨ 불상 닦기</button><button class="game-btn" onclick="playGame(event, 'moktak')">🥁 목탁 치기</button><button class="game-btn groove-btn" id="grooveBtn" onclick="toggleGrooveMode()">🪘 스님머리 그루브</button></div>
+            <div class="groove-zone" id="grooveZone">
+                <div class="beat-indicator"><div class="beat-indicator-fill" id="beatFill"></div></div>
+                <div id="monkHead" class="monk-head" onclick="tapMonkHead(event)"><span class="monk-face">👨‍🦲</span></div>
+                <div class="groove-stats"><div>두드린 횟수: <span id="grooveTapCount">0</span></div><div>PERFECT: <span id="groovePerfectCount">0</span></div></div>
+            </div>
+        </div>
+        <div class="section-title">🍹 오아시스 주스 상점</div>
+        <div class="input-group"><div class="shop-grid"><button class="game-btn" style="background:#ffecb3;" onclick="buyJuice('mango', 300)">🍹 망고 (-300원)</button><button class="game-btn" style="background:#e1bee7;" onclick="buyJuice('grape', 500)">🍇 포도 (-500원)</button></div></div>
+        <div class="notion-frame notion-frame--hybrid"><iframe class="notion-iframe" src="https://www.dontgry.com/3918faf1-d42b-8003-b119-dcce1b51c9d7" title="투자자의 오아시스" loading="lazy"></iframe></div>
+    </div>
+    <div class="modal-overlay" id="winModal"><div class="modal-content"><div class="modal-title" id="modalTitle">👑 엔딩 타이틀 👑</div><p id="modalText" style="font-size: 13px; line-height: 1.6; text-align: left; color:#333;"></p><button class="share-btn" onclick="alert('📸 스토리 공유용 주소가 복사되었습니다!')">📸 인스타 공유</button><button class="share-btn" style="background:#eee; margin-top:5px;" onclick="resetGame()">다시 가기</button></div></div>
+<script>
+    let seedMoney = parseInt(localStorage.getItem('seedMoney') || '1000', 10);
+    let juiceCount = parseInt(localStorage.getItem('juiceCount') || '0', 10);
+    let lastShakeDate = localStorage.getItem('lastShake');
+    let progress = 0; let isFinished = false;
+    document.getElementById('walletBalance').innerText = seedMoney.toLocaleString();
+    document.getElementById('juiceCountDisplay').innerText = juiceCount;
+    const fortunes = [{ emoji: "🐷💤", text: "<strong>[🚨 매매 금지 빔]</strong> 뇌동매매 접고 쉬는 게 상책!" }, { emoji: "👑🐖", text: "<strong>[🟢 우주의 기운 빔]</strong> 황금 뚱돼지 왕이 당신의 매수 타점을 축복합니다!" }, { emoji: "🛡️🐷", text: "<strong>[🛡️ 평단가 수호 빔]</strong> 세력들이 뒤흔들어도 버티세요! (방어력 +100)" }, { emoji: "🐷💢", text: "<strong>[💸 텅장 경보 빔]</strong> 오늘 충동구매하면 포도 껍질만 씹어먹어야 할 수 있습니다." }];
+    const endings = [{ title: "👑 성불 완료 & 대풍년 달성! 👑", text: "<strong>이재용 회장님</strong>이 먼저 카톡으로 삼겹살 번개를 신청합니다! 🍗🍺" }, { title: "🍔 오마하 본사의 점심 식사 초대! 🍔", text: "워렌 버핏 영감님이 인자하게 웃으며 갓 구운 맥모닝을 건냅니다. 🥤" }, { title: "🚀 도파민 최대치 돌파! 화성 이주 🚀", text: "일론 머스크가 감탄해 도지코인과 자산 가치가 <strong>4,200% 폭등</strong>합니다! 🪐" }, { title: "💾 전설의 유물 방구석 발굴! 💾", text: "재미로 캐두었던 <strong>비트코인 100개</strong>가 들어있는 구형 외장하드를 발견했습니다! 🪙" }, { title: "🏙️ 서울 노른자 땅 건물주 등극! 🏙️", text: "매달 통장에 숨만 쉬어도 수억 원의 월세가 꼬박꼬박 꽂히는 건물주 등극! 🏢💰" }];
+    function buyJuice(type, price) { if (seedMoney < price) { alert("지갑에 시드머니가 부족합니다! 💸"); return; } seedMoney -= price; if (type === 'mango') juiceCount += 1; if (type === 'grape') juiceCount += 2; localStorage.setItem('seedMoney', seedMoney); localStorage.setItem('juiceCount', juiceCount); document.getElementById('walletBalance').innerText = seedMoney.toLocaleString(); document.getElementById('juiceCountDisplay').innerText = juiceCount; alert(`🍹주스를 구매했습니다.`); }
+    function openFortune() { const grape = document.getElementById('fortuneGrape'); const result = document.getElementById('fortuneResult'); grape.style.transform = "scale(1.3) rotate(15deg)"; setTimeout(() => { const item = fortunes[Math.floor(Math.random() * fortunes.length)]; grape.innerText = item.emoji; result.innerHTML = item.text; grape.style.transform = "scale(1)"; }, 300); }
+    function shakeTree() { const today = new Date().toDateString(); if (lastShakeDate === today) { alert("오늘의 배당금은 이미 수확했습니다! 💤"); return; } const tree = document.getElementById('tree'); const grape = document.getElementById('grape'); tree.classList.add('shake'); grape.classList.remove('drop'); void grape.offsetWidth; grape.classList.add('drop'); setTimeout(() => { tree.classList.remove('shake'); grape.classList.remove('drop'); seedMoney += 150; localStorage.setItem('seedMoney', seedMoney); localStorage.setItem('lastShake', today); lastShakeDate = today; document.getElementById('walletBalance').innerText = seedMoney.toLocaleString(); document.getElementById('treeStatus').innerText = "보너스 +150원이 지갑에 들어왔습니다."; }, 800); }
+    let audioCtx = null; let musicNodes = []; let musicInterval = null;
+    const musicLabels = { protestant: '✝️ 개신교 찬송', catholic: '⛪ 카톨릭 성가대', buddhist: '🧘‍♂️ 불교 목탁 사찰음', secular: '🎧 엠씨스퀘어 뇌파음' };
+    function stopMusic() { if (musicInterval) { clearInterval(musicInterval); musicInterval = null; } musicNodes.forEach(n => { try { if (n.stop) n.stop(0); n.disconnect(); } catch(e) {} }); musicNodes = []; if (audioCtx) { audioCtx.close(); audioCtx = null; } document.getElementById('musicStatus').innerText = '음악이 정지되었습니다.'; }
+    function playTone(freq, type, duration, vol, startTime) { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = type; osc.frequency.value = freq; gain.gain.setValueAtTime(0, startTime); gain.gain.linearRampToValueAtTime(vol, startTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(startTime); osc.stop(startTime + duration); musicNodes.push(osc, gain); }
+    function playPad(chords, type, vol) { const now = audioCtx.currentTime; chords.forEach((freq, i) => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = type; osc.frequency.value = freq; gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(vol, now + 1.5); gain.gain.setValueAtTime(vol, now + 6); gain.gain.linearRampToValueAtTime(0, now + 8); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 8); musicNodes.push(osc, gain); }); }
+    function changeMusic() { const type = document.getElementById('musicSelector').value; stopMusic(); if (type === 'none') return; audioCtx = new (window.AudioContext || window.webkitAudioContext)(); document.getElementById('musicStatus').innerText = '🎵 재생 중: ' + musicLabels[type]; function loopMusic() { if (!audioCtx) return; const t = audioCtx.currentTime; if (type === 'protestant') playPad([261.63, 329.63, 392.00], 'sine', 0.06); else if (type === 'catholic') { playPad([220.00, 329.63], 'triangle', 0.07); playTone(440, 'sine', 2.5, 0.04, t + 1); } else if (type === 'buddhist') { playPad([146.83, 174.61], 'sine', 0.05); playTone(293.66, 'sine', 3, 0.08, t + 0.5); } else if (type === 'secular') { const beeps = [440, 523.25, 392]; beeps.forEach((f, i) => playTone(f, 'square', 0.15, 0.03, t + i * 0.6)); } } loopMusic(); musicInterval = setInterval(loopMusic, type === 'secular' ? 3000 : 8000); }
+    let grooveCtx = null; let grooveTimers = []; let grooveActive = false; let grooveBeatMs = 508; let lastBeatTime = 0; let grooveTapCount = 0; let groovePerfectCount = 0; let beatAnimFrame = null;
+    function toggleGrooveMode() { if (grooveActive) { stopGrooveMode(); return; } stopMusic(); grooveActive = true; grooveTapCount = 0; groovePerfectCount = 0; document.getElementById('grooveZone').classList.add('active'); document.getElementById('grooveBtn').innerText = '⏹ 그루브 종료'; startGrooveBeat(); }
+    function stopGrooveMode() { grooveActive = false; grooveTimers.forEach(t => clearInterval(t)); grooveTimers = []; if (beatAnimFrame) cancelAnimationFrame(beatAnimFrame); if (grooveCtx) { grooveCtx.close(); grooveCtx = null; } document.getElementById('grooveZone').classList.remove('active'); document.getElementById('grooveBtn').innerText = '🪘 스님머리 그루브'; }
+    function playGrooveSound(freq, type, duration, vol, time) { if (!grooveCtx) return; const osc = grooveCtx.createOscillator(); const gain = grooveCtx.createGain(); osc.type = type; osc.frequency.setValueAtTime(freq, time); gain.gain.setValueAtTime(vol, time); gain.gain.exponentialRampToValueAtTime(0.001, time + duration); osc.connect(gain); gain.connect(grooveCtx.destination); osc.start(time); osc.stop(time + duration); }
+    function startGrooveBeat() { grooveCtx = new (window.AudioContext || window.webkitAudioContext)(); const bpm = 118; grooveBeatMs = 60000 / bpm; let beatIndex = 0; const bassNotes = [110, 110, 146.83, 130.81]; function onBeat() { if (!grooveActive || !grooveCtx) return; const t = grooveCtx.currentTime; lastBeatTime = Date.now(); playGrooveSound(80, 'sine', 0.15, 0.35, t); if (beatIndex % 2 === 0) playGrooveSound(320, 'triangle', 0.06, 0.2, t + 0.05); playGrooveSound(bassNotes[beatIndex % 4], 'sine', 0.25, 0.15, t); beatIndex++; } onBeat(); grooveTimers.push(setInterval(onBeat, grooveBeatMs)); animateBeatBar(); }
+    function animateBeatBar() { if (!grooveActive) return; const elapsed = Date.now() - lastBeatTime; const pct = Math.min((elapsed / grooveBeatMs) * 100, 100); document.getElementById('beatFill').style.width = pct + '%'; beatAnimFrame = requestAnimationFrame(animateBeatBar); }
+    function tapMonkHead(event) { if (!grooveActive) return; event.stopPropagation(); playGrooveSound(280, 'triangle', 0.08, 0.25, grooveCtx.currentTime); grooveTapCount++; document.getElementById('grooveTapCount').innerText = grooveTapCount; const elapsed = Date.now() - lastBeatTime; const onBeat = elapsed < 130 || elapsed > grooveBeatMs - 130; if (onBeat) { groovePerfectCount++; document.getElementById('groovePerfectCount').innerText = groovePerfectCount; head = document.getElementById('monkHead'); if (head) head.classList.add('perfect'); setTimeout(() => { if (head) head.classList.remove('perfect'); }, 300); showTapEffect(event, 'PERFECT! 🎵', '#2e7d32'); addStressRelief(event, 6); } else { showTapEffect(event, '탁!', '#e65100'); addStressRelief(event, 3); } }
+    function addStressRelief(event, amount) { if (isFinished) return; seedMoney += 1; localStorage.setItem('seedMoney', seedMoney); document.getElementById('walletBalance').innerText = seedMoney.toLocaleString(); progress += amount; if (progress > 100) progress = 100; document.getElementById('progFill').style.width = `${progress}%`; document.getElementById('progText').innerText = `현재 수익률: ${(-50 + progress * 1.5).toFixed(0)}%`; if (progress === 100 && !isFinished) { isFinished = true; stopGrooveMode(); const end = endings[Math.floor(Math.random() * endings.length)]; document.getElementById('modalTitle').innerHTML = end.title; document.getElementById('modalText').innerHTML = end.text; document.getElementById('winModal').style.display = 'flex'; } }
+    function playGame(event, type) { if (isFinished) return; if (type === 'moktak' && grooveActive) playGrooveSound(280, 'triangle', 0.08, 0.25, grooveCtx.currentTime); addStressRelief(event, 4); }
+    function resetGame() { stopGrooveMode(); progress = 0; isFinished = false; document.getElementById('winModal').style.display = 'none'; document.getElementById('progFill').style.width = '0%'; document.getElementById('progText').innerText = '현재 수익률: -50%'; }
+</script>
+</body>
+</html>
