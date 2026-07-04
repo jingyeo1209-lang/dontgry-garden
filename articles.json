@@ -1,0 +1,109 @@
+{
+  "_howToAdd": "새 글은 articles-data.js 의 GARDEN_ARTICLES.ttong / pink / oasis 배열에 { title, url, img } 를 추가하세요. (이 json은 참고용 백업입니다)",
+  "ttong": [
+    {
+      "title": "🤩 이자 가장 많이 주는 ISA계좌와 파킹통장(7월 첫주)",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-805f-808d-e10611d733b4",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2FhudsonRiverSchool_rockyMountainsLandersPeak.jpg&blockId=38f8faf1-d42b-805f-808d-e10611d733b4&width=1024"
+    },
+    {
+      "title": "🐷 청년도약계좌 VS 청년미래적금 갈아탈까, 말까?",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-8072-a12d-f12b568a9b52",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fwoodcuts_1.jpg&blockId=38f8faf1-d42b-8072-a12d-f12b568a9b52&width=1024"
+    },
+    {
+      "title": "💵 부자가 되는 첫걸음: 현금흐름 '시스템' 만들기",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-8062-a006-cd9cf2c05960",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fmet_william_turner_1835.jpg&blockId=38f8faf1-d42b-8062-a006-cd9cf2c05960&width=1024"
+    },
+    {
+      "title": "🚇 기후동행카드 플러스가 나온다!?",
+      "url": "https://www.dontgry.com/3918faf1-d42b-80ac-87d3-d87b04aa25b6",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fusda_pear.png&blockId=3918faf1-d42b-80ac-87d3-d87b04aa25b6&width=1024"
+    },
+    {
+      "title": "💸 지역화폐(서울페이 등)로 혜택 받는 법",
+      "url": "https://www.dontgry.com/3918faf1-d42b-8023-9b2d-d3e83d55670b",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Frijksmuseum_jansz_1641.jpg&blockId=3918faf1-d42b-8023-9b2d-d3e83d55670b&width=1024"
+    },
+    {
+      "title": "🏋️‍♂️ 헬스 저렴하게 등록하려면?",
+      "url": "https://www.dontgry.com/3918faf1-d42b-803e-bedc-fe4966b1c3f9",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2FhudsonRiverSchool_catskillEarlyAutumn.jpg&blockId=3918faf1-d42b-803e-bedc-fe4966b1c3f9&width=1024"
+    },
+    {
+      "title": "🎥 매주 수요일 문화의 날에는 영화보러 가자",
+      "url": "https://www.dontgry.com/3918faf1-d42b-8034-880e-c612867a7b7f",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fmet_william_morris_1878.jpg&blockId=3918faf1-d42b-8034-880e-c612867a7b7f&width=1024"
+    },
+    {
+      "title": "💳 혜택 좋은 체크카드 추천!",
+      "url": "https://www.dontgry.com/3918faf1-d42b-809a-9837-d7f073bb097a",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2FnationalMuseumOfAsianArt_sparrowsFeedingTheirYoung.jpg&blockId=3918faf1-d42b-809a-9837-d7f073bb097a&width=1024"
+    },
+    {
+      "title": "🍒 카드 체리피커가 되는 법",
+      "url": "https://www.dontgry.com/3918faf1-d42b-80fb-8971-ea9c87e2ffd5",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2FnationalMuseumOfAsianArt_sparrowsFeedingTheirYoung.jpg&blockId=3918faf1-d42b-80fb-8971-ea9c87e2ffd5&width=1024"
+    },
+    {
+      "title": "🥕 당근으로 600만원 모은 이야기",
+      "url": "https://www.dontgry.com/3918faf1-d42b-80f4-8f48-dd35494e5d7e",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2FnationalMuseumOfAsianArt_landscapeWithGibbonsAndCranes.jpg&blockId=3918faf1-d42b-80f4-8f48-dd35494e5d7e&width=1024"
+    }
+  ],
+  "pink": [
+    {
+      "title": "🏛️ ‘재화’를 얻고자 거래하는 국민경제의 3주체",
+      "url": "https://www.dontgry.com/0328faf1-d42b-8336-bcff-81962067d440",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Frijksmuseum_claesz_1628.jpg&blockId=0328faf1-d42b-8336-bcff-81962067d440&width=1024"
+    },
+    {
+      "title": "🤧 경제 아가씨와 두 집사 🧐",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-80c5-977e-f12b44cfbea3",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2FnationalMuseumOfAsianArt_mountainMistSpringMorning.jpg&blockId=38f8faf1-d42b-80c5-977e-f12b44cfbea3&width=1024"
+    },
+    {
+      "title": "⚖️ 환율 이야기",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-808a-a22f-f06ec4600ea3",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Ftexturelabs_fabric_169S.jpg&blockId=38f8faf1-d42b-808a-a22f-f06ec4600ea3&width=1024"
+    },
+    {
+      "title": "🏜️ 원자재 이야기 ⛽",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-8066-b025-cf20633d88e1",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fmet_william_morris_1878.jpg&blockId=38f8faf1-d42b-8066-b025-cf20633d88e1&width=1024"
+    },
+    {
+      "title": "🧐 경기를 파악 하는 코난 안경 : 물가 지수",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-8033-9bd3-c60755d9a7d7",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fgradients_10.jpg&blockId=38f8faf1-d42b-8033-9bd3-c60755d9a7d7&width=1024"
+    },
+    {
+      "title": "📈 인플레이션과 디플레이션",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-8031-813f-f6f3290e03a8",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2FnationalMuseumOfAsianArt_gardenSceneMelonsEggPlantsFlowersAndTwoWeasels.jpg&blockId=38f8faf1-d42b-8031-813f-f6f3290e03a8&width=1024"
+    },
+    {
+      "title": "🪙 돈은 피처럼 돌아야 건강하다 : 금융",
+      "url": "https://www.dontgry.com/38f8faf1-d42b-8097-abd6-c5307b76a520",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fwebb2.jpg&blockId=38f8faf1-d42b-8097-abd6-c5307b76a520&width=1024"
+    }
+  ],
+  "oasis": [
+    {
+      "title": "🌟 우리는 모두 별의 조각이다",
+      "url": "https://www.dontgry.com/3918faf1-d42b-8075-a0a5-c93ada8dc49c",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fmet_klimt_1912.jpg&blockId=3918faf1-d42b-8075-a0a5-c93ada8dc49c&width=1024"
+    },
+    {
+      "title": "🫡 최강의 인생을 사는 법",
+      "url": "https://www.dontgry.com/3918faf1-d42b-8061-a175-cb8e5fca8cd2",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Fwoodcuts_3.jpg&blockId=3918faf1-d42b-8061-a175-cb8e5fca8cd2&width=1024"
+    },
+    {
+      "title": "🎮 원칙을 가지고 인생을 설계할 것",
+      "url": "https://www.dontgry.com/3918faf1-d42b-80a0-a5fd-c928322e8861",
+      "img": "https://oopy.lazyrockets.com/api/v2/notion/image?src=%2Fimages%2Fpage-cover%2Ftexturelabs_metal_285S.jpg&blockId=3918faf1-d42b-80a0-a5fd-c928322e8861&width=1024"
+    }
+  ]
+}

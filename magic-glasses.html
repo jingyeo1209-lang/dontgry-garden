@@ -2,137 +2,1032 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>선그리 돼지의 메타 안경</title>
-    <link href="https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>썬그리의 메타 안경</title>
+    <meta name="description" content="투자 기상도, MDD 계산기, 드림보드와 챌린지. 썬그리의 메타 안경 — 똔그리 가든.">
+    <meta property="og:title" content="썬그리의 메타 안경">
+    <meta property="og:description" content="투자 기상도, MDD 계산기, 드림보드와 챌린지.">
+    <meta property="og:image" content="garden-map.png">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <style>
-        :root {
-            --bg-red: #ffebee;
-            --bg-yellow: #fffde7;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
 
         body {
-            font-family: 'DungGeunMo', sans-serif;
-            background: #f0f4f8; margin: 0; padding: 15px;
-            display: flex; flex-direction: column; align-items: center;
+            font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+                "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+            background: #fff;
+            color: #37352f;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: clamp(20px, 5vw, 32px) clamp(14px, 4vw, 40px) clamp(40px, 8vw, 60px);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #787774;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 4px 8px;
+            margin: 0 0 16px -8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+
+        .back-link:hover {
+            background: #efefef;
+            color: #37352f;
+        }
+
+        .page-title {
+            font-size: clamp(22px, 5.5vw, 32px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            margin-bottom: 24px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
         }
 
         .wrapper-card {
-            width: 100%; max-width: 500px; border: 4px solid #1a1a1a;
-            border-radius: 12px; padding: 20px; box-shadow: 4px 4px 0px #000;
-            background-color: var(--bg-yellow); transition: all 0.3s ease;
-        }
-
-        .app-title {
-            text-align: center; font-size: 18px; margin: 0 0 16px;
-            border-bottom: 2px dashed #1a1a1a; padding-bottom: 10px;
+            width: 100%;
+            min-width: 0;
+            transition: background-color 0.3s ease;
+            border-radius: 10px;
         }
 
         .section-title {
-            font-size: 16px; margin: 16px 0 10px; text-align: center;
-            border-bottom: 2px dashed #1a1a1a; padding-bottom: 8px; color: #111;
+            font-size: clamp(14px, 4vw, 16px);
+            font-weight: 600;
+            margin: 28px 0 12px;
+            color: #37352f;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9e9e7;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
         }
-        .section-title:first-child { margin-top: 0; }
 
-        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0; }
-        .metric-item { background: rgba(255, 255, 255, 0.85); border: 2px solid #1a1a1a; border-radius: 6px; padding: 6px; text-align: center; }
-        .metric-label { font-size: 10px; color: #444; font-weight: bold; margin-bottom: 2px; }
-        .metric-value { font-size: 13px; font-weight: bold; color: #111; }
-        .metric-sub { font-size: 8px; color: #777; margin-top: 1px; }
+        .section-title:first-of-type { margin-top: 0; }
 
-        .farmer-zone { display: flex; align-items: center; gap: 15px; background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 12px; margin-top: 10px; }
-        .avatar { font-size: 42px; transition: transform 0.2s; }
-        .speech-bubble { font-size: 13px; line-height: 1.4; width: 100%; }
-        .pig-status-tag { background: #1a1a1a; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; display: inline-block; margin-bottom: 4px; }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin: 12px 0;
+            width: 100%;
+        }
 
-        .input-group { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-        .input-row { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-size: 13px; }
-        .pixel-input { font-family: 'DungGeunMo'; padding: 5px; border: 2px solid #1a1a1a; border-radius: 4px; width: 60%; text-align: right; }
-        .weed-list { max-height: 100px; overflow-y: auto; background: #fafafa; border: 2px solid #1a1a1a; padding: 5px; border-radius: 4px; font-size: 12px; margin-top: 8px; }
-        .weed-item { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dashed #ccc; }
+        .metric-item {
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+            min-width: 0;
+        }
 
-        .game-btn { font-family: 'DungGeunMo'; padding: 10px; font-size: 12px; cursor: pointer; border: 2px solid #1a1a1a; background: #f5f5f5; border-radius: 6px; box-shadow: 2px 2px 0px #000; width: 100%; }
-        .game-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
+        .metric-item.wide,
+        .slider-row {
+            grid-column: 1 / -1;
+        }
+
+        .metric-item.wide {
+            background: #fbf3db;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #787774;
+            font-weight: 500;
+            margin-bottom: 4px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .metric-value {
+            font-size: clamp(14px, 4vw, 16px);
+            font-weight: 600;
+            color: #37352f;
+            overflow-wrap: anywhere;
+        }
+
+        .metric-sub {
+            font-size: 11px;
+            color: #9b9a97;
+            margin-top: 2px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .slider-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #f7f6f3;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #e9e9e7;
+            margin-top: 4px;
+            font-size: clamp(12px, 3.5vw, 13px);
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        @media (max-width: 520px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .slider-row span { min-width: 0; flex: 1 1 140px; }
+        .slider-row input[type="range"] {
+            flex: 1 1 140px;
+            width: 100%;
+            min-width: 0;
+            accent-color: #37352f;
+        }
+
+        .farmer-zone {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 12px;
+            min-width: 0;
+        }
+
+        .avatar { font-size: clamp(32px, 8vw, 40px); line-height: 1; flex-shrink: 0; }
+
+        .speech-bubble {
+            font-size: clamp(13px, 3.5vw, 14px);
+            line-height: 1.55;
+            min-width: 0;
+            flex: 1;
+            color: #37352f;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .pig-status-tag {
+            background: #37352f;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 8px;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #fff;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            padding: clamp(12px, 3vw, 16px);
+            margin-bottom: 8px;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #787774;
+            margin-bottom: 2px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .save-note {
+            font-size: 12px;
+            color: #9b9a97;
+            margin-top: 8px;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+            font-size: clamp(13px, 3.5vw, 14px);
+            min-width: 0;
+        }
+
+        .input-row > span {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .pixel-input {
+            font-family: inherit;
+            padding: 8px 10px;
+            border: 1px solid #e9e9e7;
+            border-radius: 6px;
+            flex: 1 1 140px;
+            min-width: 0;
+            max-width: 100%;
+            width: auto;
+            text-align: right;
+            font-size: 14px;
+            color: #37352f;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .pixel-input.align-left { text-align: left; }
+
+        .pixel-input:focus {
+            border-color: #37352f;
+            box-shadow: 0 0 0 1px #37352f;
+        }
+
+        .weed-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: stretch;
+            border-top: 1px solid #e9e9e7;
+            padding-top: 10px;
+        }
+
+        .weed-row .pixel-input { flex: 1 1 100px; }
+        .weed-row .game-btn {
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 64px;
+            padding: 8px 12px;
+        }
+
+        .weed-list {
+            max-height: 120px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .weed-item {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 6px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e9e9e7;
+            min-width: 0;
+        }
+
+        .weed-item span {
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .weed-item .weed-del {
+            color: #eb5757;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .weed-item:last-child { border-bottom: none; }
+
+        .summary-row {
+            font-size: clamp(12px, 3.5vw, 13px);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 6px 12px;
+            margin-top: 4px;
+            font-weight: 500;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .game-btn {
+            font-family: inherit;
+            padding: 10px 14px;
+            font-size: clamp(13px, 3.5vw, 14px);
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #e9e9e7;
+            background: #f7f6f3;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 100%;
+            color: #37352f;
+            transition: background 0.15s ease;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .game-btn:hover { background: #efefef; }
+        .game-btn:active { background: #e8e7e4; }
+
+        #mddResult {
+            font-size: 13px;
+            margin-top: 4px;
+            text-align: center;
+            color: #c45500;
+            font-weight: 600;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        #fText {
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            width: 100%;
+        }
+
+        .challenge-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 0;
+            padding: 20px 12px;
+            text-decoration: none;
+            color: #37352f;
+            background: #fff;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+            text-align: center;
+        }
+
+        .challenge-card:hover {
+            background: #f7f6f3;
+            box-shadow: 0 2px 8px rgba(15, 15, 15, 0.06);
+        }
+
+        .challenge-card.grape { background: #f6f3f9; }
+        .challenge-card.grape:hover { background: #efeaf5; }
+
+        .challenge-card.corn { background: #fbf3db; }
+        .challenge-card.corn:hover { background: #f5ecd0; }
+
+        .challenge-emoji {
+            font-size: clamp(28px, 6vw, 36px);
+            line-height: 1;
+        }
+
+        .challenge-title {
+            font-size: clamp(13px, 3.5vw, 14px);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 400px) {
+            .challenge-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dream-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dream-form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .dream-form-row .pixel-input,
+        .dream-form-row .pixel-select {
+            flex: 1 1 120px;
+            min-width: 0;
+        }
+
+        .pixel-select {
+            font-family: inherit;
+            padding: 8px 10px;
+            border: 1px solid #e9e9e7;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #37352f;
+            background: #fff;
+            outline: none;
+        }
+
+        .pixel-select:focus {
+            border-color: #37352f;
+            box-shadow: 0 0 0 1px #37352f;
+        }
+
+        .harvest-basket {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .harvest-item {
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            padding: 10px 6px;
+            text-align: center;
+            min-width: 0;
+        }
+
+        .harvest-item .emoji { font-size: 22px; line-height: 1; display: block; margin-bottom: 4px; }
+        .harvest-item .count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #37352f;
+        }
+        .harvest-item .label {
+            font-size: 11px;
+            color: #787774;
+            margin-top: 2px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .dream-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .dream-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            background: #fff;
+            min-width: 0;
+        }
+
+        .dream-item.done {
+            background: #f7f6f3;
+        }
+
+        .dream-item.done .dream-text {
+            text-decoration: line-through;
+            color: #787774;
+        }
+
+        .dream-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .dream-check {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: #37352f;
+            cursor: pointer;
+        }
+
+        .dream-check:disabled {
+            cursor: not-allowed;
+            opacity: 0.4;
+        }
+
+        .dream-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dream-text {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .dream-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #787774;
+        }
+
+        .dream-meta .crop { font-weight: 500; color: #37352f; }
+        .dream-meta .overdue { color: #eb5757; font-weight: 500; }
+        .dream-meta .harvested { color: #0f7b6c; font-weight: 500; }
+        .dream-meta .growing { color: #337ea9; font-weight: 500; }
+        .dream-meta .ready { color: #0f7b6c; font-weight: 500; }
+
+        .dream-del {
+            flex-shrink: 0;
+            border: none;
+            background: transparent;
+            color: #eb5757;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 2px 4px;
+            font-family: inherit;
+        }
+
+        .crop-visual {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px 8px;
+            border-radius: 8px;
+            background: #fafafa;
+            border: 1px solid #e9e9e7;
+        }
+
+        .crop-visual.grape { background: #f6f3f9; }
+        .crop-visual.corn { background: #fbf3db; }
+        .crop-visual.mango { background: #fdecc8; }
+        .crop-visual.carrot { background: #fadec9; }
+
+        .crop-visual.clickable {
+            cursor: pointer;
+        }
+
+        .crop-visual.clickable:hover {
+            box-shadow: inset 0 0 0 1px #37352f22;
+        }
+
+        .crop-unit {
+            font-size: clamp(18px, 4.5vw, 22px);
+            line-height: 1;
+            opacity: 0.18;
+            filter: grayscale(1);
+            transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .crop-unit.filled {
+            opacity: 1;
+            filter: none;
+            transform: scale(1.05);
+        }
+
+        .dream-empty {
+            font-size: 13px;
+            color: #787774;
+            text-align: center;
+            padding: 16px 8px;
+        }
+
+        @media (max-width: 400px) {
+            .harvest-basket {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
     </style>
 </head>
 <body>
+<main class="page">
+    <a href="index.html" class="back-link">← 대문으로 돌아가기</a>
+    <h1 class="page-title">🕶️ 썬그리의 메타 안경</h1>
 
-<div class="wrapper-card" id="mainCard">
-    <div class="app-title">🕶️ 선그리 돼지의 메타 안경</div>
+    <div class="wrapper-card" id="mainCard">
+        <div class="section-title">🌤️ 오늘의 투자 기상도</div>
+        <div class="metrics-grid">
+            <div class="metric-item">
+                <div class="metric-label">공포탐욕지수</div>
+                <div class="metric-value" id="mFG">…</div>
+                <div class="metric-sub">대중 심리</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">VIX 지수</div>
+                <div class="metric-value" id="mVIX">…</div>
+                <div class="metric-sub">시장 불안도</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">RSI 지수</div>
+                <div class="metric-value" id="mRSI">…</div>
+                <div class="metric-sub">과열/과매도</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">美 10년 국채금리</div>
+                <div class="metric-value" id="mUS10Y">…</div>
+                <div class="metric-sub">자금 중력</div>
+            </div>
+            <div class="metric-item wide">
+                <div class="metric-label">종합 기술 시그널</div>
+                <div class="metric-value" id="mTechScore">계산 중…</div>
+                <div class="metric-sub" id="mTechSub">4개 지표 자동 산출</div>
+            </div>
+        </div>
+        <p class="save-note">※ 참고용 시그널입니다. 공포탐욕은 공개 데이터를, 나머지 지표는 이와 연동한 일일 추정치를 사용합니다.</p>
 
-    <div class="section-title">🌤️ 오늘의 투자 기상도 (거시 지표)</div>
-    <div class="metrics-grid">
-        <div class="metric-item">
-            <div class="metric-label">공포탐욕지수</div>
-            <div class="metric-value" id="mFG">25</div>
-            <div class="metric-sub">대중 심리</div>
+        <div class="farmer-zone">
+            <div class="avatar" id="fAvatar">🕶️</div>
+            <div class="speech-bubble">
+                <span class="pig-status-tag" id="pigRankTag">🕶️ 썬그리</span>
+                <div id="fText">기상 센서 연동 중...</div>
+            </div>
         </div>
-        <div class="metric-item">
-            <div class="metric-label">VIX 지수</div>
-            <div class="metric-value" id="mVIX">36.5</div>
-            <div class="metric-sub">시장 불안도</div>
+
+        <div class="section-title">📊 종목별 MDD 계산기</div>
+        <div class="input-group">
+            <div class="hint">※ 거시 기상도와 함께 특정 종목 침수율을 체크해 투자 판단하세요.</div>
+            <div class="input-row"><span>종목명</span><input type="text" id="mddName" class="pixel-input align-left" placeholder="예: 삼성전자"></div>
+            <div class="input-row"><span>역대 최고가(원)</span><input type="number" id="mddHigh" class="pixel-input" placeholder="0"></div>
+            <div class="input-row"><span>현재가/최저가(원)</span><input type="number" id="mddLow" class="pixel-input" placeholder="0"></div>
+            <button class="game-btn" onclick="calculateMDD()">침수율 계산</button>
+            <div id="mddResult"></div>
         </div>
-        <div class="metric-item">
-            <div class="metric-label">RSI 지수</div>
-            <div class="metric-value" id="mRSI">28.0</div>
-            <div class="metric-sub">과열/과매도</div>
+
+        <div class="section-title">✨ 드림보드</div>
+        <div class="input-group">
+            <div class="hint">꿈을 적고 기한을 정한 뒤, 작물을 눌러 알알이 채우세요. 다 채우면 체크해서 수확합니다!</div>
+            <p class="save-note">드림보드·수확·가계부 기록은 이 기기 브라우저에만 저장됩니다.</p>
+            <div class="harvest-basket">
+                <div class="harvest-item">
+                    <span class="emoji">🍇</span>
+                    <div class="count" id="harvestGrape">0</div>
+                    <div class="label">포도알</div>
+                </div>
+                <div class="harvest-item">
+                    <span class="emoji">🌽</span>
+                    <div class="count" id="harvestCorn">0</div>
+                    <div class="label">옥수수</div>
+                </div>
+                <div class="harvest-item">
+                    <span class="emoji">🥭</span>
+                    <div class="count" id="harvestMango">0</div>
+                    <div class="label">망고</div>
+                </div>
+                <div class="harvest-item">
+                    <span class="emoji">🥕</span>
+                    <div class="count" id="harvestCarrot">0</div>
+                    <div class="label">당근</div>
+                </div>
+            </div>
+            <div class="dream-form">
+                <input type="text" id="dreamText" class="pixel-input align-left" placeholder="이루고 싶은 꿈(ex.한 달에 한 권씩 책을 읽겠다)" style="width:100%; flex:none;">
+                <div class="dream-form-row">
+                    <input type="date" id="dreamDeadline" class="pixel-input align-left">
+                    <select id="dreamCrop" class="pixel-select">
+                        <option value="grape">🍇 포도송이</option>
+                        <option value="corn">🌽 옥수수</option>
+                        <option value="mango">🥭 망고</option>
+                        <option value="carrot">🥕 당근</option>
+                    </select>
+                    <button type="button" class="game-btn" style="width:auto; flex:0 0 auto; min-width:72px;" onclick="addDream()">추가</button>
+                </div>
+            </div>
+            <div class="dream-list" id="dreamList"></div>
         </div>
-        <div class="metric-item">
-            <div class="metric-label">美 10년 국채금리</div>
-            <div class="metric-value" id="mUS10Y">4.21%</div>
-            <div class="metric-sub">자금 중력</div>
+
+        <div class="section-title">🏁 챌린지</div>
+        <div class="challenge-grid">
+            <a href="https://www.dontgry.com/47a8faf1-d42b-82b0-9416-015574d25387" class="challenge-card grape">
+                <span class="challenge-emoji">🍇</span>
+                <span class="challenge-title">포도알 챌린지</span>
+            </a>
+            <a href="https://www.dontgry.com/3918faf1-d42b-8094-81c9-f6a940777020" class="challenge-card corn">
+                <span class="challenge-emoji">🌽</span>
+                <span class="challenge-title">옥수수 챌린지</span>
+            </a>
         </div>
-        <div class="metric-item" style="grid-column: span 2; background: #fff3e0;">
-            <div class="metric-label">종합 기술 시그널</div>
-            <div class="metric-value" id="mTechScore">65점</div>
-            <div class="metric-sub">보조지표 끝장토론</div>
-        </div>
-        <div class="input-row" style="grid-column: span 3; background: #f1f8ff; padding: 6px; border-radius: 4px; border: 1px solid #1a1a1a; margin-top: 4px;">
-            <span style="font-size:11px; font-weight:bold;">🛠️ 기상 시그널 테스트 (0~100점):</span>
-            <input type="range" id="weatherSlider" min="0" max="100" value="65" style="width:50%;" oninput="updateWeather(this.value)">
+
+        <div class="section-title">🌾 가계부</div>
+        <div class="input-group">
+            <div class="input-row"><span>이번 달 목표 예산(원)</span><input type="number" id="budgetGoal" class="pixel-input" onchange="saveBudget()" placeholder="0"></div>
+            <div class="weed-row">
+                <input type="text" id="weedDesc" class="pixel-input align-left" placeholder="과소비 잡초명">
+                <input type="number" id="weedAmount" class="pixel-input" placeholder="금액">
+                <button class="game-btn" onclick="addWeed()">제거</button>
+            </div>
+            <div class="summary-row">
+                <span>총 지출(잡초): <span id="totalWeedCost" style="color:#eb5757;">0</span>원</span>
+                <span>남은 자금: <span id="remainBudget" style="color:#0f7b6c;">0</span>원</span>
+            </div>
+            <div class="weed-list" id="weedList"></div>
         </div>
     </div>
-
-    <div class="farmer-zone">
-        <div class="avatar" id="fAvatar">🕶️🐖</div>
-        <div class="speech-bubble">
-            <span class="pig-status-tag" id="pigRankTag">🕶️ 선그리 돼지</span>
-            <div id="fText">기상 센서 연동 중...</div>
-        </div>
-    </div>
-
-    <div class="section-title">🕶️ 마법 안경: 종목별 MDD 계산기</div>
-    <div class="input-group">
-        <div style="font-size:11px; color:#666; margin-bottom:4px;">※ 거시 기상도와 함께 특정 종목 침수율을 체크해 투자 판단하세요.</div>
-        <div class="input-row"><span>종목명:</span><input type="text" id="mddName" class="pixel-input" style="text-align:left;" placeholder="예: 삼성전자"></div>
-        <div class="input-row"><span>역대 최고가(원):</span><input type="number" id="mddHigh" class="pixel-input" placeholder="0"></div>
-        <div class="input-row"><span>현재가/최저가(원):</span><input type="number" id="mddLow" class="pixel-input" placeholder="0"></div>
-        <button class="game-btn" style="margin-top:5px; background:#e0f7fa;" onclick="calculateMDD()">🕶️ 마법 안경으로 침수율 계산</button>
-        <div id="mddResult" style="font-size:12px; margin-top:5px; text-align:center; color:#e65100; font-weight:bold;"></div>
-    </div>
-
-    <div class="section-title">🌾 가계부: 지갑 속 잡초 제거</div>
-    <div class="input-group">
-        <div class="input-row"><span>이번 달 목표 예산(원):</span><input type="number" id="budgetGoal" class="pixel-input" onchange="saveBudget()" placeholder="0"></div>
-        <div class="input-row" style="border-top: 1px dashed #ccc; padding-top:8px; margin-top:4px;">
-            <input type="text" id="weedDesc" class="pixel-input" style="width:45%; text-align:left;" placeholder="과소비 잡초명">
-            <input type="number" id="weedAmount" class="pixel-input" style="width:35%;" placeholder="금액">
-            <button class="game-btn" style="width:18%; padding:5px; background:#ffcdd2;" onclick="addWeed()">제거</button>
-        </div>
-        <div style="font-size:12px; display:flex; justify-content:space-between; margin-top:5px; font-weight:bold;">
-            <span>총 지출(잡초): <span id="totalWeedCost" style="color:red;">0</span>원</span>
-            <span>남은 자금: <span id="remainBudget" style="color:green;">0</span>원</span>
-        </div>
-        <div class="weed-list" id="weedList"></div>
-    </div>
-</div>
+</main>
 
 <script>
     let weeds = JSON.parse(localStorage.getItem('weeds') || '[]');
+    let dreams = JSON.parse(localStorage.getItem('dreams') || '[]');
+    let harvests = JSON.parse(localStorage.getItem('harvests') || '{"grape":0,"corn":0,"mango":0,"carrot":0}');
+
+    const CROP_META = {
+        grape: { emoji: '🍇', label: '포도송이', unit: '🍇' },
+        corn: { emoji: '🌽', label: '옥수수', unit: '🌽' },
+        mango: { emoji: '🥭', label: '망고', unit: '🥭' },
+        carrot: { emoji: '🥕', label: '당근', unit: '🥕' }
+    };
+
+    const TOTAL_UNITS = 10;
+
+    function todayISO() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function saveDreams() {
+        localStorage.setItem('dreams', JSON.stringify(dreams));
+        localStorage.setItem('harvests', JSON.stringify(harvests));
+    }
+
+    function migrateDreams() {
+        let changed = false;
+        dreams = dreams.map(d => {
+            if (!d.createdAt) {
+                d.createdAt = todayISO();
+                changed = true;
+            }
+            if (typeof d.filled !== 'number') {
+                d.filled = d.done ? TOTAL_UNITS : 0;
+                changed = true;
+            }
+            return d;
+        });
+        if (changed) saveDreams();
+    }
+
+    let lastWeatherScore = 50;
 
     document.getElementById('budgetGoal').value = localStorage.getItem('budgetGoal') || '';
+    migrateDreams();
     renderWeeds();
-    updateWeather(document.getElementById('weatherSlider').value);
+    renderDreams();
+    loadMarketWeather();
+
+    function clamp(n, min, max) {
+        return Math.min(max, Math.max(min, n));
+    }
+
+    function dateSeed() {
+        const d = new Date();
+        return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+    }
+
+    function seededRand(seed, salt) {
+        const x = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
+        return x - Math.floor(x);
+    }
+
+    function computeWeatherScore(fg, vix, rsi, us10y) {
+        const fgScore = clamp(fg, 0, 100);
+        const vixScore = clamp(100 - (vix - 12) * 3.2, 0, 100);
+        const rsiScore = clamp(100 - Math.abs(rsi - 50) * 2.2, 0, 100);
+        const rateScore = clamp(100 - (us10y - 3.2) * 28, 0, 100);
+        return Math.round((fgScore + vixScore + rsiScore + rateScore) / 4);
+    }
+
+    async function loadMarketWeather() {
+        const seed = dateSeed();
+        let fg = 45 + Math.round(seededRand(seed, 1) * 30);
+
+        try {
+            const res = await fetch('https://api.alternative.me/fng/?limit=1');
+            const data = await res.json();
+            const val = parseInt(data.data[0].value, 10);
+            if (!isNaN(val)) fg = val;
+        } catch (e) {
+            // 네트워크 실패 시 일일 시드 값 사용
+        }
+
+        // 공포탐욕과 연동된 일일 지표 (같은 날이면 동일)
+        const vix = clamp(12 + (100 - fg) * 0.22 + seededRand(seed, 2) * 8, 10, 55);
+        const rsi = clamp(20 + fg * 0.45 + seededRand(seed, 3) * 12 - 6, 15, 85);
+        const us10y = clamp(3.2 + (100 - fg) * 0.012 + seededRand(seed, 4) * 0.6, 2.8, 5.8);
+
+        document.getElementById('mFG').innerText = String(fg);
+        document.getElementById('mVIX').innerText = vix.toFixed(1);
+        document.getElementById('mRSI').innerText = rsi.toFixed(1);
+        document.getElementById('mUS10Y').innerText = us10y.toFixed(2) + '%';
+
+        const score = computeWeatherScore(fg, vix, rsi, us10y);
+        lastWeatherScore = score;
+        updateWeather(score);
+    }
+
+    function updateHarvestUI() {
+        document.getElementById('harvestGrape').innerText = harvests.grape || 0;
+        document.getElementById('harvestCorn').innerText = harvests.corn || 0;
+        document.getElementById('harvestMango').innerText = harvests.mango || 0;
+        document.getElementById('harvestCarrot').innerText = harvests.carrot || 0;
+    }
+
+    function formatDate(iso) {
+        if (!iso) return '기한 없음';
+        const [y, m, d] = iso.split('-');
+        return `${y}.${m}.${d}`;
+    }
+
+    function daysBetween(startISO, endISO) {
+        const start = new Date(startISO + 'T00:00:00');
+        const end = new Date(endISO + 'T00:00:00');
+        return Math.round((end - start) / 86400000);
+    }
+
+    function getFilledCount(dream) {
+        if (dream.done) return TOTAL_UNITS;
+        return Math.min(TOTAL_UNITS, Math.max(0, dream.filled || 0));
+    }
+
+    function isReady(dream) {
+        return dream.done || getFilledCount(dream) >= TOTAL_UNITS;
+    }
+
+    function isOverdue(dream) {
+        if (!dream.deadline || dream.done) return false;
+        return daysBetween(todayISO(), dream.deadline) < 0;
+    }
+
+    function renderCropVisual(dream) {
+        const crop = CROP_META[dream.crop] || CROP_META.carrot;
+        const filled = getFilledCount(dream);
+        let units = '';
+        for (let i = 0; i < TOTAL_UNITS; i++) {
+            units += `<span class="crop-unit${i < filled ? ' filled' : ''}">${crop.unit}</span>`;
+        }
+        const canClick = !dream.done && filled < TOTAL_UNITS;
+        const clickAttr = canClick
+            ? `onclick="fillDreamUnit(${dream.id})" title="눌러서 알 채우기"`
+            : '';
+        return `<div class="crop-visual ${dream.crop}${canClick ? ' clickable' : ''}" ${clickAttr}>${units}</div>`;
+    }
+
+    function fillDreamUnit(id) {
+        const dream = dreams.find(d => d.id === id);
+        if (!dream || dream.done) return;
+        const filled = getFilledCount(dream);
+        if (filled >= TOTAL_UNITS) return;
+        dream.filled = filled + 1;
+        saveDreams();
+        renderDreams();
+        if (dream.filled >= TOTAL_UNITS) {
+            alert('작물이 다 찼어요! 체크해서 수확하세요.');
+        }
+    }
+
+    function addDream() {
+        const text = document.getElementById('dreamText').value.trim();
+        const deadline = document.getElementById('dreamDeadline').value;
+        const crop = document.getElementById('dreamCrop').value;
+        if (!text) { alert('꿈을 입력하세요!'); return; }
+        if (!deadline) { alert('기한을 선택하세요!'); return; }
+        if (daysBetween(todayISO(), deadline) < 0) {
+            alert('기한은 오늘 이후로 선택하세요!');
+            return;
+        }
+        dreams.unshift({
+            id: Date.now(),
+            text,
+            deadline,
+            crop,
+            createdAt: todayISO(),
+            filled: 0,
+            done: false
+        });
+        document.getElementById('dreamText').value = '';
+        document.getElementById('dreamDeadline').value = '';
+        saveDreams();
+        renderDreams();
+    }
+
+    function toggleDream(id) {
+        const dream = dreams.find(d => d.id === id);
+        if (!dream) return;
+        const crop = dream.crop in CROP_META ? dream.crop : 'carrot';
+        if (!dream.done) {
+            if (!isReady(dream)) {
+                alert('아직 작물이 다 차지 않았어요. 작물을 눌러 알알이 채운 뒤 수확하세요!');
+                renderDreams();
+                return;
+            }
+            dream.done = true;
+            dream.filled = TOTAL_UNITS;
+            harvests[crop] = (harvests[crop] || 0) + 1;
+            const meta = CROP_META[crop];
+            alert(`${meta.emoji} ${meta.label}을(를) 수확했습니다!`);
+        } else {
+            dream.done = false;
+            harvests[crop] = Math.max(0, (harvests[crop] || 0) - 1);
+        }
+        saveDreams();
+        renderDreams();
+    }
+
+    function deleteDream(id) {
+        const dream = dreams.find(d => d.id === id);
+        if (!dream) return;
+        if (dream.done) {
+            const crop = dream.crop in CROP_META ? dream.crop : 'carrot';
+            harvests[crop] = Math.max(0, (harvests[crop] || 0) - 1);
+        }
+        dreams = dreams.filter(d => d.id !== id);
+        saveDreams();
+        renderDreams();
+    }
+
+    function renderDreams() {
+        updateHarvestUI();
+        const list = document.getElementById('dreamList');
+        if (!dreams.length) {
+            list.innerHTML = '<div class="dream-empty">아직 적힌 꿈이 없어요. 첫 꿈을 심어보세요!</div>';
+            return;
+        }
+        list.innerHTML = dreams.map(d => {
+            const crop = CROP_META[d.crop] || CROP_META.carrot;
+            const filled = getFilledCount(d);
+            const ready = isReady(d);
+            const overdue = isOverdue(d);
+            let status = '';
+            if (d.done) status = '<span class="harvested">수확 완료</span>';
+            else if (ready) status = '<span class="ready">수확 가능!</span>';
+            else if (overdue) status = '<span class="overdue">기한 지남</span>';
+            else status = `<span class="growing">채우는 중 ${filled}/${TOTAL_UNITS} · 눌러서 채우기</span>`;
+
+            return `<div class="dream-item${d.done ? ' done' : ''}">
+                <div class="dream-top">
+                    <input type="checkbox" class="dream-check" ${d.done ? 'checked' : ''} ${!d.done && !ready ? 'disabled' : ''} onchange="toggleDream(${d.id})">
+                    <div class="dream-body">
+                        <div class="dream-text">${escapeHtml(d.text)}</div>
+                        <div class="dream-meta">
+                            <span class="crop">${crop.emoji} ${crop.label}</span>
+                            <span>기한 ${formatDate(d.deadline)}</span>
+                            ${status}
+                        </div>
+                    </div>
+                    <button type="button" class="dream-del" onclick="deleteDream(${d.id})">삭제</button>
+                </div>
+                ${renderCropVisual(d)}
+            </div>`;
+        }).join('');
+
+        // animate fill on next frame
+        requestAnimationFrame(() => {
+            list.querySelectorAll('.crop-unit.filled').forEach((el, i) => {
+                el.style.transitionDelay = `${(i % TOTAL_UNITS) * 40}ms`;
+            });
+        });
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
 
     function updateWeather(score) {
         score = parseInt(score, 10);
@@ -145,30 +1040,30 @@
 
         let weatherEmoji = "⛅";
         let weatherLabel = "구름 ⛅";
-        let weatherBg = "#78909c";
-        let cardBg = '#f5f5f5';
-        let message = `<strong>[오늘의 투자 기상도: 구름 ⛅]</strong> 시장 추세가 애매합니다. 선그리 돼지가 구름 낀 하늘 아래에서 눈치를 보며 다음 당근 파종 타이밍을 심각하게 저울질하고 있습니다.`;
+        let weatherBg = "#787774";
+        let cardBg = '#fff';
+        let message = `<strong>[오늘의 투자 기상도: 구름 ⛅]</strong> 시장 추세가 애매합니다. 썬그리가 구름 낀 하늘 아래에서 눈치를 보며 다음 당근 파종 타이밍을 심각하게 저울질하고 있습니다.`;
 
         if (score >= 81) {
             weatherEmoji = "☀️";
             weatherLabel = "맑음 ☀️";
-            weatherBg = "#29b6f6";
-            cardBg = '#e3f2fd';
-            message = `<strong>[오늘의 투자 기상도: 맑음 ☀️]</strong> 종합 기술 시그널 대풍년! 선그리 돼지가 햇살 가득한 날씨 속에서 신나게 당근 농사를 지으며 자산을 불리는 중입니다. 씨앗을 적극적으로 파종하기 아주 좋은 타이밍입니다!`;
+            weatherBg = "#337ea9";
+            cardBg = '#f1f8ff';
+            message = `<strong>[오늘의 투자 기상도: 맑음 ☀️]</strong> 종합 기술 시그널 대풍년! 썬그리가 햇살 가득한 날씨 속에서 신나게 당근 농사를 지으며 자산을 불리는 중입니다. 씨앗을 적극적으로 파종하기 아주 좋은 타이밍입니다!`;
         } else if (score <= 40) {
             weatherEmoji = "⛈️";
             weatherLabel = "폭풍우 ⛈️";
-            weatherBg = "#5e35b1";
-            cardBg = '#ede7f6';
-            message = `<strong>[오늘의 투자 기상도: 폭풍우 ⛈️]</strong> 시장 급락 경보! 선그리 돼지가 멘탈을 필사적으로 챙기며 당근밭에 방수포를 씌우고 있습니다. 매매 버튼을 접고 샘으로 대피하세요!`;
+            weatherBg = "#6940a5";
+            cardBg = '#f6f3f9';
+            message = `<strong>[오늘의 투자 기상도: 폭풍우 ⛈️]</strong> 시장 급락 경보! 썬그리가 멘탈을 필사적으로 챙기며 당근밭에 방수포를 씌우고 있습니다. 매매 버튼을 접고 샘으로 대피하세요!`;
         }
 
         const isBudgetBurst = weeds.reduce((a, b) => a + b.amount, 0) > parseInt(localStorage.getItem('budgetGoal') || '0', 10);
 
         if (!isBudgetBurst) card.style.backgroundColor = cardBg;
-        tag.innerText = `🕶️ 선그리 돼지 [${weatherLabel}]`;
+        tag.innerText = `🕶️ 썬그리 [${weatherLabel}]`;
         tag.style.background = weatherBg;
-        avatar.innerText = weatherEmoji + "🕶️🐖";
+        avatar.innerText = weatherEmoji + "🕶️";
         txt.innerHTML = message;
     }
 
@@ -180,10 +1075,10 @@
         const mdd = ((low - high) / high) * 100;
 
         let comment = "마법 안경 분석: 이 정도 조정은 똔그리 가든이 무럭무럭 자라나는 자연스러운 과정일 뿐입니다. 🌾";
-        if (mdd <= -30 && mdd > -50) comment = "⚠️ 침수 위험 경보! 선그리 돼지가 방수포를 지급합니다. 분산 투자 자산을 긴급 점검하세요! ⛈️";
+        if (mdd <= -30 && mdd > -50) comment = "⚠️ 침수 위험 경보! 썬그리가 방수포를 지급합니다. 분산 투자 자산을 긴급 점검하세요! ⛈️";
         if (mdd <= -50) comment = "🚨 계좌 난파 위기! 똔그리가 즉시 샘으로 대피령을 내렸습니다. 목탁 비트를 연타해 번뇌를 씻으세요! 🥁";
 
-        document.getElementById('mddResult').innerHTML = `[${name}] 고점 대비 낙폭(MDD): ${mdd.toFixed(2)}%<br><span style='color:#333; font-weight:normal;'>💬 선그리 돼지의 훈수: ${comment}</span>`;
+        document.getElementById('mddResult').innerHTML = `[${name}] 고점 대비 낙폭(MDD): ${mdd.toFixed(2)}%<br><span style='color:#37352f; font-weight:normal;'>💬 썬그리의 훈수: ${comment}</span>`;
     }
 
     function saveBudget() {
@@ -215,7 +1110,7 @@
         let totalCost = 0;
         weeds.forEach((w, i) => {
             totalCost += w.amount;
-            list.innerHTML += `<div class="weed-item"><span>🌱 ${w.desc} (${w.amount.toLocaleString()}원)</span><span style="color:red; cursor:pointer;" onclick="deleteWeed(${i})">[제거]</span></div>`;
+            list.innerHTML += `<div class="weed-item"><span>🌱 ${w.desc} (${w.amount.toLocaleString()}원)</span><span class="weed-del" onclick="deleteWeed(${i})">제거</span></div>`;
         });
         document.getElementById('totalWeedCost').innerText = totalCost.toLocaleString();
         const remain = goal - totalCost;
@@ -225,14 +1120,12 @@
         const txt = document.getElementById('fText');
         const card = document.getElementById('mainCard');
         if (remain < 0) {
-            remainEl.style.color = 'red';
-            card.style.backgroundColor = 'var(--bg-red)';
+            remainEl.style.color = '#eb5757';
+            card.style.backgroundColor = '#fdebec';
             txt.innerHTML = "<strong>[가계부 비상! 💢]</strong> 지갑에 과소비 잡초가 너무 무성합니다! 멧돼지 떼가 나타나 한 달 예산을 다 파헤쳐 놓았습니다! 자산 방수포 가동 불가능!";
         } else {
-            remainEl.style.color = 'green';
-            if (document.getElementById('weatherSlider')) {
-                updateWeather(document.getElementById('weatherSlider').value);
-            }
+            remainEl.style.color = '#0f7b6c';
+            updateWeather(lastWeatherScore);
         }
     }
 </script>

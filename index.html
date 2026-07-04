@@ -2,138 +2,186 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>똔그리 가든</title>
-    <link href="https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap" rel="stylesheet">
+    <meta name="description" content="다 같이 돼지런하게, 리치 투게더! 재테크·경제·투자 인사이트를 한곳에서.">
+    <meta property="og:title" content="똔그리 가든">
+    <meta property="og:description" content="다 같이 돼지런하게, 리치 투게더!">
+    <meta property="og:image" content="garden-map.png">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <style>
-        :root {
-            --bg-red: #ffebee;
-            --bg-yellow: #fffde7;
-            --bg-green: #e8f5e9;
-            --bg-purple: #f3e5f5;
-        }
-
-        /* 전체 화면 초기화 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+
+        html {
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
-            font-family: 'DungGeunMo', sans-serif;
-            background: #f0f4f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+                "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+            background: #fff;
+            color: #37352f;
             min-height: 100vh;
-            padding: 15px;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 대문 전체 컨테이너 */
-        .garden-container {
+        img { max-width: 100%; height: auto; display: block; }
+
+        .page {
             width: 100%;
-            max-width: 500px;
-            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: clamp(20px, 5vw, 48px) clamp(14px, 4vw, 40px) clamp(40px, 8vw, 80px);
         }
 
-        /* 🖥️ PC용 스타일: 통그림 대문 */
-        .pc-map-view {
-            display: block;
-            position: relative;
+        .page-title {
+            font-size: clamp(24px, 6vw, 40px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+            margin-bottom: 12px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .page-title .emoji { margin-right: 8px; }
+
+        .page-desc {
+            color: #787774;
+            font-size: clamp(13px, 3.5vw, 14px);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .hero {
             width: 100%;
-            border: 4px solid #1a1a1a;
+            margin-bottom: clamp(20px, 4vw, 28px);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 4px 4px 0px #000;
+            border: 1px solid #e9e9e7;
+            background: #f7f6f3;
+            line-height: 0;
+        }
+
+        .hero img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            width: 100%;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            max-width: 100%;
+            text-decoration: none;
+            color: inherit;
             background: #fff;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
         }
-        .garden-map-img { width: 100%; display: block; }
-        
-        .map-link {
-            position: absolute; 
-            background: rgba(255, 0, 0, 0); 
-            cursor: pointer; 
-            text-indent: -9999px; 
-            border-radius: 8px; 
-            transition: background 0.1s;
+
+        .card:hover {
+            background: #f7f6f3;
+            box-shadow: 0 2px 8px rgba(15, 15, 15, 0.06);
         }
-        .map-link:hover { background: rgba(255, 255, 255, 0.2); outline: 2px dashed #1a1a1a; }
-        
-        /* 📍 PC 그림 위 캐릭터별 절대 좌표 */
-        .link-ttong    { top: 10%; left: 10%; width: 35%; height: 35%; }
-        .link-pink     { top: 10%; right: 10%; width: 35%; height: 35%; }
-        .link-sungree  { bottom: 10%; left: 10%; width: 35%; height: 35%; }
-        .link-oasis    { bottom: 10%; right: 10%; width: 35%; height: 35%; }
 
-        /* 📱 모바일용 스타일: 2x2 아이콘 그리드 대문 (기본 숨김) */
-        .mobile-grid-view { display: none; }
+        .card-cover {
+            aspect-ratio: 16 / 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            border-bottom: 1px solid #e9e9e7;
+            flex-shrink: 0;
+        }
 
-        /* 🎛️ 모바일 반응형 스위치 (화면 크기가 600px 이하일 때 가동) */
-        @media (max-width: 600px) {
-            .pc-map-view { display: none; }
-            
-            .mobile-grid-view {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 15px;
-                width: 100%;
+        .card-cover.ttong { background: linear-gradient(145deg, #fff8e1, #ffe082); }
+        .card-cover.pink { background: linear-gradient(145deg, #fce4ec, #f8bbd0); }
+        .card-cover.sungree { background: linear-gradient(145deg, #e8f5e9, #a5d6a7); }
+        .card-cover.oasis { background: linear-gradient(145deg, #f3e5f5, #ce93d8); }
+
+        .card-body {
+            padding: 8px 10px 10px;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #37352f;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        @media (min-width: 720px) {
+            .gallery {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 16px;
             }
 
-            .mobile-grid-btn {
-                padding: 30px 10px;
-                font-size: 13px;
-                line-height: 1.4;
-                border: 3px solid #1a1a1a;
-                border-radius: 12px;
-                box-shadow: 4px 4px 0px #000;
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 12px;
-                text-decoration: none;
-                color: #1a1a1a;
-                font-weight: bold;
-                transition: all 0.1s;
-            }
-            .mobile-grid-btn:active {
-                transform: translate(2px, 2px);
-                box-shadow: 1px 1px 0px #000;
-            }
-            .mobile-emoji { font-size: 36px; display: block; }
+            .card-cover { font-size: 44px; }
+            .card-body { padding: 12px 14px 14px; }
+            .card-title { font-size: 14px; line-height: 1.45; }
         }
     </style>
 </head>
 <body>
+    <main class="page">
+        <h1 class="page-title"><span class="emoji">🏡</span>똔그리 가든</h1>
+        <p class="page-desc">다 같이 돼지런하게, 리치 투게더!</p>
 
-    <div class="garden-container">
-        
-        <div class="pc-map-view">
-            <img src="garden-map.png" class="garden-map-img" alt="똔그리가든 지도">
-            <a href="ttong.html" class="map-link link-ttong">똔그리 돼지</a>
-            <a href="pink.html" class="map-link link-pink">분홍 돼지</a>
-            <a href="magic-glasses.html" class="map-link link-sungree">선그리 돼지</a>
-            <a href="oasis.html" class="map-link link-oasis">투자자의 오아시스</a>
+        <div class="hero">
+            <img src="garden-map.png" alt="똔그리 가든 — 돈을 키우는 돼지들의 정원" loading="eager">
         </div>
 
-        <div class="mobile-grid-view">
-            <a href="ttong.html" class="mobile-grid-btn" style="background-color: var(--bg-yellow);">
-                <span class="mobile-emoji">🐖</span>
-                <span>똔그리의<br>재테크 한 스푼</span>
+        <div class="gallery">
+            <a href="ttong.html" class="card">
+                <div class="card-cover ttong">🥕</div>
+                <div class="card-body">
+                    <div class="card-title">🥕 똔그리의 재테크 한 스푼</div>
+                </div>
             </a>
-            <a href="pink.html" class="mobile-grid-btn" style="background-color: var(--bg-red);">
-                <span class="mobile-emoji">🐷</span>
-                <span>분홍돼지의<br>경제 한 스푼</span>
+
+            <a href="pink.html" class="card">
+                <div class="card-cover pink">🐷</div>
+                <div class="card-body">
+                    <div class="card-title">🐷 연그리의 경제 한 스푼</div>
+                </div>
             </a>
-            <a href="magic-glasses.html" class="mobile-grid-btn" style="background-color: var(--bg-green);">
-                <span class="mobile-emoji">🕶️</span>
-                <span>선그리 돼지의<br>메타 안경</span>
+
+            <a href="magic-glasses.html" class="card">
+                <div class="card-cover sungree">🕶️</div>
+                <div class="card-body">
+                    <div class="card-title">🕶️ 썬그리의 메타 안경</div>
+                </div>
             </a>
-            <a href="oasis.html" class="mobile-grid-btn" style="background-color: var(--bg-purple);">
-                <span class="mobile-emoji">🔮</span>
-                <span>투자자의<br>오아시스</span>
+
+            <a href="oasis.html" class="card">
+                <div class="card-cover oasis">🏝️</div>
+                <div class="card-body">
+                    <div class="card-title">🏝️ 투자자의 오아시스</div>
+                </div>
             </a>
         </div>
-        
-    </div>
-
+    </main>
 </body>
 </html>
