@@ -4,68 +4,849 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>똔그리 가든</title>
+    <link href="https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #f8fafc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        
-        .garden-container { position: relative; width: 100%; max-width: 1000px; text-align: center; }
-
-        /* 🖥️ [1] PC / 태블릿 화면용 스타일 */
-        .pc-view { position: relative; display: inline-block; width: 100%; max-width: 800px; margin: 0 auto; }
-        .pc-map-img { width: 100%; display: block; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        
-        /* 💡 위치 맞출 때만 맨 끝 0을 0.3으로 고쳐서 빨간 상자를 보세요! */
-        .pc-link { position: absolute; background: rgba(255, 0, 0, 0); border-radius: 15px; cursor: pointer; text-indent: -9999px; transition: background 0.2s; }
-        .pc-link:hover { background: rgba(255, 255, 255, 0.15); border: 2px dashed #003366; }
-
-        /* 📍 캐릭터별 투명 버튼 위치 (% 숫자는 그림에 맞게 조절) */
-        .link-ttong    { top: 10%; left: 10%; width: 35%; height: 35%; } 
-        .link-pink     { top: 10%; right: 10%; width: 35%; height: 35%; } 
-        .link-sungree  { bottom: 10%; left: 10%; width: 35%; height: 35%; } 
-        .link-wisdom   { bottom: 10%; right: 10%; width: 35%; height: 35%; } 
-
-        /* 📱 [2] 모바일 화면용 스타일 (2x2 그리드 카드) */
-        .mobile-view { display: none; width: 100%; max-width: 420px; grid-template-columns: 1fr 1fr; gap: 15px; margin: 0 auto; }
-        .menu-card { background: white; padding: 35px 15px; border-radius: 15px; text-decoration: none; color: #334155; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: transform 0.2s; }
-        .menu-card:active { transform: scale(0.95); }
-        .menu-card span { font-size: 36px; }
-
-        /* 반응형 스위치 */
-        @media (max-width: 600px) {
-            .pc-view { display: none; } 
-            .mobile-view { display: grid; } 
+        :root {
+            --bg-red: #ffebee; --border-red: #ff8a80;
+            --bg-yellow: #fffde7; --border-yellow: #ffd54f;
+            --bg-green: #e8f5e9; --border-green: #81c784;
         }
+
+        body {
+            font-family: 'DungGeunMo', sans-serif;
+            background: #f0f4f8; margin: 0; padding: 15px;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+        }
+
+        .wrapper-card {
+            width: 100%; max-width: 500px; border: 4px solid #1a1a1a;
+            border-radius: 12px; padding: 20px; box-shadow: 4px 4px 0px #000;
+            background-color: var(--bg-yellow); transition: all 0.3s ease; position: relative;
+        }
+
+        .app-title {
+            text-align: center; font-size: 18px; margin: 0 0 12px;
+            border-bottom: 2px dashed #1a1a1a; padding-bottom: 10px;
+        }
+
+        .wallet-zone {
+            display: flex; justify-content: space-between; background: #222; color: #fff;
+            padding: 8px 15px; border-radius: 6px; font-size: 14px; border: 2px solid #000; align-items: center;
+            margin-bottom: 15px;
+        }
+
+        /* 4대 메인 메뉴 네비게이션 */
+        .main-nav {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px;
+        }
+        .nav-btn {
+            font-family: 'DungGeunMo'; padding: 12px 8px; font-size: 11px; line-height: 1.35;
+            cursor: pointer; border: 2px solid #1a1a1a; background: #fff; border-radius: 8px;
+            box-shadow: 2px 2px 0px #000; text-align: center; transition: all 0.15s;
+        }
+        .nav-btn:hover { background: #fffde7; }
+        .nav-btn.active {
+            background: #ffeb3b; transform: translate(1px, 1px); box-shadow: 1px 1px 0px #000;
+        }
+        .nav-btn .nav-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+
+        /* 패널 (하네스 모듈) */
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .panel-area { margin-top: 4px; }
+
+        .section-title {
+            font-size: 16px; margin: 16px 0 10px; text-align: center;
+            border-bottom: 2px dashed #1a1a1a; padding-bottom: 8px; color: #111;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0; }
+        .metric-item { background: rgba(255, 255, 255, 0.85); border: 2px solid #1a1a1a; border-radius: 6px; padding: 6px; text-align: center; }
+        .metric-label { font-size: 10px; color: #444; font-weight: bold; margin-bottom: 2px; }
+        .metric-value { font-size: 13px; font-weight: bold; color: #111; }
+        .metric-sub { font-size: 8px; color: #777; margin-top: 1px; }
+
+        .farmer-zone { display: flex; align-items: center; gap: 15px; background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 12px; margin-top: 10px; }
+        .avatar { font-size: 42px; transition: transform 0.2s; }
+        .speech-bubble { font-size: 13px; line-height: 1.4; width: 100%; }
+        .pig-status-tag { background: #1a1a1a; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; display: inline-block; margin-bottom: 4px; }
+
+        .input-group { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+        .input-row { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-size: 13px; }
+        .pixel-input { font-family: 'DungGeunMo'; padding: 5px; border: 2px solid #1a1a1a; border-radius: 4px; width: 60%; text-align: right; }
+        .weed-list { max-height: 100px; overflow-y: auto; background: #fafafa; border: 2px solid #1a1a1a; padding: 5px; border-radius: 4px; font-size: 12px; margin-top: 8px; }
+        .weed-item { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dashed #ccc; }
+
+        .fortune-box { background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 15px; text-align: center; }
+        #fortuneGrape { font-size: 50px; cursor: pointer; display: inline-block; transition: transform 0.2s; }
+        #fortuneResult { margin-top: 10px; font-size: 13px; min-height: 35px; color: #333; line-height: 1.4; }
+
+        .tree-zone { text-align: center; padding: 15px; background: #f3e5f5; border: 3px solid #1a1a1a; border-radius: 8px; position: relative; overflow: hidden; }
+        .grape-tree { font-size: 60px; cursor: pointer; display: inline-block; }
+        .shake { animation: shakeTree 0.5s ease-in-out; }
+        @keyframes shakeTree { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+        .falling-grape { position: absolute; font-size: 25px; top: 20px; left: 50%; transform: translateX(-50%); opacity: 0; pointer-events: none; }
+        .drop { animation: dropGrape 0.8s forwards; }
+        @keyframes dropGrape { 0% { opacity: 1; top: 20px; } 100% { opacity: 0; top: 100px; } }
+
+        .music-status { font-size: 12px; color: #555; margin: 10px 0; padding: 8px; background: #f9f9f9; border-radius: 4px; border: 1px dashed #aaa; min-height: 18px; }
+        .music-controls { display: flex; gap: 8px; margin-top: 8px; }
+        .music-controls .game-btn { flex: 1; }
+
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+
+        .healing-center { background: #fff; border: 3px solid #1a1a1a; border-radius: 8px; padding: 15px; }
+        .religion-select { width: 100%; font-family: 'DungGeunMo'; padding: 8px; margin-bottom: 15px; border: 2px solid #1a1a1a; }
+        .progress-container { margin: 15px 0; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+        .progress-bar-bg { background: #ff8a80; border: 2px solid #1a1a1a; height: 20px; border-radius: 4px; overflow: hidden; position: relative; }
+        .progress-bar-fill { background: #b9f6ca; width: 0%; height: 100%; transition: width 0.1s ease; }
+        .progress-text { position: absolute; width: 100%; text-align: center; font-size: 11px; top: 2px; font-weight: bold; }
+        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .action-buttons .groove-btn { grid-column: span 2; background: #fff9c4; }
+
+        /* 스님머리 그루브 존 */
+        .groove-zone {
+            display: none; margin-top: 12px; text-align: center;
+            background: linear-gradient(180deg, #fff8e1 0%, #ffe0b2 100%);
+            border: 3px solid #1a1a1a; border-radius: 8px; padding: 15px;
+            transition: box-shadow 0.1s;
+        }
+        .groove-zone.active { display: block; }
+        .groove-zone.beat-flash { box-shadow: inset 0 0 0 4px #ff9800; }
+        .monk-head {
+            width: 130px; height: 130px; margin: 12px auto;
+            border-radius: 50%; background: #ffcc80;
+            border: 4px solid #1a1a1a; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 5px 5px 0 #000; transition: transform 0.07s;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .monk-head .monk-face { font-size: 72px; line-height: 1; pointer-events: none; }
+        .monk-head.tap { transform: scale(0.9) translateY(4px); box-shadow: 2px 2px 0 #000; }
+        .monk-head.perfect { animation: monkGlow 0.3s ease; }
+        @keyframes monkGlow { 0% { box-shadow: 0 0 0 6px #ffeb3b; } 100% { box-shadow: 5px 5px 0 #000; } }
+        .groove-info { font-size: 12px; color: #555; margin: 8px 0; }
+        .groove-stats { display: flex; justify-content: center; gap: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
+        .groove-stats span { color: #e65100; }
+        .beat-indicator {
+            height: 8px; background: #eee; border: 2px solid #1a1a1a; border-radius: 4px;
+            overflow: hidden; margin-bottom: 10px;
+        }
+        .beat-indicator-fill {
+            height: 100%; width: 0%; background: #ff9800;
+            transition: width 0.05s linear;
+        }
+        .tap-effect {
+            position: fixed; font-weight: bold; font-size: 16px; pointer-events: none; z-index: 200;
+            animation: tapPop 0.5s ease-out forwards;
+        }
+        @keyframes tapPop {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.4) translateY(-30px); }
+        }
+
+        .placeholder-box {
+            background: #fff; border: 3px dashed #1a1a1a; border-radius: 8px;
+            padding: 40px 20px; text-align: center; color: #666;
+        }
+        .placeholder-box .placeholder-emoji { font-size: 48px; margin-bottom: 12px; }
+
+        .game-btn { font-family: 'DungGeunMo'; padding: 10px; font-size: 12px; cursor: pointer; border: 2px solid #1a1a1a; background: #f5f5f5; border-radius: 6px; box-shadow: 2px 2px 0px #000; width: 100%; }
+        .game-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
+        .game-btn:disabled { background: #eee; cursor: not-allowed; box-shadow: none; transform: none; color: #aaa; }
+
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 999; }
+        .modal-content { background: #fff; border: 4px solid #000; border-radius: 12px; padding: 25px; width: 85%; max-width: 400px; box-shadow: 6px 6px 0px #ffd700; text-align: center; }
+        .modal-title { color: #d32f2f; font-size: 18px; margin-bottom: 15px; font-weight: bold; }
+        .share-btn { font-family: 'DungGeunMo'; background: #ffeb3b; padding: 10px 20px; border: 2px solid #000; box-shadow: 2px 2px 0px #000; cursor: pointer; margin-top: 15px; width: 100%; }
+
+        .money-effect { position: fixed; color: #2e7d32; font-weight: bold; font-size: 14px; animation: fadeUp 0.6s ease-out forwards; pointer-events: none; z-index: 100; }
+        @keyframes fadeUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-30px); } }
     </style>
 </head>
 <body>
 
-    <div class="garden-container">
-        
-        <div class="pc-view">
-            <img src="garden-map.png" class="pc-map-img" alt="똔그리가든">
-            
-            <a href="ttong.html" class="pc-link link-ttong">똔그리 돼지</a>
-            <a href="pink.html" class="pc-link link-pink">분홍 돼지</a>
-            <a href="magic-glasses.html" class="pc-link link-sungree">선그리 돼지</a>
-            <a href="wisdom.html" class="pc-link link-wisdom">지혜의 샘</a>
-        </div>
+<div class="wrapper-card" id="mainCard">
+    <div class="app-title">🌳 똔그리 가든</div>
 
-        <div class="mobile-view">
-            <a href="ttong.html" class="menu-card">
-                <span>👑</span> 똔그리 돼지
-            </a>
-            <a href="pink.html" class="menu-card">
-                <span>🐷</span> 분홍 돼지
-            </a>
-            <a href="magic-glasses.html" class="menu-card">
-                <span>😎</span> 선그리 돼지
-            </a>
-            <a href="wisdom.html" class="menu-card">
-                <span>💧</span> 지혜의 샘
-            </a>
-        </div>
-        
+    <div class="wallet-zone">
+        <span>💰 나의 시드머니: <strong id="walletBalance">0</strong> 원</span>
+        <span style="font-size:11px; color:#aaa;">🧃 마신 주스: <strong id="juiceCountDisplay" style="color:#ffeb3b;">0</strong>잔</span>
     </div>
 
+    <!-- 4대 메인 메뉴 -->
+    <nav class="main-nav">
+        <button class="nav-btn" data-panel="panel-weather" onclick="switchPanel('panel-weather', this)">
+            <span class="nav-emoji">🕶️</span>선글라스 돼지의<br>투자 기상도
+        </button>
+        <button class="nav-btn" data-panel="panel-golden" onclick="switchPanel('panel-golden', this)">
+            <span class="nav-emoji">👑</span>황금 돼지의<br>재테크 한 스푼
+        </button>
+        <button class="nav-btn" data-panel="panel-pink" onclick="switchPanel('panel-pink', this)">
+            <span class="nav-emoji">🐷</span>분홍돼지의<br>경제 한 스푼
+        </button>
+        <button class="nav-btn" data-panel="panel-oasis" onclick="switchPanel('panel-oasis', this)">
+            <span class="nav-emoji">💧</span>투자자의<br>지혜의 샘
+        </button>
+    </nav>
+
+    <div class="panel-area">
+    <!-- 패널 1: 선글라스 돼지의 투자 기상도 -->
+    <div id="panel-weather" class="panel">
+        <div class="section-title">🌤️ 오늘의 투자 기상도 (거시 지표)</div>
+        <div class="metrics-grid">
+            <div class="metric-item">
+                <div class="metric-label">공포탐욕지수</div>
+                <div class="metric-value" id="mFG">25</div>
+                <div class="metric-sub">대중 심리</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">VIX 지수</div>
+                <div class="metric-value" id="mVIX">36.5</div>
+                <div class="metric-sub">시장 불안도</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">RSI 지수</div>
+                <div class="metric-value" id="mRSI">28.0</div>
+                <div class="metric-sub">과열/과매도</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">美 10년 국채금리</div>
+                <div class="metric-value" id="mUS10Y">4.21%</div>
+                <div class="metric-sub">자금 중력</div>
+            </div>
+            <div class="metric-item" style="grid-column: span 2; background: #fff3e0;">
+                <div class="metric-label">종합 기술 시그널</div>
+                <div class="metric-value" id="mTechScore">65점</div>
+                <div class="metric-sub">보조지표 끝장토론</div>
+            </div>
+            <div class="input-row" style="grid-column: span 3; background: #f1f8ff; padding: 6px; border-radius: 4px; border: 1px solid #1a1a1a; margin-top: 4px;">
+                <span style="font-size:11px; font-weight:bold;">🛠️ 기상 시그널 테스트 (0~100점):</span>
+                <input type="range" id="weatherSlider" min="0" max="100" value="65" style="width:50%;" oninput="updateWeather(this.value)">
+            </div>
+        </div>
+
+        <div class="farmer-zone">
+            <div class="avatar" id="fAvatar">🕶️🐖</div>
+            <div class="speech-bubble">
+                <span class="pig-status-tag" id="pigRankTag">🕶️ 선글라스 돼지</span>
+                <div id="fText">기상 센서 연동 중...</div>
+            </div>
+        </div>
+
+        <div class="section-title">🕶️ 마법 안경: 종목별 MDD 계산기</div>
+        <div class="input-group">
+            <div style="font-size:11px; color:#666; margin-bottom:4px;">※ 거시 기상도와 함께 특정 종목 침수율을 체크해 투자 판단하세요.</div>
+            <div class="input-row"><span>종목명:</span><input type="text" id="mddName" class="pixel-input" style="text-align:left;" placeholder="예: 삼성전자"></div>
+            <div class="input-row"><span>역대 최고가(원):</span><input type="number" id="mddHigh" class="pixel-input" placeholder="0"></div>
+            <div class="input-row"><span>현재가/최저가(원):</span><input type="number" id="mddLow" class="pixel-input" placeholder="0"></div>
+            <button class="game-btn" style="margin-top:5px; background:#e0f7fa;" onclick="calculateMDD()">🕶️ 마법 안경으로 침수율 계산</button>
+            <div id="mddResult" style="font-size:12px; margin-top:5px; text-align:center; color:#e65100; font-weight:bold;"></div>
+        </div>
+
+        <div class="section-title">🌾 가계부: 지갑 속 잡초 제거</div>
+        <div class="input-group">
+            <div class="input-row"><span>이번 달 목표 예산(원):</span><input type="number" id="budgetGoal" class="pixel-input" onchange="saveBudget()" placeholder="0"></div>
+            <div class="input-row" style="border-top: 1px dashed #ccc; padding-top:8px; margin-top:4px;">
+                <input type="text" id="weedDesc" class="pixel-input" style="width:45%; text-align:left;" placeholder="과소비 잡초명">
+                <input type="number" id="weedAmount" class="pixel-input" style="width:35%;" placeholder="금액">
+                <button class="game-btn" style="width:18%; padding:5px; background:#ffcdd2;" onclick="addWeed()">제거</button>
+            </div>
+            <div style="font-size:12px; display:flex; justify-content:space-between; margin-top:5px; font-weight:bold;">
+                <span>총 지출(잡초): <span id="totalWeedCost" style="color:red;">0</span>원</span>
+                <span>남은 자금: <span id="remainBudget" style="color:green;">0</span>원</span>
+            </div>
+            <div class="weed-list" id="weedList"></div>
+        </div>
+    </div>
+
+    <!-- 패널 2: 황금 돼지의 재테크 한 스푼 -->
+    <div id="panel-golden" class="panel">
+        <div class="section-title">👑 황금 돼지의 재테크 한 스푼</div>
+        <div class="placeholder-box">
+            <div class="placeholder-emoji">👑🐖</div>
+            <p>황금 돼지가 재테크 레시피를 준비 중입니다.<br>곧 한 스푼씩 올려드릴게요!</p>
+        </div>
+    </div>
+
+    <!-- 패널 3: 분홍돼지의 경제 한 스푼 -->
+    <div id="panel-pink" class="panel">
+        <div class="section-title">🐷 분홍돼지의 경제 한 스푼</div>
+        <div class="placeholder-box">
+            <div class="placeholder-emoji">🐷🍇</div>
+            <p>분홍돼지가 경제 뉴스를 정리 중입니다.<br>곧 한 스푼씩 올려드릴게요!</p>
+        </div>
+    </div>
+
+    <!-- 패널 4: 투자자의 지혜의 샘 -->
+    <div id="panel-oasis" class="panel">
+        <div class="section-title">🔮 오늘의 럭키빔 돼지 운세</div>
+        <div class="fortune-box">
+            <div id="fortuneGrape" onclick="openFortune()">🍇</div>
+            <div id="fortuneResult">포도알을 눌러 럭키빔 돼지의 투자 운세를 점쳐보세요!</div>
+        </div>
+
+        <div class="section-title">🎵 번뇌를 날리는 음악</div>
+        <div class="healing-center">
+            <div style="font-size:11px; color:#666; margin-bottom:8px;">종교를 선택하면 마음이 차분해지는 명상 음악이 재생됩니다.</div>
+            <select class="religion-select" id="musicSelector" onchange="changeMusic()">
+                <option value="none">🙏 나의 신앙(종교)을 선택하세요</option>
+                <option value="protestant">✝️ 개신교 — 잔잔한 찬송 연주</option>
+                <option value="catholic">⛪ 카톨릭 — 성가대 명상 선율</option>
+                <option value="buddhist">🧘‍♂️ 불교 — 목탁 & 사찰 종소리</option>
+                <option value="secular">🎧 무교 — 엠씨스퀘어 차분 뇌파음</option>
+            </select>
+            <div class="music-status" id="musicStatus">음악이 선택되지 않았습니다.</div>
+            <div class="music-controls">
+                <button class="game-btn" style="background:#e8f5e9;" onclick="changeMusic()">▶️ 재생</button>
+                <button class="game-btn" style="background:#ffcdd2;" onclick="stopMusic()">⏹ 정지</button>
+            </div>
+        </div>
+
+        <div class="section-title">🧘 스트레스야 잘 가!</div>
+        <div class="healing-center">
+            <div class="progress-container">
+                <div class="progress-label"><span>🔴 번뇌(손실) 구간</span><span>🟢 수익권 진입!</span></div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progFill"></div>
+                    <div class="progress-text" id="progText">현재 수익률: -50%</div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="game-btn" onclick="playGame(event, 'buddha')">✨ 황금돼지 불상 닦기</button>
+                <button class="game-btn" onclick="playGame(event, 'moktak')">🥁 목탁 두들기기</button>
+                <button class="game-btn groove-btn" id="grooveBtn" onclick="toggleGrooveMode()">🪘 스님머리 두들기며 그루브 타기</button>
+            </div>
+
+            <div class="groove-zone" id="grooveZone">
+                <div style="font-size:13px; font-weight:bold; color:#e65100;">🎶 그루비 목탁 비트 가동 중!</div>
+                <div class="groove-info">비트에 맞춰 스님 머리를 두드려보세요. 타이밍이 맞으면 PERFECT!</div>
+                <div class="beat-indicator"><div class="beat-indicator-fill" id="beatFill"></div></div>
+                <div id="monkHead" class="monk-head" onclick="tapMonkHead(event)">
+                    <span class="monk-face">👨‍🦲</span>
+                </div>
+                <div class="groove-stats">
+                    <div>두드린 횟수: <span id="grooveTapCount">0</span></div>
+                    <div>PERFECT: <span id="groovePerfectCount">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">🍇 오아시스 포도 나무 (일일 배당수확)</div>
+        <div class="tree-zone">
+            <div id="tree" class="grape-tree" onclick="shakeTree()">🍇🌳</div>
+            <div id="grape" class="falling-grape">🍇</div>
+            <p id="treeStatus" style="font-size:12px; margin-top:10px; color:#555;">포도 나무를 흔들면 시드머니 보너스가 바닥에 떨어집니다!</p>
+        </div>
+
+        <div class="section-title">🍹 오아시스 주스 상점 (돼지 벌크업)</div>
+        <div class="input-group" style="background:#fffde7;">
+            <div style="font-size:12px; text-align:center; color:#555; margin-bottom:5px;">주스를 사 마실수록 똔그리가 통통한 자산가 돼지로 영구 진화합니다!</div>
+            <div class="shop-grid">
+                <button class="game-btn" style="background:#ffecb3;" onclick="buyJuice('mango', 300)">🍹 망고주스 (-300원)</button>
+                <button class="game-btn" style="background:#e1bee7;" onclick="buyJuice('grape', 500)">🍇 포도주스 (-500원)</button>
+            </div>
+        </div>
+
+        <div class="section-title">📖 지혜 한 스푼</div>
+        <div class="placeholder-box" style="padding: 30px 20px;">
+            <div class="placeholder-emoji">💧📜</div>
+            <p>지혜의 샘에서 한 스푼씩 길어 올릴<br>투자자 명언 & 마음 처방을 준비 중입니다.<br><strong>업뎃 예정!</strong></p>
+        </div>
+    </div>
+    </div><!-- /.panel-area -->
+</div>
+
+<div class="modal-overlay" id="winModal">
+    <div class="modal-content">
+        <div class="modal-title" id="modalTitle">👑 엔딩 타이틀 👑</div>
+        <p id="modalText" style="font-size: 13px; line-height: 1.6; text-align: left; color:#333;"></p>
+        <button class="share-btn" onclick="alert('📸 스토리 공유용 주소가 복사되었습니다!')">📸 인스타 스토리에 공유하기</button>
+        <button class="share-btn" style="background:#eee; margin-top:5px;" onclick="resetGame()">다시 번뇌 씻으러 가기</button>
+    </div>
+</div>
+
+<script>
+    let seedMoney = parseInt(localStorage.getItem('seedMoney') || '1000', 10);
+    let juiceCount = parseInt(localStorage.getItem('juiceCount') || '0', 10);
+    let weeds = JSON.parse(localStorage.getItem('weeds') || '[]');
+    let lastShakeDate = localStorage.getItem('lastShake');
+    let progress = 0;
+    let isFinished = false;
+
+    document.getElementById('walletBalance').innerText = seedMoney.toLocaleString();
+    document.getElementById('juiceCountDisplay').innerText = juiceCount;
+    document.getElementById('budgetGoal').value = localStorage.getItem('budgetGoal') || '';
+    renderWeeds();
+    updateWeather(document.getElementById('weatherSlider').value);
+
+    function switchPanel(panelId, btn) {
+        if (panelId !== 'panel-oasis') {
+            if (grooveActive) stopGrooveMode();
+            stopMusic();
+        }
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(panelId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    const fortunes = [
+        { emoji: "🐷💤", text: "<strong>[🚨 럭키빔 돼지: 매매 금지 빔]</strong> 오늘도 피하라... 내일도 피하라... 모레도 피하라... 돼지가 코골며 누워 자는 날엔 뇌동매매 접고 쉬는 게 상책!" },
+        { emoji: "👑🐖", text: "<strong>[🟢 럭키빔 돼지: 우주의 기운 빔]</strong> 오늘은 우주의 기운이 계좌를 감싸는 대길의 날! 황금 뚱돼지 왕이 당신의 매수 타점을 축복합니다!" },
+        { emoji: "🛡️🐷", text: "<strong>[🛡️ 럭키빔 돼지: 평단가 수호 빔]</strong> 럭키빔 돼지가 눈을 부릅뜨고 평단가 바리케이트를 칩니다. 세력들이 뒤흔들어도 버티세요! (방어력 +100)" },
+        { emoji: "🐷💢", text: "<strong>[💸 럭키빔 돼지: 텅장 경보 빔]</strong> 꿀꿀! 손가락이 근질근질하죠? 오늘 충동구매하면 오아시스 포도 껍질만 씹어먹어야 할 수 있습니다." }
+    ];
+
+    const endings = [
+        { title: "👑 성불 완료 & 대풍년 달성! 👑", text: "<strong>이재용 회장님</strong>이 먼저 카톡으로 삼겹살 번개를 신청합니다!<br><br><strong>젠슨 황 회장</strong>이 엔비디아 마진으로 쏜 깐부치킨 크리스피 획득!<br><br>지금 당장 두 깐부와 치맥을 즐기러 이동하세요! 🍗🍺" },
+        { title: "🍔 오마하 본사의 점심 식사 초대! 🍔", text: "전 세계 투자자들의 꿈! <strong>버크셔 해서웨이 오마하 본사 점심 식사</strong>에 초청받았습니다!<br><br>워렌 버핏 영감님이 인자하게 웃으며 갓 구운 <strong>맥모닝 베이컨 에그 맥머핀</strong>을 건냅니다.<br><br>본사 냉장고의 체리 코카콜라는 무한 리필 가능! 거장의 비밀 노트를 전수받았습니다! 🥤" },
+        { title: "🚀 도파민 최대치 돌파! 화성 이주 🚀", text: "일론 머스크가 당신이 닦던 '황금 돼지 불상' 픽셀아트를 보고 감탄해 X(트위터)에 박제했습니다!<br><br>도지코인과 자산 가치가 <strong>4,200% 폭등</strong>합니다!<br><br>스페이스X 스타십 프라이빗 좌석을 타고 화성으로 가서 최초의 '우주 돼지 감자 농장'을 개업하러 출발합니다! 🪐" },
+        { title: "💾 전설의 유물 방구석 발굴! 💾", text: "목탁을 너무 세게 두들긴 나머지 방구석 서랍장 뒤로 떨어진 2010년산 구형 외장하드를 발견했습니다!<br><br>먼지를 털고 켜보니 대학생 때 재미로 캐두었던 <strong>비트코인 100개</strong>가 들어있습니다!<br><br>비밀번호가 극적으로 기억나며 전 세계 자산가 순위 등극! 사토시의 웰컴 메일이 도착합니다! 🪙" },
+        { title: "🏙️ 서울 노른자 땅 건물주 등극! 🏙️", text: "축하합니다! 주식 번뇌를 이겨내고 서울 가장 핫한 대형 빌딩의 <strong>진짜 건물주</strong>가 되었스니다!<br><br>매달 통장에 숨만 쉬어도 수억 원의 월세가 꼬박꼬박 꽂히는 떼부자의 삶이 펼쳐집니다.<br><br>똔그리 돼지도 이제 멋진 건물주 모자를 쓰고 빌딩 라운지에서 망고주스를 원샷합니다! 🏢💰" }
+    ];
+
+    function updateWeather(score) {
+        score = parseInt(score, 10);
+        const card = document.getElementById('mainCard');
+        const txt = document.getElementById('fText');
+        const tag = document.getElementById('pigRankTag');
+        const avatar = document.getElementById('fAvatar');
+
+        document.getElementById('mTechScore').innerText = score + "점";
+
+        let weatherEmoji = "⛅";
+        let weatherLabel = "구름 ⛅";
+        let weatherBg = "#78909c";
+        let cardBg = '#f5f5f5';
+        let message = `<strong>[오늘의 투자 기상도: 구름 ⛅]</strong> 시장 추세가 애매합니다. 선글라스 돼지가 구름 낀 하늘 아래에서 눈치를 보며 다음 당근 파종 타이밍을 심각하게 저울질하고 있습니다.`;
+
+        if (score >= 81) {
+            weatherEmoji = "☀️";
+            weatherLabel = "맑음 ☀️";
+            weatherBg = "#29b6f6";
+            cardBg = '#e3f2fd';
+            message = `<strong>[오늘의 투자 기상도: 맑음 ☀️]</strong> 종합 기술 시그널 대풍년! 선글라스 돼지가 햇살 가득한 날씨 속에서 신나게 당근 농사를 지으며 자산을 불리는 중입니다. 씨앗을 적극적으로 파종하기 아주 좋은 타이밍입니다!`;
+        } else if (score <= 40) {
+            weatherEmoji = "⛈️";
+            weatherLabel = "폭풍우 ⛈️";
+            weatherBg = "#5e35b1";
+            cardBg = '#ede7f6';
+            message = `<strong>[오늘의 투자 기상도: 폭풍우 ⛈️]</strong> 시장 급락 경보! 선글라스 돼지가 멘탈을 필사적으로 챙기며 당근밭에 방수포를 씌우고 있습니다. 매매 버튼을 접고 샘으로 대피하세요!`;
+        }
+
+        const isBudgetBurst = weeds.reduce((a, b) => a + b.amount, 0) > parseInt(localStorage.getItem('budgetGoal') || '0', 10);
+
+        if (!isBudgetBurst) card.style.backgroundColor = cardBg;
+        tag.innerText = `🕶️ 선글라스 돼지 [${weatherLabel}]`;
+        tag.style.background = weatherBg;
+        avatar.innerText = weatherEmoji + "🕶️🐖";
+        txt.innerHTML = message;
+    }
+
+    function buyJuice(type, price) {
+        if (seedMoney < price) { alert("지갑에 시드머니가 부족합니다! 열심히 일해서 돈을 벌어오세요! 💸"); return; }
+        seedMoney -= price;
+        if (type === 'mango') juiceCount += 1;
+        if (type === 'grape') juiceCount += 2;
+
+        localStorage.setItem('seedMoney', seedMoney);
+        localStorage.setItem('juiceCount', juiceCount);
+        document.getElementById('walletBalance').innerText = seedMoney.toLocaleString();
+        document.getElementById('juiceCountDisplay').innerText = juiceCount;
+
+        alert(`🍹 꺼억~! 맛있는 ${type === 'mango' ? '망고' : '포도'}주스를 충동 구매했습니다. (-${price}원 / 벌크업 진행 중)`);
+    }
+
+    function calculateMDD() {
+        const name = document.getElementById('mddName').value || "선택 종목";
+        const high = parseFloat(document.getElementById('mddHigh').value);
+        const low = parseFloat(document.getElementById('mddLow').value);
+        if (!high || !low) { alert("최고가와 현재가를 정확히 입력하세요!"); return; }
+        const mdd = ((low - high) / high) * 100;
+
+        let comment = "마법 안경 분석: 이 정도 조정은 똔그리 가든이 무럭무럭 자라나는 자연스러운 과정일 뿐입니다. 🌾";
+        if (mdd <= -30 && mdd > -50) comment = "⚠️ 침수 위험 경보! 선글라스 돼지가 방수포를 지급합니다. 분산 투자 자산을 긴급 점검하세요! ⛈️";
+        if (mdd <= -50) comment = "🚨 계좌 난파 위기! 똔그리가 즉시 샘으로 대피령을 내렸습니다. 목탁 비트를 연타해 번뇌를 씻으세요! 🥁";
+
+        document.getElementById('mddResult').innerHTML = `[${name}] 고점 대비 낙폭(MDD): ${mdd.toFixed(2)}%<br><span style='color:#333; font-weight:normal;'>💬 선글라스 돼지의 훈수: ${comment}</span>`;
+    }
+
+    function saveBudget() { localStorage.setItem('budgetGoal', document.getElementById('budgetGoal').value); renderWeeds(); }
+
+    function addWeed() {
+        const desc = document.getElementById('weedDesc').value;
+        const amount = parseInt(document.getElementById('weedAmount').value, 10);
+        if (!desc || !amount) { alert("내용과 금액을 입력하세요!"); return; }
+        weeds.push({ desc, amount });
+        localStorage.setItem('weeds', JSON.stringify(weeds));
+        document.getElementById('weedDesc').value = '';
+        document.getElementById('weedAmount').value = '';
+        renderWeeds();
+    }
+
+    function deleteWeed(index) {
+        weeds.splice(index, 1);
+        localStorage.setItem('weeds', JSON.stringify(weeds));
+        renderWeeds();
+    }
+
+    function renderWeeds() {
+        const list = document.getElementById('weedList');
+        const goal = parseInt(localStorage.getItem('budgetGoal') || '0', 10);
+        list.innerHTML = '';
+        let totalCost = 0;
+        weeds.forEach((w, i) => {
+            totalCost += w.amount;
+            list.innerHTML += `<div class="weed-item"><span>🌱 ${w.desc} (${w.amount.toLocaleString()}원)</span><span style="color:red; cursor:pointer;" onclick="deleteWeed(${i})">[제거]</span></div>`;
+        });
+        document.getElementById('totalWeedCost').innerText = totalCost.toLocaleString();
+        const remain = goal - totalCost;
+        const remainEl = document.getElementById('remainBudget');
+        remainEl.innerText = remain.toLocaleString();
+
+        const txt = document.getElementById('fText');
+        const card = document.getElementById('mainCard');
+        if (remain < 0) {
+            remainEl.style.color = 'red';
+            card.style.backgroundColor = 'var(--bg-red)';
+            txt.innerHTML = "<strong>[가계부 비상! 💢]</strong> 지갑에 과소비 잡초가 너무 무성합니다! 멧돼지 떼가 나타나 한 달 예산을 다 파헤쳐 놓았습니다! 자산 방수포 가동 불가능!";
+        } else {
+            remainEl.style.color = 'green';
+            if (document.getElementById('weatherSlider')) {
+                updateWeather(document.getElementById('weatherSlider').value);
+            }
+        }
+    }
+
+    function openFortune() {
+        const grape = document.getElementById('fortuneGrape');
+        const result = document.getElementById('fortuneResult');
+        grape.style.transform = "scale(1.3) rotate(15deg)";
+        setTimeout(() => {
+            const item = fortunes[Math.floor(Math.random() * fortunes.length)];
+            grape.innerText = item.emoji;
+            result.innerHTML = item.text;
+            grape.style.transform = "scale(1)";
+        }, 300);
+    }
+
+    function shakeTree() {
+        const today = new Date().toDateString();
+        if (lastShakeDate === today) { alert("오늘의 포도 나무 배당금은 이미 수확했습니다! 내일 다시 오세요. 💤"); return; }
+        const tree = document.getElementById('tree');
+        const grape = document.getElementById('grape');
+        tree.classList.add('shake');
+        grape.classList.remove('drop');
+        void grape.offsetWidth;
+        grape.classList.add('drop');
+        setTimeout(() => {
+            tree.classList.remove('shake');
+            grape.classList.remove('drop');
+            seedMoney += 150;
+            localStorage.setItem('seedMoney', seedMoney);
+            localStorage.setItem('lastShake', today);
+            lastShakeDate = today;
+            document.getElementById('walletBalance').innerText = seedMoney.toLocaleString();
+            document.getElementById('treeStatus').innerText = "오늘 수확 완료! 포도 배당금 보너스 +150원이 지갑에 들어왔습니다.";
+        }, 800);
+    }
+
+    // 명상 음악 (Web Audio API)
+    let audioCtx = null;
+    let musicNodes = [];
+    let musicInterval = null;
+
+    const musicLabels = {
+        protestant: '✝️ 개신교 찬송 연주 — 마음이 잔잔해집니다...',
+        catholic: '⛪ 카톨릭 성가대 선율 — 평온한 기도의 시간...',
+        buddhist: '🧘‍♂️ 불교 사찰 종소리 — 번뇌가 가라앉습니다...',
+        secular: '🎧 엠씨스퀘어 차분 뇌파음 — 삐- 삐- 머리가 맑아집니다...'
+    };
+
+    function stopMusic() {
+        if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
+        musicNodes.forEach(n => { try { if (n.stop) n.stop(0); n.disconnect(); } catch(e) {} });
+        musicNodes = [];
+        if (audioCtx) { audioCtx.close(); audioCtx = null; }
+        document.getElementById('musicStatus').innerText = '음악이 정지되었습니다.';
+    }
+
+    function playTone(freq, type, duration, vol, startTime) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(vol, startTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+        musicNodes.push(osc, gain);
+    }
+
+    function playPad(chords, type, vol) {
+        const now = audioCtx.currentTime;
+        chords.forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(vol, now + 1.5);
+            gain.gain.setValueAtTime(vol, now + 6);
+            gain.gain.linearRampToValueAtTime(0, now + 8);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 8);
+            musicNodes.push(osc, gain);
+        });
+    }
+
+    function changeMusic() {
+        const type = document.getElementById('musicSelector').value;
+        stopMusic();
+        if (type === 'none') {
+            document.getElementById('musicStatus').innerText = '종교를 선택해 주세요.';
+            return;
+        }
+
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        document.getElementById('musicStatus').innerText = '🎵 재생 중: ' + musicLabels[type];
+
+        function loopMusic() {
+            if (!audioCtx) return;
+            const t = audioCtx.currentTime;
+
+            if (type === 'protestant') {
+                playPad([261.63, 329.63, 392.00, 523.25], 'sine', 0.06);
+            } else if (type === 'catholic') {
+                playPad([220.00, 277.18, 329.63], 'triangle', 0.07);
+                playTone(440, 'sine', 2.5, 0.04, t + 1);
+            } else if (type === 'buddhist') {
+                playPad([146.83, 174.61], 'sine', 0.05);
+                playTone(293.66, 'sine', 3, 0.08, t + 0.5);
+                playTone(220, 'sine', 4, 0.05, t + 2);
+            } else if (type === 'secular') {
+                const beeps = [440, 523.25, 392, 440];
+                beeps.forEach((f, i) => playTone(f, 'square', 0.15, 0.03, t + i * 0.6));
+            }
+        }
+
+        loopMusic();
+        musicInterval = setInterval(loopMusic, type === 'secular' ? 3000 : 8000);
+    }
+
+    // 🪘 스님머리 그루브 모드
+    let grooveCtx = null;
+    let grooveTimers = [];
+    let grooveActive = false;
+    let grooveBeatMs = 508;
+    let lastBeatTime = 0;
+    let grooveTapCount = 0;
+    let groovePerfectCount = 0;
+    let beatAnimFrame = null;
+
+    function toggleGrooveMode() {
+        if (grooveActive) {
+            stopGrooveMode();
+            return;
+        }
+        stopMusic();
+        grooveActive = true;
+        grooveTapCount = 0;
+        groovePerfectCount = 0;
+        document.getElementById('grooveTapCount').innerText = '0';
+        document.getElementById('groovePerfectCount').innerText = '0';
+        document.getElementById('grooveZone').classList.add('active');
+        document.getElementById('grooveBtn').innerText = '⏹ 그루브 종료';
+        document.getElementById('grooveBtn').style.background = '#ffcdd2';
+        startGrooveBeat();
+    }
+
+    function stopGrooveMode() {
+        grooveActive = false;
+        grooveTimers.forEach(t => clearInterval(t));
+        grooveTimers = [];
+        if (beatAnimFrame) cancelAnimationFrame(beatAnimFrame);
+        if (grooveCtx) { grooveCtx.close(); grooveCtx = null; }
+        document.getElementById('grooveZone').classList.remove('active', 'beat-flash');
+        document.getElementById('beatFill').style.width = '0%';
+        document.getElementById('grooveBtn').innerText = '🪘 스님머리 두들기며 그루브 타기';
+        document.getElementById('grooveBtn').style.background = '#fff9c4';
+    }
+
+    function playGrooveSound(freq, type, duration, vol, time) {
+        if (!grooveCtx) return;
+        const osc = grooveCtx.createOscillator();
+        const gain = grooveCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, time);
+        gain.gain.setValueAtTime(vol, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+        osc.connect(gain);
+        gain.connect(grooveCtx.destination);
+        osc.start(time);
+        osc.stop(time + duration);
+    }
+
+    function playGrooveKick(time) {
+        playGrooveSound(80, 'sine', 0.15, 0.35, time);
+        playGrooveSound(40, 'square', 0.08, 0.12, time);
+    }
+
+    function playGrooveMoktak(time) {
+        playGrooveSound(320, 'triangle', 0.06, 0.2, time);
+        playGrooveSound(640, 'sine', 0.04, 0.08, time + 0.02);
+    }
+
+    function playGrooveBass(time, note) {
+        playGrooveSound(note, 'sine', 0.25, 0.15, time);
+    }
+
+    function playGrooveHat(time) {
+        playGrooveSound(8000, 'square', 0.03, 0.04, time);
+    }
+
+    function startGrooveBeat() {
+        grooveCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const bpm = 118;
+        grooveBeatMs = 60000 / bpm;
+        let beatIndex = 0;
+        const bassNotes = [110, 110, 146.83, 130.81];
+
+        function onBeat() {
+            if (!grooveActive || !grooveCtx) return;
+            const t = grooveCtx.currentTime;
+            lastBeatTime = Date.now();
+            playGrooveKick(t);
+            if (beatIndex % 2 === 0) playGrooveMoktak(t + 0.05);
+            if (beatIndex % 4 === 2) playGrooveHat(t);
+            playGrooveBass(t, bassNotes[beatIndex % 4]);
+            beatIndex++;
+
+            const zone = document.getElementById('grooveZone');
+            zone.classList.remove('beat-flash');
+            void zone.offsetWidth;
+            zone.classList.add('beat-flash');
+        }
+
+        onBeat();
+        grooveTimers.push(setInterval(onBeat, grooveBeatMs));
+        animateBeatBar();
+    }
+
+    function animateBeatBar() {
+        if (!grooveActive) return;
+        const elapsed = Date.now() - lastBeatTime;
+        const pct = Math.min((elapsed / grooveBeatMs) * 100, 100);
+        document.getElementById('beatFill').style.width = pct + '%';
+        beatAnimFrame = requestAnimationFrame(animateBeatBar);
+    }
+
+    function playMoktakTap() {
+        if (!grooveCtx) return;
+        const t = grooveCtx.currentTime;
+        playGrooveSound(280, 'triangle', 0.08, 0.25, t);
+        playGrooveSound(560, 'sine', 0.05, 0.12, t);
+    }
+
+    function isOnBeat() {
+        const elapsed = Date.now() - lastBeatTime;
+        return elapsed < 130 || elapsed > grooveBeatMs - 130;
+    }
+
+    function showTapEffect(event, text, color) {
+        const el = document.createElement('div');
+        el.className = 'tap-effect';
+        el.innerText = text;
+        el.style.color = color || '#e65100';
+        el.style.left = (event.clientX - 30) + 'px';
+        el.style.top = (event.clientY - 20) + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 500);
+    }
+
+    function tapMonkHead(event) {
+        if (!grooveActive) return;
+        event.stopPropagation();
+        const head = document.getElementById('monkHead');
+        head.classList.remove('tap', 'perfect');
+        void head.offsetWidth;
+        head.classList.add('tap');
+        playMoktakTap();
+
+        grooveTapCount++;
+        document.getElementById('grooveTapCount').innerText = grooveTapCount;
+
+        const onBeat = isOnBeat();
+        if (onBeat) {
+            groovePerfectCount++;
+            document.getElementById('groovePerfectCount').innerText = groovePerfectCount;
+            head.classList.add('perfect');
+            showTapEffect(event, 'PERFECT! 🎵', '#2e7d32');
+            addStressRelief(event, 6);
+        } else {
+            showTapEffect(event, '탁!', '#e65100');
+            addStressRelief(event, 3);
+        }
+    }
+
+    function addStressRelief(event, amount) {
+        if (isFinished) return;
+        seedMoney += 1;
+        localStorage.setItem('seedMoney', seedMoney);
+        document.getElementById('walletBalance').innerText = seedMoney.toLocaleString();
+
+        const effect = document.createElement('div');
+        effect.className = 'money-effect';
+        effect.innerText = '+ 시드머니 1원';
+        effect.style.left = `${event.clientX - 40}px`;
+        effect.style.top = `${event.clientY - 40}px`;
+        document.body.appendChild(effect);
+        setTimeout(() => effect.remove(), 600);
+
+        progress += amount;
+        if (progress > 100) progress = 100;
+        const roi = -50 + (progress * 1.5);
+        document.getElementById('progFill').style.width = `${progress}%`;
+        document.getElementById('progText').innerText = `현재 수익률: ${roi.toFixed(0)}%`;
+
+        if (progress === 100 && !isFinished) {
+            isFinished = true;
+            stopGrooveMode();
+            const end = endings[Math.floor(Math.random() * endings.length)];
+            setTimeout(() => {
+                alert('🔊 (BGM 오토 체인지) 승리 행진곡 빰빰빰-!! 🎺🎉');
+                document.getElementById('modalTitle').innerHTML = end.title;
+                document.getElementById('modalText').innerHTML = end.text;
+                document.getElementById('winModal').style.display = 'flex';
+            }, 300);
+        }
+    }
+
+    function playGame(event, type) {
+        if (isFinished) return;
+        if (type === 'moktak' && grooveActive) playMoktakTap();
+        addStressRelief(event, 4);
+    }
+
+    function resetGame() {
+        stopGrooveMode();
+        progress = 0;
+        isFinished = false;
+        document.getElementById('winModal').style.display = 'none';
+        document.getElementById('progFill').style.width = '0%';
+        document.getElementById('progText').innerText = '현재 수익률: -50%';
+        document.getElementById('fortuneGrape').innerText = '🍇';
+        document.getElementById('fortuneResult').innerText = '포도알을 눌러 오늘의 투자 운세를 점쳐보세요!';
+        updateWeather(document.getElementById('weatherSlider').value);
+    }
+</script>
 </body>
 </html>
