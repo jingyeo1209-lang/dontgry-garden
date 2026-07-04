@@ -5,32 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>똔그리 가든</title>
     <style>
-        /* 기본 리셋 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: #f8fafc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         
         .garden-container { position: relative; width: 100%; max-width: 1000px; text-align: center; }
 
-        /* 🖥️ [1] PC용 스타일 */
+        /* 🖥️ [1] PC / 태블릿 화면용 스타일 */
         .pc-view { position: relative; display: inline-block; width: 100%; max-width: 800px; margin: 0 auto; }
         .pc-map-img { width: 100%; display: block; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         
-        /* 💡 영역 조절 시 끝자리 0을 0.3으로 고치세요! */
-        .pc-link { position: absolute; background: rgba(255, 0, 0, 0.3); border-radius: 15px; cursor: pointer; text-indent: -9999px; transition: background 0.2s; }
+        /* 💡 위치 맞출 때만 맨 끝 0을 0.3으로 고쳐서 빨간 상자를 보세요! */
+        .pc-link { position: absolute; background: rgba(255, 0, 0, 0); border-radius: 15px; cursor: pointer; text-indent: -9999px; transition: background 0.2s; }
         .pc-link:hover { background: rgba(255, 255, 255, 0.15); border: 2px dashed #003366; }
 
-        /* 📍 캐릭터별 투명 버튼 위치 */
+        /* 📍 캐릭터별 투명 버튼 위치 (% 숫자는 그림에 맞게 조절) */
         .link-ttong    { top: 10%; left: 10%; width: 35%; height: 35%; } 
         .link-pink     { top: 10%; right: 10%; width: 35%; height: 35%; } 
         .link-sungree  { bottom: 10%; left: 10%; width: 35%; height: 35%; } 
         .link-wisdom   { bottom: 10%; right: 10%; width: 35%; height: 35%; } 
 
-        /* 📱 [2] 모바일용 스타일 */
+        /* 📱 [2] 모바일 화면용 스타일 (2x2 그리드 카드) */
         .mobile-view { display: none; width: 100%; max-width: 420px; grid-template-columns: 1fr 1fr; gap: 15px; margin: 0 auto; }
         .menu-card { background: white; padding: 35px 15px; border-radius: 15px; text-decoration: none; color: #334155; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: transform 0.2s; }
         .menu-card:active { transform: scale(0.95); }
         .menu-card span { font-size: 36px; }
 
+        /* 반응형 스위치 */
         @media (max-width: 600px) {
             .pc-view { display: none; } 
             .mobile-view { display: grid; } 
@@ -42,26 +42,24 @@
     <div class="garden-container">
         
         <div class="pc-view">
-            <img src="garden-map.png" class="pc-map-img" alt="똔그리가든 정원 지도">
+            <img src="garden-map.png" class="pc-map-img" alt="똔그리가든">
             
-            <a href="https://www.dontgry.com/38f8faf1-d42b-80bd-bf30-ef78db13bb65" class="pc-link link-ttong">똔그리 돼지</a>
-            <a href="https://www.dontgry.com/38f8faf1-d42b-8037-936e-c3cb21c31d98" class="pc-link link-pink">분홍 돼지</a>
-            <a href="https://www.dontgry.com/38f8faf1-d42b-8096-9903-ec5ab181517b" class="pc-link link-sungree">선그리 돼지</a>
-            
+            <a href="ttong.html" class="pc-link link-ttong">똔그리 돼지</a>
+            <a href="pink.html" class="pc-link link-pink">분홍 돼지</a>
+            <a href="magic-glasses.html" class="pc-link link-sungree">선그리 돼지</a>
             <a href="wisdom.html" class="pc-link link-wisdom">지혜의 샘</a>
         </div>
 
         <div class="mobile-view">
-            <a href="https://www.dontgry.com/38f8faf1-d42b-80bd-bf30-ef78db13bb65" class="menu-card">
+            <a href="ttong.html" class="menu-card">
                 <span>👑</span> 똔그리 돼지
             </a>
-            <a href="https://www.dontgry.com/38f8faf1-d42b-8037-936e-c3cb21c31d98" class="menu-card">
+            <a href="pink.html" class="menu-card">
                 <span>🐷</span> 분홍 돼지
             </a>
-            <a href="https://www.dontgry.com/38f8faf1-d42b-8096-9903-ec5ab181517b" class="menu-card">
+            <a href="magic-glasses.html" class="menu-card">
                 <span>😎</span> 선그리 돼지
             </a>
-            
             <a href="wisdom.html" class="menu-card">
                 <span>💧</span> 지혜의 샘
             </a>
