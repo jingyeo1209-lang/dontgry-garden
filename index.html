@@ -5,38 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>똔그리 가든</title>
     <style>
-        /* 기본 리셋 (아이프레임 완전 해방) */
+        /* 기본 리셋 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: #f8fafc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         
         .garden-container { position: relative; width: 100%; max-width: 1000px; text-align: center; }
 
-        /* 🖥️ [1] PC / 태블릿 화면용 스타일 */
+        /* 🖥️ [1] PC용 스타일 */
         .pc-view { position: relative; display: inline-block; width: 100%; max-width: 800px; margin: 0 auto; }
         .pc-map-img { width: 100%; display: block; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         
-        /* 그림 위에 얹어질 투명 버튼들의 마법 공식 */
-        /* 💡 영역을 눈으로 보면서 맞추고 싶다면 아래 background의 맨 끝 숫자 0을 0.3으로 바꾸세요! (예: rgba(255, 0, 0, 0.3)) */
-        .pc-link { position: absolute; background: rgba(255, 0, 0, 0); border-radius: 15px; cursor: pointer; text-indent: -9999px; transition: background 0.2s; }
+        /* 💡 영역 조절 시 끝자리 0을 0.3으로 고치세요! */
+        .pc-link { position: absolute; background: rgba(255, 0, 0, 0.3); border-radius: 15px; cursor: pointer; text-indent: -9999px; transition: background 0.2s; }
         .pc-link:hover { background: rgba(255, 255, 255, 0.15); border: 2px dashed #003366; }
 
-        /* 📍 캐릭터별 투명 버튼 위치 (똔그리님의 'garden-map.png' 그림 속 위치에 맞게 % 숫자를 조절하세요) */
-        /* top(위에서부터의 거리), left/right(좌우 거리), width(가로크기), height(세로크기) */
+        /* 📍 캐릭터별 투명 버튼 위치 */
         .link-ttong    { top: 10%; left: 10%; width: 35%; height: 35%; } 
         .link-pink     { top: 10%; right: 10%; width: 35%; height: 35%; } 
         .link-sungree  { bottom: 10%; left: 10%; width: 35%; height: 35%; } 
         .link-wisdom   { bottom: 10%; right: 10%; width: 35%; height: 35%; } 
 
-        /* 📱 [2] 모바일 화면용 스타일 (2x2 그리드 카드) */
+        /* 📱 [2] 모바일용 스타일 */
         .mobile-view { display: none; width: 100%; max-width: 420px; grid-template-columns: 1fr 1fr; gap: 15px; margin: 0 auto; }
         .menu-card { background: white; padding: 35px 15px; border-radius: 15px; text-decoration: none; color: #334155; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: transform 0.2s; }
         .menu-card:active { transform: scale(0.95); }
         .menu-card span { font-size: 36px; }
 
-        /* 🔥 반응형 체인저: 화면 가로가 600px 이하(스마트폰)가 되면 모바일 모드로 자동 전환! */
         @media (max-width: 600px) {
-            .pc-view { display: none; } /* PC 그림 숨기기 */
-            .mobile-view { display: grid; } /* 모바일 버튼 켜기 */
+            .pc-view { display: none; } 
+            .mobile-view { display: grid; } 
         }
     </style>
 </head>
@@ -50,7 +47,8 @@
             <a href="https://www.dontgry.com/38f8faf1-d42b-80bd-bf30-ef78db13bb65" class="pc-link link-ttong">똔그리 돼지</a>
             <a href="https://www.dontgry.com/38f8faf1-d42b-8037-936e-c3cb21c31d98" class="pc-link link-pink">분홍 돼지</a>
             <a href="https://www.dontgry.com/38f8faf1-d42b-8096-9903-ec5ab181517b" class="pc-link link-sungree">선그리 돼지</a>
-            <a href="https://www.dontgry.com/3918faf1-d42b-8003-b119-dcce1b51c9d7" class="pc-link link-wisdom">지혜의 샘</a>
+            
+            <a href="wisdom.html" class="pc-link link-wisdom">지혜의 샘</a>
         </div>
 
         <div class="mobile-view">
@@ -63,7 +61,8 @@
             <a href="https://www.dontgry.com/38f8faf1-d42b-8096-9903-ec5ab181517b" class="menu-card">
                 <span>😎</span> 선그리 돼지
             </a>
-            <a href="https://www.dontgry.com/3918faf1-d42b-8003-b119-dcce1b51c9d7" class="menu-card">
+            
+            <a href="wisdom.html" class="menu-card">
                 <span>💧</span> 지혜의 샘
             </a>
         </div>
