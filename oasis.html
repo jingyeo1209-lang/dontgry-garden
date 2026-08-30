@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8183610093645853"
+     crossorigin="anonymous"></script>
     <title>투자자의 오아시스</title>
     <meta name="description" content="시드머니, 운세, 힐링 미니게임과 지혜의 샘. 투자자의 오아시스 — 똔그리 가든.">
     <meta property="og:title" content="투자자의 오아시스">
@@ -11,6 +13,7 @@
     <meta property="og:type" content="website">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="gallery-list.css">
+    <link rel="stylesheet" href="ads.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -540,6 +543,8 @@
     <a href="index.html" class="back-link">← 대문으로 돌아가기</a>
     <h1 class="page-title">🏝️ 투자자의 오아시스</h1>
 
+    <div class="ad-slot" data-ad-unit="banner" aria-label="광고"></div>
+
     <div class="wrapper-card">
         <div class="wallet-zone">
             <span>💰 나의 시드머니: <strong id="walletBalance">0</strong> 원</span>
@@ -634,6 +639,8 @@
 
     </div>
 
+    <div class="ad-slot" data-ad-unit="footer" aria-label="광고"></div>
+
     <section class="articles-section">
         <div class="section-title">📖 지혜의 샘</div>
         <div class="gallery" id="articleGallery"></div>
@@ -655,6 +662,8 @@
         <button class="share-btn secondary" onclick="resetGame()">다시 가기</button>
     </div>
 </div>
+<script src="ads-config.js"></script>
+<script src="ads.js"></script>
 <script>
     let seedMoney = parseInt(localStorage.getItem('seedMoney') || '1000', 10);
     let juiceCount = parseInt(localStorage.getItem('juiceCount') || '0', 10);
