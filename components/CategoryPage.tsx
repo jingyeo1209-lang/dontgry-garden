@@ -42,7 +42,8 @@ export async function CategoryPage({ category }: Props) {
         config={config}
         error={error}
         articleCount={articles.length}
-        emptyMessage="이 카테고리에 발행된 글이 없습니다. Notion에서 카테고리와 발행을 확인해 주세요."
+        category={category}
+        emptyMessage="이 카테고리에 글이 없습니다. Notion 갤러리에 글이 있는지, Integration 연결을 확인해 주세요."
       />
 
       {articles.length > 0 ? (

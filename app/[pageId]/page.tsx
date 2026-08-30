@@ -50,7 +50,7 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
 
   const { article, config, error } = await getArticleById(pageId);
   if (!article) {
-    if (!config.ready || error) {
+    if (!config.hasToken || error) {
       return (
         <main className="page page-narrow">
           <Link href="/" className="back-link">
