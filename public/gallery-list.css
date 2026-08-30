@@ -1,0 +1,134 @@
+.gallery-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 16px;
+    width: 100%;
+}
+
+.gallery-search-wrap {
+    grid-column: 1;
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    max-width: 340px;
+    min-width: 0;
+    padding: 0 10px 0 10px;
+    border: 1px solid #e9e9e7;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.gallery-search-wrap:focus-within {
+    border-color: #37352f;
+    box-shadow: 0 0 0 1px #37352f;
+}
+
+.gallery-search-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.gallery-search {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    font-family: inherit;
+    font-size: 13px;
+    color: #37352f;
+    padding: 8px 0;
+    border: 0;
+    background: transparent;
+    outline: none;
+}
+
+.gallery-search::placeholder {
+    color: #9b9a97;
+}
+
+/* type=search 기본 clear 버튼 여백 정리 */
+.gallery-search::-webkit-search-decoration,
+.gallery-search::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+.gallery-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #787774;
+    font-size: 14px;
+    padding: 32px 12px;
+}
+
+.gallery-pager {
+    grid-column: 2;
+    justify-self: center;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+}
+
+.gallery-pager button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: #37352f;
+    background: #f7f6f3;
+    border: 1px solid #e9e9e7;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    min-width: 34px;
+    line-height: 1.2;
+}
+
+.gallery-pager button:hover:not(:disabled) {
+    background: #efefef;
+}
+
+.gallery-pager button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.gallery-pager .page-info {
+    font-size: 12px;
+    color: #787774;
+    padding: 0 2px;
+    white-space: nowrap;
+}
+
+.gallery-controls.is-empty .gallery-pager {
+    display: none;
+}
+
+/* 모바일: 검색(위) → 페이지 전환(아래·가운데) — 필터 후 이동이 일반적 */
+@media (max-width: 520px) {
+    .gallery-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .gallery-search-wrap {
+        order: 1;
+        width: 100%;
+        max-width: none;
+    }
+
+    .gallery-pager {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+    }
+}
