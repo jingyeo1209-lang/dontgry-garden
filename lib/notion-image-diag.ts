@@ -10,9 +10,10 @@ import {
   type GardenArticle,
 } from "@/lib/notion";
 import {
+  buildUpstreamFetchInit,
   isAllowedImageHost,
   isImageContentType,
-  needsNotionAuth,
+  isPresignedS3Url,
   resolveMediaSourceUrl,
   toProxiedBlockMediaUrl,
   toProxiedImageUrl,
@@ -59,6 +60,8 @@ export type NotionImageDiagTrace = {
     status: number;
     contentType: string;
     host: string;
+    presignedS3?: boolean;
+    authHeaderSent?: boolean;
   };
   finalStatus: number;
   failureStage: NotionImageFailureStage;
@@ -340,9 +343,9 @@ export async function probeUpstream(url: string): Promise<{
   host: string;
   error?: string;
 }> {
-  let target: URL;
+  let hostname: string;
   try {
-    target = new URL(url);
+    hostname = new URL(url).hostname;
   } catch {
     return {
       ok: false,
@@ -353,31 +356,27 @@ export async function probeUpstream(url: string): Promise<{
     };
   }
 
-  const headers: Record<string, string> = { Accept: "image/*,*/*" };
-  const token = process.env.NOTION_TOKEN?.trim();
-  if (token && needsNotionAuth(target.hostname)) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  const { fetchUrl, headers, redirect, cache } = buildUpstreamFetchInit(url);
 
   try {
-    const upstream = await fetch(target.toString(), {
+    const upstream = await fetch(fetchUrl, {
       headers,
-      redirect: "follow",
-      cache: "no-store",
+      redirect,
+      cache,
     });
     const contentType = upstream.headers.get("content-type") || "";
     return {
       ok: upstream.ok,
       status: upstream.status,
       contentType,
-      host: target.hostname,
+      host: hostname,
     };
   } catch (err) {
     return {
       ok: false,
       status: 0,
       contentType: "",
-      host: target.hostname,
+      host: hostname,
       error: err instanceof Error ? err.message : "fetch-error",
     };
   }
@@ -423,17 +422,16 @@ export async function runNotionImagePipeline(
     return { trace };
   }
 
-  const headers: Record<string, string> = { Accept: "image/*,*/*" };
-  const token = process.env.NOTION_TOKEN?.trim();
-  if (token && needsNotionAuth(target.hostname)) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  const { fetchUrl, headers, redirect, cache } = buildUpstreamFetchInit(sourceUrl);
+  const authHeaderSent = Boolean(
+    headers && typeof headers === "object" && "Authorization" in headers
+  );
 
   try {
-    const upstream = await fetch(target.toString(), {
+    const upstream = await fetch(fetchUrl, {
       headers,
-      redirect: "follow",
-      cache: "no-store",
+      redirect,
+      cache,
     });
 
     const contentType = upstream.headers.get("content-type") || "";
@@ -441,6 +439,8 @@ export async function runNotionImagePipeline(
       status: upstream.status,
       contentType,
       host: target.hostname,
+      presignedS3: isPresignedS3Url(sourceUrl),
+      authHeaderSent,
     };
 
     if (!upstream.ok || !upstream.body) {
@@ -450,7 +450,7 @@ export async function runNotionImagePipeline(
       return { trace };
     }
 
-    if (!isImageContentType(contentType, target.toString())) {
+    if (!isImageContentType(contentType, sourceUrl)) {
       trace.failureStage = "upstream-bad-content-type";
       trace.failureDetail = contentType || "empty";
       trace.finalStatus = 502;

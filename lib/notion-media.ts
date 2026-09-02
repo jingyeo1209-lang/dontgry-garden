@@ -75,10 +75,48 @@ export function isAllowedImageHost(hostname: string): boolean {
   );
 }
 
+export function isPresignedS3Url(url: string): boolean {
+  if (!/\.amazonaws\.com/i.test(url)) return false;
+  return /[?&]X-Amz-(Signature|Algorithm|Credential)=/i.test(url);
+}
+
+/** Presigned S3 URLs must be fetched verbatim — no Bearer token or extra headers. */
+export function buildUpstreamFetchInit(url: string): RequestInit & { fetchUrl: string } {
+  if (isPresignedS3Url(url)) {
+    return {
+      fetchUrl: url,
+      headers: {},
+      redirect: "follow",
+      cache: "no-store",
+    };
+  }
+
+  const headers: Record<string, string> = { Accept: "image/*,*/*" };
+  const token = process.env.NOTION_TOKEN?.trim();
+  if (token) {
+    try {
+      const host = new URL(url).hostname;
+      if (needsNotionAuth(host)) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // ignore malformed url; caller validates earlier
+    }
+  }
+
+  return {
+    fetchUrl: url,
+    headers,
+    redirect: "follow",
+    cache: "no-store",
+  };
+}
+
 export function needsNotionAuth(hostname: string): boolean {
   const host = hostname.toLowerCase();
+  // S3 presigned URLs authenticate via query string; Bearer token causes HTTP 400.
+  if (host.endsWith(".amazonaws.com")) return false;
   return (
-    host.endsWith(".amazonaws.com") ||
     host.endsWith(".notion.so") ||
     host === "notion.so" ||
     host.endsWith(".notion.com") ||
