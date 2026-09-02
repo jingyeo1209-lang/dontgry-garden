@@ -35,6 +35,8 @@ export type GardenArticle = {
   category: CategoryId;
   summary: string;
   coverImage: string | null;
+  /** Set when coverImage comes from the first body image block (no Notion page cover). */
+  coverFallbackBlockId: string | null;
   date: string | null;
   url: string;
 };
@@ -137,17 +139,27 @@ async function getFirstBodyImageFallback(
   return null;
 }
 
-async function resolveArticleCoverImage(page: PageObjectResponse): Promise<string | null> {
+async function resolveArticleCoverImage(
+  page: PageObjectResponse
+): Promise<{ coverImage: string | null; coverFallbackBlockId: string | null }> {
   const pageId = normalizePageId(page.id);
   const pageCover = getCoverImage(page);
   if (pageCover) {
-    return toProxiedMediaUrl(pageCover, pageId);
+    return {
+      coverImage: toProxiedMediaUrl(pageCover, pageId),
+      coverFallbackBlockId: null,
+    };
   }
 
   const fallback = await getFirstBodyImageFallback(pageId);
-  if (!fallback) return null;
+  if (!fallback) {
+    return { coverImage: null, coverFallbackBlockId: null };
+  }
 
-  return toProxiedMediaUrl(fallback.url, fallback.blockId);
+  return {
+    coverImage: toProxiedMediaUrl(fallback.url, fallback.blockId),
+    coverFallbackBlockId: fallback.blockId,
+  };
 }
 
 /** Notion file / image object → raw HTTPS URL */
@@ -212,12 +224,14 @@ async function pageToArticle(
   category: CategoryId
 ): Promise<GardenArticle> {
   const id = normalizePageId(page.id);
+  const cover = await resolveArticleCoverImage(page);
   return {
     id,
     title: getTitle(page),
     category,
     summary: "",
-    coverImage: await resolveArticleCoverImage(page),
+    coverImage: cover.coverImage,
+    coverFallbackBlockId: cover.coverFallbackBlockId,
     date: page.last_edited_time?.slice(0, 10) ?? page.created_time?.slice(0, 10) ?? null,
     url: `/${id}`,
   };

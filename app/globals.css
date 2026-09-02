@@ -519,6 +519,78 @@ a {
   border-radius: 8px;
 }
 
+/* Notion rich_text annotation colors */
+.notion-body .notion-annot-gray {
+  color: #9b9a97;
+}
+.notion-body .notion-annot-brown {
+  color: #64473a;
+}
+.notion-body .notion-annot-orange {
+  color: #d9730d;
+}
+.notion-body .notion-annot-yellow {
+  color: #dfab01;
+}
+.notion-body .notion-annot-green {
+  color: #0f7b6c;
+}
+.notion-body .notion-annot-blue {
+  color: #0b6e99;
+}
+.notion-body .notion-annot-purple {
+  color: #6940a5;
+}
+.notion-body .notion-annot-pink {
+  color: #ad1a72;
+}
+.notion-body .notion-annot-red {
+  color: #e03e3e;
+}
+
+.notion-body [class*="notion-annot-"][class*="-background"] {
+  border-radius: 2px;
+  padding: 0 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.notion-body .notion-annot-gray-background {
+  background-color: #f1f1ef;
+}
+.notion-body .notion-annot-brown-background {
+  background-color: #f4eeee;
+  color: #64473a;
+}
+.notion-body .notion-annot-orange-background {
+  background-color: #faebdd;
+  color: #d9730d;
+}
+.notion-body .notion-annot-yellow-background {
+  background-color: #fbf3db;
+  color: inherit;
+}
+.notion-body .notion-annot-green-background {
+  background-color: #edf3ec;
+  color: #0f7b6c;
+}
+.notion-body .notion-annot-blue-background {
+  background-color: #e7f3f8;
+  color: #0b6e99;
+}
+.notion-body .notion-annot-purple-background {
+  background-color: #f6f3f9;
+  color: #6940a5;
+}
+.notion-body .notion-annot-pink-background {
+  background-color: #faf1f5;
+  color: #ad1a72;
+}
+.notion-body .notion-annot-red-background {
+  background-color: #ffe2dd;
+  color: #e03e3e;
+}
+
 .notion-todo {
   display: flex;
   gap: 8px;

@@ -91,7 +91,13 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
 
       <AdSlot unit="banner" />
 
-      <NotionBlocks blocks={blocks} insertAdAfter={3} />
+      <NotionBlocks
+        blocks={blocks}
+        insertAdAfter={3}
+        skipImageBlockIds={
+          article.coverFallbackBlockId ? [article.coverFallbackBlockId] : []
+        }
+      />
 
       <AdSlot unit="footer" />
     </main>

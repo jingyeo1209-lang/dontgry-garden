@@ -42,9 +42,13 @@
                 galleryEl.innerHTML = '<div class="gallery-empty">검색 결과가 없습니다.</div>';
             } else {
                 galleryEl.innerHTML = slice.map(function (item) {
+                    var img = item.img || item.coverImage || "";
+                    var coverHtml = img
+                        ? '<img src="' + escapeHtml(img) + '" alt="" loading="lazy">'
+                        : '<div class="card-cover-fallback"></div>';
                     return (
                         '<a href="' + escapeHtml(item.url) + '" class="card">' +
-                            '<div class="card-cover"><img src="' + escapeHtml(item.img) + '" alt="" loading="lazy"></div>' +
+                            '<div class="card-cover">' + coverHtml + '</div>' +
                             '<div class="card-body"><div class="card-title">' + escapeHtml(item.title) + '</div></div>' +
                         '</a>'
                     );
@@ -107,7 +111,15 @@
                 return res.json();
             })
             .then(function (data) {
-                start((data && data.articles) || []);
+                var raw = (data && data.articles) || [];
+                var articles = raw.map(function (item) {
+                    return {
+                        title: item.title,
+                        url: item.url,
+                        img: item.coverImage || item.img || "",
+                    };
+                });
+                start(articles);
             })
             .catch(function () {
                 if (galleryEl) {
