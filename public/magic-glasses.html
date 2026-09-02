@@ -1,0 +1,2454 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8183610093645853"
+     crossorigin="anonymous"></script>
+    <title>썬그리의 메타 안경</title>
+    <meta name="description" content="투자 기상도, MDD 계산기, 드림보드와 챌린지. 썬그리의 메타 안경 — 똔그리 가든.">
+    <meta property="og:title" content="썬그리의 메타 안경">
+    <meta property="og:description" content="투자 기상도, MDD 계산기, 드림보드와 챌린지.">
+    <meta property="og:image" content="garden-map.png">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="ads.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { overflow-x: hidden; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+        body {
+            font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+                "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+            background: #fff;
+            color: #37352f;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: clamp(20px, 5vw, 32px) clamp(14px, 4vw, 40px) clamp(40px, 8vw, 60px);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #787774;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 4px 8px;
+            margin: 0 0 16px -8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+
+        .back-link:hover {
+            background: #efefef;
+            color: #37352f;
+        }
+
+        .page-title {
+            font-size: clamp(22px, 5.5vw, 32px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            margin-bottom: 8px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .page-desc {
+            color: #787774;
+            font-size: clamp(13px, 3.5vw, 14px);
+            line-height: 1.55;
+            margin-bottom: 16px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .briefing-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .briefing-nav a {
+            flex: 1 1 auto;
+            min-width: 0;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #37352f;
+            text-decoration: none;
+            padding: 8px 10px;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            background: #f7f6f3;
+            transition: background 0.15s ease, border-color 0.15s ease;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .briefing-nav a:hover {
+            background: #efefef;
+            border-color: #d3d2d0;
+        }
+
+        .weather-section {
+            border-radius: 12px;
+            padding: 4px 0 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .wrapper-card {
+            width: 100%;
+            min-width: 0;
+            border-radius: 10px;
+        }
+
+        .section-title {
+            font-size: clamp(14px, 4vw, 16px);
+            font-weight: 600;
+            margin: 28px 0 12px;
+            color: #37352f;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9e9e7;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .section-title:first-of-type { margin-top: 0; }
+
+        .farmer-zone + .save-note {
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .weather-hero {
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 12px;
+            padding: clamp(16px, 4vw, 24px);
+            margin: 0 0 12px;
+            text-align: center;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .main-gauge-wrap {
+            max-width: 280px;
+            margin: 0 auto 8px;
+        }
+
+        .main-gauge-wrap .gauge-svg {
+            max-width: 260px;
+        }
+
+        .investment-verdict {
+            font-size: clamp(15px, 4vw, 18px);
+            font-weight: 700;
+            color: #37352f;
+            margin-top: 4px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .investment-hint {
+            font-size: 12px;
+            color: #787774;
+            margin-top: 4px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .gauge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin: 0 0 12px;
+            width: 100%;
+        }
+
+        .gauge-card {
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            padding: 10px 6px 12px;
+            text-align: center;
+            min-width: 0;
+            position: relative;
+        }
+
+        .gauge-card--estimated {
+            border-style: dashed;
+            background: #fafaf9;
+        }
+
+        .gauge-source-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 4px;
+            line-height: 1.2;
+        }
+
+        .gauge-source-badge.live {
+            background: #e7f3f1;
+            color: #0f7b6c;
+        }
+
+        .gauge-source-badge.estimated {
+            background: #f1f1ef;
+            color: #9b9a97;
+        }
+
+        .gauge-source-badge.offline {
+            background: #fbf3db;
+            color: #d9730d;
+        }
+
+        .gauge-num.loading {
+            color: #c4c4c2;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.45; }
+            50% { opacity: 1; }
+        }
+
+        .gauge-svg {
+            width: 100%;
+            max-width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .gauge-num {
+            font-size: clamp(13px, 3.5vw, 15px);
+            font-weight: 700;
+            color: #37352f;
+            margin-top: 2px;
+            line-height: 1.2;
+        }
+
+        .gauge-label {
+            font-size: 10px;
+            color: #787774;
+            font-weight: 600;
+            margin-top: 4px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .gauge-hint {
+            font-size: 10px;
+            color: #9b9a97;
+            margin-top: 2px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .gauge-buy-tip {
+            font-size: 9px;
+            color: #787774;
+            margin-top: 5px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+            padding: 3px 4px;
+            border-radius: 4px;
+        }
+
+        .gauge-buy-tip.in-zone {
+            color: #0f7b6c;
+            background: #e7f3f1;
+            font-weight: 600;
+        }
+
+        @media (max-width: 520px) {
+            .gauge-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .farmer-zone {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 0;
+            min-width: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .avatar { font-size: clamp(32px, 8vw, 40px); line-height: 1; flex-shrink: 0; }
+
+        .speech-bubble {
+            font-size: clamp(13px, 3.5vw, 14px);
+            line-height: 1.55;
+            min-width: 0;
+            flex: 1;
+            color: #37352f;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .pig-status-tag {
+            background: #37352f;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 8px;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .weather-bridge {
+            display: block;
+            margin: 12px 0 4px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #37352f;
+            text-decoration: none;
+            text-align: center;
+            background: #f7f6f3;
+            border: 1px dashed #d3d2d0;
+            border-radius: 8px;
+            transition: background 0.15s ease;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .weather-bridge:hover {
+            background: #efefef;
+        }
+
+        .budget-alert {
+            display: none;
+            margin-bottom: 10px;
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #37352f;
+            background: #fdebec;
+            border: 1px solid #f5c4c4;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .budget-alert.visible { display: block; }
+
+        .budget-section.burst {
+            border-radius: 10px;
+            padding: 4px;
+            background: #fdebec;
+        }
+
+        .mdd-weather-context {
+            font-size: 12px;
+            color: #787774;
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .challenge-hint {
+            font-size: 13px;
+            color: #787774;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #fff;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            padding: clamp(12px, 3vw, 16px);
+            margin-bottom: 8px;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #787774;
+            margin-bottom: 2px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .save-note {
+            font-size: 12px;
+            color: #9b9a97;
+            margin-top: 8px;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+            font-size: clamp(13px, 3.5vw, 14px);
+            min-width: 0;
+        }
+
+        .input-row > span {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .pixel-input {
+            font-family: inherit;
+            padding: 8px 10px;
+            border: 1px solid #e9e9e7;
+            border-radius: 6px;
+            flex: 1 1 140px;
+            min-width: 0;
+            max-width: 100%;
+            width: auto;
+            text-align: right;
+            font-size: 14px;
+            color: #37352f;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .pixel-input.align-left { text-align: left; }
+
+        .pixel-input:focus {
+            border-color: #37352f;
+            box-shadow: 0 0 0 1px #37352f;
+        }
+
+        .weed-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: stretch;
+            border-top: 1px solid #e9e9e7;
+            padding-top: 10px;
+        }
+
+        .weed-row .pixel-input { flex: 1 1 100px; }
+        .weed-row .game-btn {
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 64px;
+            padding: 8px 12px;
+        }
+
+        .weed-list {
+            max-height: 120px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .weed-item {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 6px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e9e9e7;
+            min-width: 0;
+        }
+
+        .weed-item span {
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .weed-item .weed-del {
+            color: #eb5757;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .weed-item:last-child { border-bottom: none; }
+
+        .summary-row {
+            font-size: clamp(12px, 3.5vw, 13px);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 6px 12px;
+            margin-top: 4px;
+            font-weight: 500;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .game-btn {
+            font-family: inherit;
+            padding: 10px 14px;
+            font-size: clamp(13px, 3.5vw, 14px);
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #e9e9e7;
+            background: #f7f6f3;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 100%;
+            color: #37352f;
+            transition: background 0.15s ease;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .game-btn:hover { background: #efefef; }
+        .game-btn:active { background: #e8e7e4; }
+
+        #mddResult {
+            display: none;
+            margin-top: 12px;
+            padding: 14px;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            background: #fff;
+            text-align: left;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        #mddResult.visible { display: block; }
+
+        .mdd-input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .mdd-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .mdd-field label {
+            font-size: 12px;
+            color: #787774;
+            font-weight: 600;
+        }
+
+        .mdd-field .pixel-input {
+            flex: none;
+            width: 100%;
+            text-align: right;
+        }
+
+        .mdd-field-wide {
+            grid-column: 1 / -1;
+        }
+
+        .mdd-field-wide .pixel-input { text-align: left; }
+
+        .mdd-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .mdd-actions .game-btn {
+            flex: 1 1 120px;
+            width: auto;
+        }
+
+        .mdd-actions .game-btn.primary {
+            background: #37352f;
+            color: #fff;
+            border-color: #37352f;
+        }
+
+        .mdd-actions .game-btn.primary:hover { background: #2f2d2a; }
+
+        .mdd-result-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mdd-result-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #37352f;
+        }
+
+        .mdd-status-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+            color: #fff;
+        }
+
+        .mdd-status-badge.safe { background: #0f7b6c; }
+        .mdd-status-badge.caution { background: #d9730d; }
+        .mdd-status-badge.warning { background: #c45500; }
+        .mdd-status-badge.danger { background: #6940a5; }
+        .mdd-status-badge.crisis { background: #eb5757; }
+
+        .mdd-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mdd-stat {
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            padding: 10px;
+            min-width: 0;
+        }
+
+        .mdd-stat-label {
+            font-size: 11px;
+            color: #787774;
+            margin-bottom: 4px;
+        }
+
+        .mdd-stat-value {
+            font-size: clamp(14px, 3.8vw, 16px);
+            font-weight: 700;
+            color: #37352f;
+        }
+
+        .mdd-stat-value.loss { color: #eb5757; }
+        .mdd-stat-value.gain { color: #0f7b6c; }
+
+        .mdd-flood-wrap {
+            margin-bottom: 12px;
+        }
+
+        .mdd-flood-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #787774;
+            margin-bottom: 4px;
+        }
+
+        .mdd-flood-bar {
+            height: 10px;
+            background: #e9e9e7;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .mdd-flood-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+
+        .mdd-comment {
+            font-size: 13px;
+            color: #37352f;
+            padding-top: 10px;
+            border-top: 1px solid #e9e9e7;
+        }
+
+        .mdd-history-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #37352f;
+            margin: 16px 0 8px;
+        }
+
+        .mdd-history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .mdd-history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 12px;
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            font-size: 13px;
+            min-width: 0;
+        }
+
+        .mdd-history-main {
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .mdd-history-main:hover { color: #0f7b6c; }
+
+        .mdd-history-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .mdd-history-meta {
+            font-size: 11px;
+            color: #787774;
+        }
+
+        .mdd-history-del {
+            flex-shrink: 0;
+            font-size: 12px;
+            color: #9b9a97;
+            cursor: pointer;
+            padding: 2px 6px;
+        }
+
+        .mdd-history-del:hover { color: #eb5757; }
+
+        .mdd-history-empty {
+            font-size: 12px;
+            color: #9b9a97;
+            text-align: center;
+            padding: 12px;
+            background: #f7f6f3;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 520px) {
+            .mdd-input-grid,
+            .mdd-stat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #fText {
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            width: 100%;
+        }
+
+        .challenge-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 0;
+            padding: 20px 12px;
+            text-decoration: none;
+            color: #37352f;
+            background: #fff;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+            text-align: center;
+        }
+
+        .challenge-card:hover {
+            background: #f7f6f3;
+            box-shadow: 0 2px 8px rgba(15, 15, 15, 0.06);
+        }
+
+        .challenge-card.grape { background: #f6f3f9; }
+        .challenge-card.grape:hover { background: #efeaf5; }
+
+        .challenge-card.corn { background: #fbf3db; }
+        .challenge-card.corn:hover { background: #f5ecd0; }
+
+        .challenge-emoji {
+            font-size: clamp(28px, 6vw, 36px);
+            line-height: 1;
+        }
+
+        .challenge-title {
+            font-size: clamp(13px, 3.5vw, 14px);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 400px) {
+            .challenge-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dream-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dream-form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .dream-form-row .pixel-input,
+        .dream-form-row .pixel-select {
+            flex: 1 1 120px;
+            min-width: 0;
+        }
+
+        .pixel-select {
+            font-family: inherit;
+            padding: 8px 10px;
+            border: 1px solid #e9e9e7;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #37352f;
+            background: #fff;
+            outline: none;
+        }
+
+        .pixel-select:focus {
+            border-color: #37352f;
+            box-shadow: 0 0 0 1px #37352f;
+        }
+
+        .harvest-basket {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .harvest-item {
+            background: #f7f6f3;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            padding: 10px 6px;
+            text-align: center;
+            min-width: 0;
+        }
+
+        .harvest-item .emoji { font-size: 22px; line-height: 1; display: block; margin-bottom: 4px; }
+        .harvest-item .count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #37352f;
+        }
+        .harvest-item .label {
+            font-size: 11px;
+            color: #787774;
+            margin-top: 2px;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .dream-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .dream-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid #e9e9e7;
+            border-radius: 10px;
+            background: #fff;
+            min-width: 0;
+        }
+
+        .dream-item.done {
+            background: #f7f6f3;
+        }
+
+        .dream-item.done .dream-text {
+            text-decoration: line-through;
+            color: #787774;
+        }
+
+        .dream-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .dream-check {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: #37352f;
+            cursor: pointer;
+        }
+
+        .dream-check:disabled {
+            cursor: not-allowed;
+            opacity: 0.4;
+        }
+
+        .dream-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dream-text {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+            word-break: keep-all;
+        }
+
+        .dream-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #787774;
+        }
+
+        .dream-meta .crop { font-weight: 500; color: #37352f; }
+        .dream-meta .overdue { color: #eb5757; font-weight: 500; }
+        .dream-meta .harvested { color: #0f7b6c; font-weight: 500; }
+        .dream-meta .growing { color: #337ea9; font-weight: 500; }
+        .dream-meta .ready { color: #0f7b6c; font-weight: 500; }
+
+        .dream-del {
+            flex-shrink: 0;
+            border: none;
+            background: transparent;
+            color: #eb5757;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 2px 4px;
+            font-family: inherit;
+        }
+
+        .crop-visual {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px 8px;
+            border-radius: 8px;
+            background: #fafafa;
+            border: 1px solid #e9e9e7;
+        }
+
+        .crop-visual.grape { background: #f6f3f9; }
+        .crop-visual.corn { background: #fbf3db; }
+        .crop-visual.mango { background: #fdecc8; }
+        .crop-visual.carrot { background: #fadec9; }
+
+        .crop-visual.clickable {
+            cursor: pointer;
+        }
+
+        .crop-visual.clickable:hover {
+            box-shadow: inset 0 0 0 1px #37352f22;
+        }
+
+        .crop-unit {
+            font-size: clamp(18px, 4.5vw, 22px);
+            line-height: 1;
+            opacity: 0.18;
+            filter: grayscale(1);
+            transition: opacity 0.25s ease, filter 0.25s ease, transform 0.25s ease;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .crop-unit.filled {
+            opacity: 1;
+            filter: none;
+            transform: scale(1.05);
+        }
+
+        .dream-empty {
+            font-size: 13px;
+            color: #787774;
+            text-align: center;
+            padding: 16px 8px;
+        }
+
+        @media (max-width: 400px) {
+            .harvest-basket {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="page">
+    <a href="/" class="back-link">← 대문으로 돌아가기</a>
+    <h1 class="page-title">🕶️ 썬그리의 메타 안경</h1>
+    <p class="page-desc">오늘 시장 기상 → 내 종목 점검 → 생활 재무까지, 썬그리가 한눈에 브리핑해 드려요.</p>
+
+    <nav class="briefing-nav" aria-label="오늘의 브리핑">
+        <a href="#weatherSection">① 투자 기상도</a>
+        <a href="#mddSection">② 종목 MDD</a>
+        <a href="#budgetSection">③ 가계부</a>
+    </nav>
+
+    <div class="ad-slot" data-ad-unit="banner" aria-label="광고"></div>
+
+    <div class="wrapper-card" id="mainCard">
+        <div id="weatherSection" class="weather-section">
+        <div class="section-title">🌤️ 오늘의 투자 기상도</div>
+
+        <div class="gauge-grid">
+            <div class="gauge-card" id="gaugeCardFG">
+                <span class="gauge-source-badge live" id="fgSourceBadge">연동 중</span>
+                <svg class="gauge-svg" id="gaugeFG" viewBox="0 0 120 72" aria-hidden="true">
+                    <path d="M 14 62 A 46 46 0 0 1 106 62" fill="none" stroke="#e9e9e7" stroke-width="8" stroke-linecap="round"/>
+                    <path class="gauge-arc" fill="none" stroke="#0f7b6c" stroke-width="8" stroke-linecap="round" stroke-dasharray="144" stroke-dashoffset="144"/>
+                    <g class="gauge-needle" transform="rotate(-90, 60, 62)">
+                        <line x1="60" y1="62" x2="60" y2="24" stroke="#37352f" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="62" r="4" fill="#37352f"/>
+                    </g>
+                </svg>
+                <div class="gauge-num" id="mFG">--</div>
+                <div class="gauge-label">공포탐욕지수</div>
+                <div class="gauge-hint">대중 심리</div>
+                <div class="gauge-buy-tip" id="buyTipFG">역발상 참고 25~45점<br>(공포 구간)</div>
+            </div>
+            <div class="gauge-card" id="gaugeCardVIX">
+                <span class="gauge-source-badge estimated" id="vixSourceBadge">연동 중</span>
+                <svg class="gauge-svg" id="gaugeVIX" viewBox="0 0 120 72" aria-hidden="true">
+                    <path d="M 14 62 A 46 46 0 0 1 106 62" fill="none" stroke="#e9e9e7" stroke-width="8" stroke-linecap="round"/>
+                    <path class="gauge-arc" fill="none" stroke="#6940a5" stroke-width="8" stroke-linecap="round" stroke-dasharray="144" stroke-dashoffset="144"/>
+                    <g class="gauge-needle" transform="rotate(-90, 60, 62)">
+                        <line x1="60" y1="62" x2="60" y2="24" stroke="#37352f" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="62" r="4" fill="#37352f"/>
+                    </g>
+                </svg>
+                <div class="gauge-num" id="mVIX">--</div>
+                <div class="gauge-label">VIX 지수</div>
+                <div class="gauge-hint">시장 불안도 · FRED</div>
+                <div class="gauge-buy-tip" id="buyTipVIX">역발상 참고 22~35<br>(불안 고조 시)</div>
+            </div>
+            <div class="gauge-card" id="gaugeCardRSI">
+                <span class="gauge-source-badge live" id="rsiSourceBadge">일일</span>
+                <svg class="gauge-svg" id="gaugeRSI" viewBox="0 0 120 72" aria-hidden="true">
+                    <path d="M 14 62 A 46 46 0 0 1 106 62" fill="none" stroke="#e9e9e7" stroke-width="8" stroke-linecap="round"/>
+                    <path class="gauge-arc" fill="none" stroke="#337ea9" stroke-width="8" stroke-linecap="round" stroke-dasharray="144" stroke-dashoffset="144"/>
+                    <g class="gauge-needle" transform="rotate(-90, 60, 62)">
+                        <line x1="60" y1="62" x2="60" y2="24" stroke="#37352f" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="62" r="4" fill="#37352f"/>
+                    </g>
+                </svg>
+                <div class="gauge-num" id="mRSI">52.9</div>
+                <div class="gauge-label">RSI 지수</div>
+                <div class="gauge-hint">S&P500 · 14일 RSI</div>
+                <div class="gauge-buy-tip" id="buyTipRSI">역발상 참고 40 이하<br>(과매도 구간)</div>
+            </div>
+            <div class="gauge-card" id="gaugeCardUS10Y">
+                <span class="gauge-source-badge estimated" id="us10ySourceBadge">연동 중</span>
+                <svg class="gauge-svg" id="gaugeUS10Y" viewBox="0 0 120 72" aria-hidden="true">
+                    <path d="M 14 62 A 46 46 0 0 1 106 62" fill="none" stroke="#e9e9e7" stroke-width="8" stroke-linecap="round"/>
+                    <path class="gauge-arc" fill="none" stroke="#d9730d" stroke-width="8" stroke-linecap="round" stroke-dasharray="144" stroke-dashoffset="144"/>
+                    <g class="gauge-needle" transform="rotate(-90, 60, 62)">
+                        <line x1="60" y1="62" x2="60" y2="24" stroke="#37352f" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="62" r="4" fill="#37352f"/>
+                    </g>
+                </svg>
+                <div class="gauge-num" id="mUS10Y">--</div>
+                <div class="gauge-label">美 10년 국채금리</div>
+                <div class="gauge-hint">자금 중력 · FRED</div>
+                <div class="gauge-buy-tip" id="buyTipUS10Y">역발상 참고 4.0% 이하<br>(금리 부담 완화)</div>
+            </div>
+        </div>
+
+        <script>
+        (function () {
+            try {
+                var raw = localStorage.getItem('sungreeWeatherCache_v2');
+                if (!raw) return;
+                var c = JSON.parse(raw);
+                if (!c || c.fg == null) return;
+                function setNum(id, val) {
+                    var el = document.getElementById(id);
+                    if (el) el.textContent = val;
+                }
+                setNum('mFG', String(Math.round(c.fg)));
+                setNum('mVIX', Number(c.vix).toFixed(1));
+                setNum('mRSI', Number(c.rsi).toFixed(1));
+                setNum('mUS10Y', Number(c.us10y).toFixed(2) + '%');
+                function setBadge(cardId, badgeId, badge) {
+                    if (!badge) return;
+                    var card = document.getElementById(cardId);
+                    var el = document.getElementById(badgeId);
+                    if (!el) return;
+                    var kind = badge.kind || 'estimated';
+                    var estimated = kind === 'estimated' || kind === 'offline';
+                    if (card) card.classList.toggle('gauge-card--estimated', estimated);
+                    el.className = 'gauge-source-badge ' + (kind === 'live' || kind === 'daily' ? 'live' : kind);
+                    el.textContent = badge.label || '';
+                }
+                setBadge('gaugeCardFG', 'fgSourceBadge', {
+                    kind: c.fgLive ? 'live' : 'offline',
+                    label: c.fgLive ? '실시간' : '오프라인'
+                });
+                setBadge('gaugeCardVIX', 'vixSourceBadge', c.vixBadge);
+                setBadge('gaugeCardRSI', 'rsiSourceBadge', c.rsiBadge && c.rsiBadge.label !== '갱신 중' && c.rsiBadge.label !== '연동 중' ? c.rsiBadge : { kind: 'daily', label: '일일' });
+                setBadge('gaugeCardUS10Y', 'us10ySourceBadge', c.us10yBadge);
+            } catch (e) {}
+        })();
+        </script>
+
+        <div class="weather-hero" id="weatherHero">
+            <div class="main-gauge-wrap">
+                <svg class="gauge-svg" id="mainGaugeSvg" viewBox="0 0 200 118" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="mainGaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#6940a5"/>
+                            <stop offset="35%" stop-color="#d9730d"/>
+                            <stop offset="65%" stop-color="#d9730d"/>
+                            <stop offset="100%" stop-color="#0f7b6c"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M 24 98 A 76 76 0 0 1 176 98" fill="none" stroke="#e9e9e7" stroke-width="14" stroke-linecap="round"/>
+                    <path id="mainGaugeArc" d="M 24 98 A 76 76 0 0 1 176 98" fill="none" stroke="url(#mainGaugeGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="239"/>
+                    <g id="mainGaugeNeedle" transform="rotate(-90, 100, 98)">
+                        <line x1="100" y1="98" x2="100" y2="34" stroke="#37352f" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="100" cy="98" r="6" fill="#37352f"/>
+                    </g>
+                    <text x="14" y="114" font-size="9" fill="#9b9a97" font-family="inherit">약세</text>
+                    <text x="86" y="114" font-size="9" fill="#9b9a97" font-family="inherit">중립</text>
+                    <text x="158" y="114" font-size="9" fill="#9b9a97" font-family="inherit">우호</text>
+                </svg>
+            </div>
+            <div class="gauge-num" id="mTechScore" style="font-size:clamp(18px,5vw,22px);">계산 중…</div>
+            <div class="investment-verdict" id="investmentVerdict">지표 분석 중…</div>
+            <div class="investment-hint" id="mTechSub">4개 지표를 종합한 매수 환경 점수입니다</div>
+        </div>
+
+        <div class="farmer-zone" id="weatherFarmerZone">
+            <div class="avatar" id="fAvatar">🕶️</div>
+            <div class="speech-bubble">
+                <span class="pig-status-tag" id="pigRankTag">🕶️ 썬그리</span>
+                <div id="fText">기상 센서 연동 중...</div>
+            </div>
+        </div>
+
+        <p class="save-note">※ 참고용 시그널입니다. 공포탐욕(Alternative.me), VIX·美10년국채(Yahoo Finance), RSI(S&amp;P500 일봉 계산) 실데이터를 사용합니다. API 장애 시 해당 지표만 추정치로 대체됩니다. <strong>매수 판단은 종합 점수·기상도를 우선</strong>하세요.</p>
+
+        <a href="#mddSection" class="weather-bridge">↓ 오늘 기상을 확인했으면, 내 보유 종목 침수율도 점검해 보세요</a>
+        </div>
+
+        <div class="section-title" id="mddSection">📊 종목별 MDD 계산기</div>
+        <div class="input-group mdd-panel">
+            <div class="hint">※ 매수가·고점·현재가를 넣으면 침수율, 손익, 고점 회복 폭을 한눈에 볼 수 있어요. 기록은 이 기기에 저장됩니다.</div>
+            <div class="mdd-input-grid">
+                <div class="mdd-field mdd-field-wide">
+                    <label for="mddName">종목명</label>
+                    <input type="text" id="mddName" class="pixel-input align-left" placeholder="예: 삼성전자">
+                </div>
+                <div class="mdd-field">
+                    <label for="mddBuy">매수 단가(원)</label>
+                    <input type="number" id="mddBuy" class="pixel-input" placeholder="0" min="0">
+                </div>
+                <div class="mdd-field">
+                    <label for="mddHigh">역대 최고가(원)</label>
+                    <input type="number" id="mddHigh" class="pixel-input" placeholder="0" min="0">
+                </div>
+                <div class="mdd-field">
+                    <label for="mddCurrent">현재가(원)</label>
+                    <input type="number" id="mddCurrent" class="pixel-input" placeholder="0" min="0">
+                </div>
+                <div class="mdd-field">
+                    <label for="mddQty">보유 수량(주, 선택)</label>
+                    <input type="number" id="mddQty" class="pixel-input" placeholder="0" min="0">
+                </div>
+            </div>
+            <div class="mdd-actions">
+                <button type="button" class="game-btn primary" onclick="calculateMDD()">침수율 분석</button>
+                <button type="button" class="game-btn" onclick="saveMddRecord()">기록 저장</button>
+                <button type="button" class="game-btn" onclick="clearMddForm()">초기화</button>
+            </div>
+            <div id="mddResult"></div>
+            <div class="mdd-history-title">📋 최근 분석 기록</div>
+            <div class="mdd-history-list" id="mddHistory"></div>
+        </div>
+
+        <div class="section-title">✨ 드림보드</div>
+        <div class="input-group">
+            <div class="hint">꿈을 적고 기한을 정한 뒤, 작물을 눌러 알알이 채우세요. 다 채우면 체크해서 수확합니다!</div>
+            <p class="save-note">드림보드·수확·가계부 기록은 이 기기 브라우저에만 저장됩니다.</p>
+            <div class="harvest-basket">
+                <div class="harvest-item">
+                    <span class="emoji">🍇</span>
+                    <div class="count" id="harvestGrape">0</div>
+                    <div class="label">포도알</div>
+                </div>
+                <div class="harvest-item">
+                    <span class="emoji">🌽</span>
+                    <div class="count" id="harvestCorn">0</div>
+                    <div class="label">옥수수</div>
+                </div>
+                <div class="harvest-item">
+                    <span class="emoji">🥭</span>
+                    <div class="count" id="harvestMango">0</div>
+                    <div class="label">망고</div>
+                </div>
+                <div class="harvest-item">
+                    <span class="emoji">🥕</span>
+                    <div class="count" id="harvestCarrot">0</div>
+                    <div class="label">당근</div>
+                </div>
+            </div>
+            <div class="dream-form">
+                <input type="text" id="dreamText" class="pixel-input align-left" placeholder="이루고 싶은 꿈(ex.한 달에 한 권씩 책을 읽겠다)" style="width:100%; flex:none;">
+                <div class="dream-form-row">
+                    <input type="date" id="dreamDeadline" class="pixel-input align-left">
+                    <select id="dreamCrop" class="pixel-select">
+                        <option value="grape">🍇 포도송이</option>
+                        <option value="corn">🌽 옥수수</option>
+                        <option value="mango">🥭 망고</option>
+                        <option value="carrot">🥕 당근</option>
+                    </select>
+                    <button type="button" class="game-btn" style="width:auto; flex:0 0 auto; min-width:72px;" onclick="addDream()">추가</button>
+                </div>
+            </div>
+            <div class="dream-list" id="dreamList"></div>
+        </div>
+
+        <div class="section-title">🏁 챌린지</div>
+        <p class="challenge-hint">똔그리 가든 챌린지에 참여하고, 위 드림보드에서 수확한 작물(🍇🌽)과 연결해 보세요.</p>
+        <div class="challenge-grid">
+            <a href="https://www.dontgry.com/47a8faf1-d42b-82b0-9416-015574d25387" class="challenge-card grape">
+                <span class="challenge-emoji">🍇</span>
+                <span class="challenge-title">포도알 챌린지</span>
+            </a>
+            <a href="https://www.dontgry.com/3918faf1-d42b-8094-81c9-f6a940777020" class="challenge-card corn">
+                <span class="challenge-emoji">🌽</span>
+                <span class="challenge-title">옥수수 챌린지</span>
+            </a>
+        </div>
+
+        <div class="section-title" id="budgetSection">🌾 가계부</div>
+        <div class="input-group budget-section" id="budgetPanel">
+            <div class="budget-alert" id="budgetAlert"></div>
+            <div class="input-row"><span>이번 달 목표 예산(원)</span><input type="number" id="budgetGoal" class="pixel-input" onchange="saveBudget()" placeholder="0"></div>
+            <div class="weed-row">
+                <input type="text" id="weedDesc" class="pixel-input align-left" placeholder="과소비 잡초명">
+                <input type="number" id="weedAmount" class="pixel-input" placeholder="금액">
+                <button class="game-btn" onclick="addWeed()">제거</button>
+            </div>
+            <div class="summary-row">
+                <span>총 지출(잡초): <span id="totalWeedCost" style="color:#eb5757;">0</span>원</span>
+                <span>남은 자금: <span id="remainBudget" style="color:#0f7b6c;">0</span>원</span>
+            </div>
+            <div class="weed-list" id="weedList"></div>
+        </div>
+    </div>
+
+    <div class="ad-slot" data-ad-unit="footer" aria-label="광고"></div>
+</main>
+
+<script src="ads-config.js"></script>
+<script src="ads.js"></script>
+<script>
+    let weeds = JSON.parse(localStorage.getItem('weeds') || '[]');
+    let dreams = JSON.parse(localStorage.getItem('dreams') || '[]');
+    let harvests = JSON.parse(localStorage.getItem('harvests') || '{"grape":0,"corn":0,"mango":0,"carrot":0}');
+    let mddHistory = JSON.parse(localStorage.getItem('mddHistory') || '[]');
+    let lastMddSnapshot = null;
+
+    const CROP_META = {
+        grape: { emoji: '🍇', label: '포도송이', unit: '🍇' },
+        corn: { emoji: '🌽', label: '옥수수', unit: '🌽' },
+        mango: { emoji: '🥭', label: '망고', unit: '🥭' },
+        carrot: { emoji: '🥕', label: '당근', unit: '🥕' }
+    };
+
+    const TOTAL_UNITS = 10;
+
+    function todayISO() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function saveDreams() {
+        localStorage.setItem('dreams', JSON.stringify(dreams));
+        localStorage.setItem('harvests', JSON.stringify(harvests));
+    }
+
+    function migrateDreams() {
+        let changed = false;
+        dreams = dreams.map(d => {
+            if (!d.createdAt) {
+                d.createdAt = todayISO();
+                changed = true;
+            }
+            if (typeof d.filled !== 'number') {
+                d.filled = d.done ? TOTAL_UNITS : 0;
+                changed = true;
+            }
+            return d;
+        });
+        if (changed) saveDreams();
+    }
+
+    let lastWeatherScore = 50;
+    let lastWeatherTier = null;
+    let fgIsLive = false;
+    let weatherLoaded = false;
+
+    document.getElementById('budgetGoal').value = localStorage.getItem('budgetGoal') || '';
+    migrateDreams();
+    renderWeeds();
+    renderDreams();
+    renderMddHistory();
+
+    function clamp(n, min, max) {
+        return Math.min(max, Math.max(min, n));
+    }
+
+    function dateSeed() {
+        const d = new Date();
+        return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+    }
+
+    function seededRand(seed, salt) {
+        const x = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
+        return x - Math.floor(x);
+    }
+
+    function computeWeatherScore(fg, vix, rsi, us10y) {
+        const fgScore = clamp(fg, 0, 100);
+        const vixScore = clamp(100 - (vix - 12) * 3.2, 0, 100);
+        const rsiScore = clamp(100 - Math.abs(rsi - 50) * 2.2, 0, 100);
+        const rateScore = clamp(100 - (us10y - 3.2) * 28, 0, 100);
+        return Math.round((fgScore + vixScore + rsiScore + rateScore) / 4);
+    }
+
+    const MINI_GAUGE_ARC = 144;
+    const MAIN_GAUGE_ARC = 239;
+
+    function pctToAngle(pct) {
+        return -90 + clamp(pct, 0, 1) * 180;
+    }
+
+    function setMiniGauge(svgId, pct, arcColor) {
+        const svg = document.getElementById(svgId);
+        if (!svg) return;
+        const arc = svg.querySelector('.gauge-arc');
+        const needle = svg.querySelector('.gauge-needle');
+        const p = clamp(pct, 0, 1);
+        if (arc) {
+            arc.setAttribute('stroke-dashoffset', String(MINI_GAUGE_ARC * (1 - p)));
+            if (arcColor) arc.setAttribute('stroke', arcColor);
+        }
+        if (needle) needle.setAttribute('transform', `rotate(${pctToAngle(p)}, 60, 62)`);
+    }
+
+    function setMainGauge(pct) {
+        const arc = document.getElementById('mainGaugeArc');
+        const needle = document.getElementById('mainGaugeNeedle');
+        const p = clamp(pct, 0, 1);
+        if (arc) arc.setAttribute('stroke-dashoffset', String(MAIN_GAUGE_ARC * (1 - p)));
+        if (needle) needle.setAttribute('transform', `rotate(${pctToAngle(p)}, 100, 98)`);
+    }
+
+    function gaugeColorForScore(score) {
+        if (score >= 70) return '#0f7b6c';
+        if (score >= 40) return '#d9730d';
+        return '#6940a5';
+    }
+
+    function investmentVerdict(score) {
+        if (score >= 81) return { label: '적극 매수 적기 ☀️', hint: '종합 시그널이 강합니다. 분할 매수·적립 타이밍으로 검토해 보세요.' };
+        if (score >= 61) return { label: '양호 — 매수 고려 🌤️', hint: '전반적으로 우호적입니다. 무리한 레버리지는 피하세요.' };
+        if (score >= 41) return { label: '관망 · 눈치 보기 ⛅', hint: '방향이 애매합니다. 추가 매수보다는 포지션 점검이 좋아요.' };
+        if (score >= 21) return { label: '주의 — 포지션 축소 🌧️', hint: '리스크가 커지고 있습니다. 현금 비중을 늘릴 여지를 두세요.' };
+        return { label: '매도·현금 보유 권장 ⛈️', hint: '시장 공포가 큽니다. 무리한 매매보다 방어가 우선입니다.' };
+    }
+
+    function weatherTier(score) {
+        if (score >= 81) {
+            return {
+                key: 'sunny',
+                emoji: '☀️',
+                label: '맑음',
+                tagBg: '#337ea9',
+                sectionBg: '#f1f8ff',
+                heroBg: '#eef6ff',
+                farmerBg: '#eef6ff',
+                message: '<strong>[오늘의 투자 기상도: 맑음 ☀️]</strong> 종합 기술 시그널 대풍년! 썬그리가 햇살 가득한 날씨 속에서 신나게 당근 농사를 지으며 자산을 불리는 중입니다. 씨앗을 적극적으로 파종하기 아주 좋은 타이밍입니다!'
+            };
+        }
+        if (score >= 61) {
+            return {
+                key: 'fair',
+                emoji: '🌤️',
+                label: '쨍함',
+                tagBg: '#0f7b6c',
+                sectionBg: '#f0faf8',
+                heroBg: '#f0faf8',
+                farmerBg: '#f0faf8',
+                message: '<strong>[오늘의 투자 기상도: 쨍함 🌤️]</strong> 대체로 우호적인 하늘입니다. 썬그리가 기지개를 켜며 당근밭을 살피고 있어요. 무리하지 않는 분할 매수를 검토해 보세요.'
+            };
+        }
+        if (score >= 41) {
+            return {
+                key: 'cloudy',
+                emoji: '⛅',
+                label: '구름',
+                tagBg: '#787774',
+                sectionBg: '#f7f6f3',
+                heroBg: '#f7f6f3',
+                farmerBg: '#f7f6f3',
+                message: '<strong>[오늘의 투자 기상도: 구름 ⛅]</strong> 시장 추세가 애매합니다. 썬그리가 구름 낀 하늘 아래에서 눈치를 보며 다음 당근 파종 타이밍을 심각하게 저울질하고 있습니다.'
+            };
+        }
+        if (score >= 21) {
+            return {
+                key: 'rainy',
+                emoji: '🌧️',
+                label: '비',
+                tagBg: '#337ea9',
+                sectionBg: '#eef3f8',
+                heroBg: '#eef3f8',
+                farmerBg: '#eef3f8',
+                message: '<strong>[오늘의 투자 기상도: 비 🌧️]</strong> 시장에 비바람이 내립니다. 썬그리가 당근밭에 방수포를 준비하며 포지션을 줄일지 고민 중입니다. 추가 매수보다 방어가 우선이에요.'
+            };
+        }
+        return {
+            key: 'storm',
+            emoji: '⛈️',
+            label: '폭풍우',
+            tagBg: '#6940a5',
+            sectionBg: '#f6f3f9',
+            heroBg: '#f6f3f9',
+            farmerBg: '#f6f3f9',
+            message: '<strong>[오늘의 투자 기상도: 폭풍우 ⛈️]</strong> 시장 급락 경보! 썬그리가 멘탈을 필사적으로 챙기며 당근밭에 방수포를 씌우고 있습니다. 매매 버튼을 접고 샘으로 대피하세요!'
+        };
+    }
+
+    function setWeatherLoading(loading) {
+        ['mFG', 'mVIX', 'mRSI', 'mUS10Y', 'mTechScore'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (loading) {
+                el.classList.add('loading');
+                el.innerText = id === 'mTechScore' ? '계산 중…' : '…';
+            } else {
+                el.classList.remove('loading');
+            }
+        });
+        const verdictEl = document.getElementById('investmentVerdict');
+        const subEl = document.getElementById('mTechSub');
+        if (loading && verdictEl) verdictEl.innerText = '지표 분석 중…';
+        if (loading && subEl) subEl.innerText = '4개 지표를 종합한 매수 환경 점수입니다';
+    }
+
+    const CONVEX_API = 'https://convextrade.com/api/public/data';
+    const METRIC_FETCH_TIMEOUT = 5000;
+    const YAHOO_PROXY_TIMEOUT = 15000;
+    const WEATHER_CACHE_KEY = 'sungreeWeatherCache_v2';
+    const BUNDLED_SPY_UPDATED = '2026-07-07';
+    const BUNDLED_SPY_CLOSES = [
+        745.6400146484375, 750.5900268554688, 750.4600219726562, 754.5999755859375,
+        756.47998046875, 758.5399780273438, 759.5700073242188, 754.239990234375,
+        757.0900268554688, 737.5499877929688, 739.219970703125, 737.0499877929688,
+        725.4299926757812, 737.760009765625, 741.75, 754.8300170898438,
+        750.3300170898438, 740.9600219726562, 746.739990234375, 744.3900146484375,
+        733.5800170898438, 733.239990234375, 734.2999877929688, 728.989990234375,
+        741, 746.77001953125, 745.760009765625, 744.780029296875,
+        751.280029296875, 747.7100219726562
+    ];
+
+    let weatherMetrics = {
+        fg: 50,
+        vix: 20,
+        rsi: 50,
+        us10y: 4.2,
+        fgLive: false,
+        vixBadge: { kind: 'estimated', label: '추정' },
+        rsiBadge: { kind: 'estimated', label: '추정' },
+        us10yBadge: { kind: 'estimated', label: '추정' }
+    };
+
+    function fetchWithTimeout(url, options, ms) {
+        ms = ms || METRIC_FETCH_TIMEOUT;
+        const controller = new AbortController();
+        const timer = setTimeout(function () { controller.abort(); }, ms);
+        return fetch(url, Object.assign({}, options || {}, { signal: controller.signal }))
+            .then(function (res) {
+                clearTimeout(timer);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .catch(function (err) {
+                clearTimeout(timer);
+                throw err;
+            });
+    }
+
+    function fetchTextWithTimeout(url, ms) {
+        ms = ms || METRIC_FETCH_TIMEOUT;
+        const controller = new AbortController();
+        const timer = setTimeout(function () { controller.abort(); }, ms);
+        return fetch(url, { signal: controller.signal })
+            .then(function (res) {
+                clearTimeout(timer);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.text();
+            })
+            .catch(function (err) {
+                clearTimeout(timer);
+                throw err;
+            });
+    }
+
+    function isPendingBadge(badge) {
+        return !badge || badge.label === '갱신 중' || badge.label === '연동 중';
+    }
+
+    function normalizeMetricBadge(badge, fallback) {
+        if (isPendingBadge(badge)) return fallback;
+        return badge;
+    }
+
+    function getBundledSpyRsi() {
+        const rsi = calculateRSI(BUNDLED_SPY_CLOSES, 14);
+        if (rsi == null || isNaN(rsi)) return null;
+        return {
+            value: rsi,
+            source: 'bundled',
+            badge: { kind: 'daily', label: '일일' }
+        };
+    }
+
+    function latestConvexObservation(json) {
+        const rows = (json && json.data ? json.data : []).filter(function (r) {
+            return r.value != null && !isNaN(r.value);
+        });
+        if (!rows.length) return null;
+        return rows[rows.length - 1];
+    }
+
+    function fetchConvexSeries(seriesId) {
+        return fetchWithTimeout(CONVEX_API + '/' + seriesId).then(function (json) {
+            const obs = latestConvexObservation(json);
+            if (!obs) throw new Error('empty series');
+            return obs.value;
+        });
+    }
+
+    function fetchDirectJson(url, ms) {
+        return fetchWithTimeout(url, null, ms || METRIC_FETCH_TIMEOUT);
+    }
+
+    function parseAlloriginsGetPayload(text) {
+        if (!text || text.charAt(0) === '<') throw new Error('proxy html error');
+        const wrap = JSON.parse(text);
+        if (!wrap || !wrap.contents) throw new Error('bad proxy payload');
+        if (wrap.contents.charAt(0) === '<') throw new Error('upstream html error');
+        return JSON.parse(wrap.contents);
+    }
+
+    function fetchYahooChartBrowser(symbol, range, interval) {
+        range = range || '2mo';
+        interval = interval || '1d';
+        const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/'
+            + symbol
+            + '?range=' + range
+            + '&interval=' + interval;
+        const getUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(yahooUrl);
+        const rawUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(yahooUrl);
+        const corsProxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(yahooUrl);
+
+        return fetchWithTimeout(corsProxyUrl, null, 8000)
+            .catch(function () {
+                return fetchTextWithTimeout(getUrl, YAHOO_PROXY_TIMEOUT)
+                    .then(parseAlloriginsGetPayload);
+            })
+            .catch(function () {
+                return fetchWithTimeout(rawUrl, null, YAHOO_PROXY_TIMEOUT);
+            });
+    }
+
+    function safeMetricFetch(task, timeoutMs) {
+        return new Promise(function (resolve, reject) {
+            let settled = false;
+            const timer = setTimeout(function () {
+                if (!settled) {
+                    settled = true;
+                    reject(new Error('timeout'));
+                }
+            }, timeoutMs);
+            Promise.resolve()
+                .then(task)
+                .then(function (result) {
+                    if (!settled) {
+                        settled = true;
+                        clearTimeout(timer);
+                        resolve(result);
+                    }
+                })
+                .catch(function (err) {
+                    if (!settled) {
+                        settled = true;
+                        clearTimeout(timer);
+                        reject(err);
+                    }
+                });
+        });
+    }
+
+    function parseYahooCloses(chartJson) {
+        const result = chartJson && chartJson.chart && chartJson.chart.result
+            ? chartJson.chart.result[0]
+            : null;
+        const closes = result && result.indicators && result.indicators.quote
+            ? result.indicators.quote[0].close
+            : null;
+        if (!closes) return null;
+        return closes.filter(function (v) { return v != null && !isNaN(v); });
+    }
+
+    function parseYahooLatestPrice(chartJson) {
+        const result = chartJson && chartJson.chart && chartJson.chart.result
+            ? chartJson.chart.result[0]
+            : null;
+        if (!result) return null;
+        const meta = result.meta || {};
+        if (meta.regularMarketPrice != null && !isNaN(meta.regularMarketPrice)) {
+            return meta.regularMarketPrice;
+        }
+        const closes = parseYahooCloses(chartJson);
+        return closes && closes.length ? closes[closes.length - 1] : null;
+    }
+
+    function fetchYahooChart(symbol, range, interval) {
+        return fetchYahooChartBrowser(symbol, range, interval);
+    }
+
+    function fetchVixValue() {
+        return fetchConvexSeries('VIXCLS')
+            .then(function (value) { return { value: value, source: 'fred' }; });
+    }
+
+    function fetchUs10yValue() {
+        return fetchConvexSeries('DGS10')
+            .then(function (value) { return { value: value, source: 'fred' }; });
+    }
+
+    function calculateRSI(closes, period) {
+        period = period || 14;
+        if (closes.length < period + 1) return null;
+        let avgGain = 0;
+        let avgLoss = 0;
+        for (let i = 1; i <= period; i++) {
+            const diff = closes[i] - closes[i - 1];
+            if (diff >= 0) avgGain += diff;
+            else avgLoss -= diff;
+        }
+        avgGain /= period;
+        avgLoss /= period;
+        for (let i = period + 1; i < closes.length; i++) {
+            const diff = closes[i] - closes[i - 1];
+            const gain = diff > 0 ? diff : 0;
+            const loss = diff < 0 ? -diff : 0;
+            avgGain = (avgGain * (period - 1) + gain) / period;
+            avgLoss = (avgLoss * (period - 1) + loss) / period;
+        }
+        if (avgLoss === 0) return 100;
+        return 100 - (100 / (1 + avgGain / avgLoss));
+    }
+
+    function fetchSp500RSI() {
+        return fetchYahooChartBrowser('SPY', '2mo', '1d').then(function (json) {
+            const closes = parseYahooCloses(json);
+            if (!closes || closes.length < 15) throw new Error('insufficient closes');
+            const rsi = calculateRSI(closes, 14);
+            if (rsi == null || isNaN(rsi)) throw new Error('rsi calc failed');
+            return { value: rsi, source: 'yahoo' };
+        });
+    }
+
+    function readWeatherCache() {
+        try {
+            const raw = JSON.parse(localStorage.getItem(WEATHER_CACHE_KEY) || 'null');
+            if (!raw || raw.fg == null) return null;
+            return Object.assign({}, raw, { stale: raw.date !== todayISO() });
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function writeWeatherCache() {
+        const bundled = getBundledSpyRsi();
+        localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({
+            date: todayISO(),
+            fg: weatherMetrics.fg,
+            vix: weatherMetrics.vix,
+            rsi: weatherMetrics.rsi,
+            us10y: weatherMetrics.us10y,
+            fgLive: weatherMetrics.fgLive,
+            vixBadge: normalizeMetricBadge(weatherMetrics.vixBadge, { kind: 'estimated', label: '추정' }),
+            rsiBadge: normalizeMetricBadge(
+                weatherMetrics.rsiBadge,
+                bundled ? bundled.badge : { kind: 'estimated', label: '추정' }
+            ),
+            us10yBadge: normalizeMetricBadge(weatherMetrics.us10yBadge, { kind: 'estimated', label: '추정' })
+        }));
+    }
+
+    function renderWeatherMetrics() {
+        const m = weatherMetrics;
+        fgIsLive = m.fgLive;
+
+        document.getElementById('mFG').innerText = String(Math.round(m.fg));
+        document.getElementById('mVIX').innerText = m.vix.toFixed(1);
+        document.getElementById('mRSI').innerText = m.rsi.toFixed(1);
+        document.getElementById('mUS10Y').innerText = m.us10y.toFixed(2) + '%';
+
+        updateMetricSourceBadge('gaugeCardFG', 'fgSourceBadge', m.fgLive ? 'live' : 'offline', m.fgLive ? '실시간' : '오프라인');
+        updateMetricSourceBadge('gaugeCardVIX', 'vixSourceBadge', m.vixBadge.kind, m.vixBadge.label);
+        updateMetricSourceBadge('gaugeCardRSI', 'rsiSourceBadge', m.rsiBadge.kind, m.rsiBadge.label);
+        updateMetricSourceBadge('gaugeCardUS10Y', 'us10ySourceBadge', m.us10yBadge.kind, m.us10yBadge.label);
+
+        updateMetricGauges(m.fg, m.vix, m.rsi, m.us10y);
+        updateBuyZoneHighlights(m.fg, m.vix, m.rsi, m.us10y);
+
+        const score = computeWeatherScore(m.fg, m.vix, m.rsi, m.us10y);
+        lastWeatherScore = score;
+        lastWeatherTier = weatherTier(score);
+        weatherLoaded = true;
+        updateWeather(score);
+    }
+
+    function refreshWeatherComposite() {
+        renderWeatherMetrics();
+        writeWeatherCache();
+    }
+
+    function fetchFearGreedIndex() {
+        return fetchDirectJson('https://api.alternative.me/fng/?limit=1', 4000)
+            .then(function (data) {
+                if (!data || !data.data || !data.data[0]) throw new Error('invalid fg payload');
+                const val = parseInt(data.data[0].value, 10);
+                if (isNaN(val)) throw new Error('invalid fg value');
+                return { fg: val, live: true };
+            });
+    }
+
+    function estimateVix(fg, seed) {
+        return clamp(12 + (100 - fg) * 0.22 + seededRand(seed, 2) * 8, 10, 55);
+    }
+
+    function estimateRsi(fg, seed) {
+        return clamp(20 + fg * 0.45 + seededRand(seed, 3) * 12 - 6, 15, 85);
+    }
+
+    function estimateUs10y(fg, seed) {
+        return clamp(3.2 + (100 - fg) * 0.012 + seededRand(seed, 4) * 0.6, 2.8, 5.8);
+    }
+
+    function metricBadgeForSource(source) {
+        if (source === 'yahoo') return { kind: 'live', label: '실시간' };
+        if (source === 'bundled') return { kind: 'daily', label: '일일' };
+        if (source === 'fred') return { kind: 'daily', label: '일일' };
+        return { kind: 'estimated', label: '추정' };
+    }
+
+    function updateMetricSourceBadge(cardId, badgeId, kind, label) {
+        const card = document.getElementById(cardId);
+        const badge = document.getElementById(badgeId);
+        if (!badge) return;
+        const isEstimated = kind === 'estimated' || kind === 'offline';
+        if (card) card.classList.toggle('gauge-card--estimated', isEstimated);
+        badge.className = 'gauge-source-badge ' + (kind === 'live' || kind === 'daily' ? 'live' : kind);
+        badge.innerText = label;
+    }
+
+    function updateFgSourceBadge() {
+        updateMetricSourceBadge('gaugeCardFG', 'fgSourceBadge', fgIsLive ? 'live' : 'offline', fgIsLive ? '실시간' : '오프라인');
+    }
+
+    function setBuyTipActive(id, active, baseHtml) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('in-zone', active);
+        el.innerHTML = (active ? '✓ ' : '') + baseHtml;
+    }
+
+    function updateBuyZoneHighlights(fg, vix, rsi, us10y) {
+        setBuyTipActive('buyTipFG', fg >= 25 && fg <= 45, '역발상 참고 25~45점<br>(공포 구간)');
+        setBuyTipActive('buyTipVIX', vix >= 22 && vix <= 35, '역발상 참고 22~35<br>(불안 고조 시)');
+        setBuyTipActive('buyTipRSI', rsi <= 40, '역발상 참고 40 이하<br>(과매도 구간)');
+        setBuyTipActive('buyTipUS10Y', us10y <= 4.0, '역발상 참고 4.0% 이하<br>(금리 부담 완화)');
+    }
+
+    function getWeatherContextText() {
+        if (!weatherLoaded || !lastWeatherTier) return '';
+        return `오늘 기상: ${lastWeatherTier.emoji} ${lastWeatherTier.label} (종합 ${lastWeatherScore}점)`;
+    }
+
+    function mddWeatherAdvice(mdd) {
+        if (!weatherLoaded || !lastWeatherTier) return '';
+        if (lastWeatherScore <= 40 && mdd <= -30) {
+            return '거시 기상이 흐리고 종목 침수율도 깊습니다. 분산·현금 비중을 함께 점검하세요.';
+        }
+        if (lastWeatherScore >= 61 && mdd > -20) {
+            return '시장 기상은 양호하고 종목 조정도 얕은 편입니다. 무리한 추격 매수만 피하면 됩니다.';
+        }
+        if (lastWeatherScore <= 40) {
+            return '오늘 시장 기상이 좋지 않습니다. 개별 종목 매수보다 방어 점검을 우선하세요.';
+        }
+        if (mdd <= -30) {
+            return '시장은 괜찮아도 이 종목은 깊이 침수됐습니다. 비중·손절 기준을 다시 보세요.';
+        }
+        return '거시 기상과 개별 종목 상태를 함께 보고 판단하세요.';
+    }
+
+    function updateMetricGauges(fg, vix, rsi, us10y) {
+        setMiniGauge('gaugeFG', fg / 100, gaugeColorForScore(fg));
+        setMiniGauge('gaugeVIX', 1 - (vix - 10) / 45, gaugeColorForScore(100 - (vix - 12) * 3.2));
+        setMiniGauge('gaugeRSI', 1 - Math.abs(rsi - 50) / 50, gaugeColorForScore(100 - Math.abs(rsi - 50) * 2.2));
+        setMiniGauge('gaugeUS10Y', 1 - (us10y - 2.8) / 3, gaugeColorForScore(100 - (us10y - 3.2) * 28));
+    }
+
+    function loadMarketWeather() {
+        const seed = dateSeed();
+        const cached = readWeatherCache();
+        const bundledRsi = getBundledSpyRsi();
+        const baseFg = cached ? cached.fg : 45 + Math.round(seededRand(seed, 1) * 30);
+        const hasCachedMetrics = !!cached;
+        const cachedRsiBadge = cached ? normalizeMetricBadge(cached.rsiBadge, bundledRsi.badge) : bundledRsi.badge;
+        const initialRsi = cached && !isPendingBadge(cached.rsiBadge)
+            ? cached.rsi
+            : bundledRsi.value;
+
+        weatherMetrics = {
+            fg: baseFg,
+            vix: cached ? cached.vix : estimateVix(baseFg, seed),
+            rsi: initialRsi,
+            us10y: cached ? cached.us10y : estimateUs10y(baseFg, seed),
+            fgLive: cached ? !!cached.fgLive : false,
+            vixBadge: hasCachedMetrics
+                ? normalizeMetricBadge(cached.vixBadge, { kind: 'estimated', label: '갱신 중' })
+                : { kind: 'estimated', label: '갱신 중' },
+            rsiBadge: cachedRsiBadge,
+            us10yBadge: hasCachedMetrics
+                ? normalizeMetricBadge(cached.us10yBadge, { kind: 'estimated', label: '갱신 중' })
+                : { kind: 'estimated', label: '갱신 중' }
+        };
+
+        renderWeatherMetrics();
+
+        safeMetricFetch(function () { return fetchFearGreedIndex(); }, 4500)
+            .then(function (fgData) {
+                weatherMetrics.fg = fgData.fg;
+                weatherMetrics.fgLive = true;
+                refreshWeatherComposite();
+            })
+            .catch(function () {
+                weatherMetrics.fgLive = false;
+                refreshWeatherComposite();
+            });
+
+        safeMetricFetch(function () { return fetchVixValue(); }, 4500)
+            .then(function (payload) {
+                weatherMetrics.vix = payload.value;
+                weatherMetrics.vixBadge = metricBadgeForSource(payload.source);
+                refreshWeatherComposite();
+            })
+            .catch(function () {
+                if (!hasCachedMetrics) {
+                    weatherMetrics.vix = estimateVix(weatherMetrics.fg, seed);
+                    weatherMetrics.vixBadge = { kind: 'estimated', label: '추정' };
+                }
+                refreshWeatherComposite();
+            });
+
+        safeMetricFetch(function () { return fetchUs10yValue(); }, 4500)
+            .then(function (payload) {
+                weatherMetrics.us10y = payload.value;
+                weatherMetrics.us10yBadge = metricBadgeForSource(payload.source);
+                refreshWeatherComposite();
+            })
+            .catch(function () {
+                if (!hasCachedMetrics) {
+                    weatherMetrics.us10y = estimateUs10y(weatherMetrics.fg, seed);
+                    weatherMetrics.us10yBadge = { kind: 'estimated', label: '추정' };
+                }
+                refreshWeatherComposite();
+            });
+
+        safeMetricFetch(function () { return fetchSp500RSI(); }, YAHOO_PROXY_TIMEOUT + 3000)
+            .then(function (payload) {
+                weatherMetrics.rsi = payload.value;
+                weatherMetrics.rsiBadge = metricBadgeForSource(payload.source);
+                refreshWeatherComposite();
+            })
+            .catch(function () {
+                weatherMetrics.rsi = bundledRsi.value;
+                weatherMetrics.rsiBadge = bundledRsi.badge;
+                refreshWeatherComposite();
+            });
+    }
+
+    function updateHarvestUI() {
+        document.getElementById('harvestGrape').innerText = harvests.grape || 0;
+        document.getElementById('harvestCorn').innerText = harvests.corn || 0;
+        document.getElementById('harvestMango').innerText = harvests.mango || 0;
+        document.getElementById('harvestCarrot').innerText = harvests.carrot || 0;
+    }
+
+    function formatDate(iso) {
+        if (!iso) return '기한 없음';
+        const [y, m, d] = iso.split('-');
+        return `${y}.${m}.${d}`;
+    }
+
+    function daysBetween(startISO, endISO) {
+        const start = new Date(startISO + 'T00:00:00');
+        const end = new Date(endISO + 'T00:00:00');
+        return Math.round((end - start) / 86400000);
+    }
+
+    function getFilledCount(dream) {
+        if (dream.done) return TOTAL_UNITS;
+        return Math.min(TOTAL_UNITS, Math.max(0, dream.filled || 0));
+    }
+
+    function isReady(dream) {
+        return dream.done || getFilledCount(dream) >= TOTAL_UNITS;
+    }
+
+    function isOverdue(dream) {
+        if (!dream.deadline || dream.done) return false;
+        return daysBetween(todayISO(), dream.deadline) < 0;
+    }
+
+    function renderCropVisual(dream) {
+        const crop = CROP_META[dream.crop] || CROP_META.carrot;
+        const filled = getFilledCount(dream);
+        let units = '';
+        for (let i = 0; i < TOTAL_UNITS; i++) {
+            units += `<span class="crop-unit${i < filled ? ' filled' : ''}">${crop.unit}</span>`;
+        }
+        const canClick = !dream.done && filled < TOTAL_UNITS;
+        const clickAttr = canClick
+            ? `onclick="fillDreamUnit(${dream.id})" title="눌러서 알 채우기"`
+            : '';
+        return `<div class="crop-visual ${dream.crop}${canClick ? ' clickable' : ''}" ${clickAttr}>${units}</div>`;
+    }
+
+    function fillDreamUnit(id) {
+        const dream = dreams.find(d => d.id === id);
+        if (!dream || dream.done) return;
+        const filled = getFilledCount(dream);
+        if (filled >= TOTAL_UNITS) return;
+        dream.filled = filled + 1;
+        saveDreams();
+        renderDreams();
+        if (dream.filled >= TOTAL_UNITS) {
+            alert('작물이 다 찼어요! 체크해서 수확하세요.');
+        }
+    }
+
+    function addDream() {
+        const text = document.getElementById('dreamText').value.trim();
+        const deadline = document.getElementById('dreamDeadline').value;
+        const crop = document.getElementById('dreamCrop').value;
+        if (!text) { alert('꿈을 입력하세요!'); return; }
+        if (!deadline) { alert('기한을 선택하세요!'); return; }
+        if (daysBetween(todayISO(), deadline) < 0) {
+            alert('기한은 오늘 이후로 선택하세요!');
+            return;
+        }
+        dreams.unshift({
+            id: Date.now(),
+            text,
+            deadline,
+            crop,
+            createdAt: todayISO(),
+            filled: 0,
+            done: false
+        });
+        document.getElementById('dreamText').value = '';
+        document.getElementById('dreamDeadline').value = '';
+        saveDreams();
+        renderDreams();
+    }
+
+    function toggleDream(id) {
+        const dream = dreams.find(d => d.id === id);
+        if (!dream) return;
+        const crop = dream.crop in CROP_META ? dream.crop : 'carrot';
+        if (!dream.done) {
+            if (!isReady(dream)) {
+                alert('아직 작물이 다 차지 않았어요. 작물을 눌러 알알이 채운 뒤 수확하세요!');
+                renderDreams();
+                return;
+            }
+            dream.done = true;
+            dream.filled = TOTAL_UNITS;
+            harvests[crop] = (harvests[crop] || 0) + 1;
+            const meta = CROP_META[crop];
+            alert(`${meta.emoji} ${meta.label}을(를) 수확했습니다!`);
+        } else {
+            dream.done = false;
+            harvests[crop] = Math.max(0, (harvests[crop] || 0) - 1);
+        }
+        saveDreams();
+        renderDreams();
+    }
+
+    function deleteDream(id) {
+        const dream = dreams.find(d => d.id === id);
+        if (!dream) return;
+        if (dream.done) {
+            const crop = dream.crop in CROP_META ? dream.crop : 'carrot';
+            harvests[crop] = Math.max(0, (harvests[crop] || 0) - 1);
+        }
+        dreams = dreams.filter(d => d.id !== id);
+        saveDreams();
+        renderDreams();
+    }
+
+    function renderDreams() {
+        updateHarvestUI();
+        const list = document.getElementById('dreamList');
+        if (!dreams.length) {
+            list.innerHTML = '<div class="dream-empty">아직 적힌 꿈이 없어요. 첫 꿈을 심어보세요!</div>';
+            return;
+        }
+        list.innerHTML = dreams.map(d => {
+            const crop = CROP_META[d.crop] || CROP_META.carrot;
+            const filled = getFilledCount(d);
+            const ready = isReady(d);
+            const overdue = isOverdue(d);
+            let status = '';
+            if (d.done) status = '<span class="harvested">수확 완료</span>';
+            else if (ready) status = '<span class="ready">수확 가능!</span>';
+            else if (overdue) status = '<span class="overdue">기한 지남</span>';
+            else status = `<span class="growing">채우는 중 ${filled}/${TOTAL_UNITS} · 눌러서 채우기</span>`;
+
+            return `<div class="dream-item${d.done ? ' done' : ''}">
+                <div class="dream-top">
+                    <input type="checkbox" class="dream-check" ${d.done ? 'checked' : ''} ${!d.done && !ready ? 'disabled' : ''} onchange="toggleDream(${d.id})">
+                    <div class="dream-body">
+                        <div class="dream-text">${escapeHtml(d.text)}</div>
+                        <div class="dream-meta">
+                            <span class="crop">${crop.emoji} ${crop.label}</span>
+                            <span>기한 ${formatDate(d.deadline)}</span>
+                            ${status}
+                        </div>
+                    </div>
+                    <button type="button" class="dream-del" onclick="deleteDream(${d.id})">삭제</button>
+                </div>
+                ${renderCropVisual(d)}
+            </div>`;
+        }).join('');
+
+        // animate fill on next frame
+        requestAnimationFrame(() => {
+            list.querySelectorAll('.crop-unit.filled').forEach((el, i) => {
+                el.style.transitionDelay = `${(i % TOTAL_UNITS) * 40}ms`;
+            });
+        });
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function updateWeather(score) {
+        score = parseInt(score, 10);
+        const section = document.getElementById('weatherSection');
+        const hero = document.getElementById('weatherHero');
+        const farmer = document.getElementById('weatherFarmerZone');
+        const txt = document.getElementById('fText');
+        const tag = document.getElementById('pigRankTag');
+        const avatar = document.getElementById('fAvatar');
+        const tier = weatherTier(score);
+
+        lastWeatherTier = tier;
+
+        document.getElementById('mTechScore').innerText = '종합 ' + score + '점';
+        setMainGauge(score / 100);
+
+        const verdict = investmentVerdict(score);
+        const verdictEl = document.getElementById('investmentVerdict');
+        const subEl = document.getElementById('mTechSub');
+        if (verdictEl) verdictEl.innerText = verdict.label;
+        if (subEl) subEl.innerText = verdict.hint;
+
+        if (section) section.style.backgroundColor = tier.sectionBg;
+        if (hero) hero.style.backgroundColor = tier.heroBg;
+        if (farmer) farmer.style.backgroundColor = tier.farmerBg;
+        tag.innerText = `🕶️ 썬그리 [${tier.label} ${tier.emoji}]`;
+        tag.style.background = tier.tagBg;
+        avatar.innerText = tier.emoji + '🕶️';
+        txt.innerHTML = tier.message;
+    }
+
+    function bindMddInputs() {
+        ['mddName', 'mddBuy', 'mddHigh', 'mddCurrent', 'mddQty'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') calculateMDD();
+            });
+        });
+    }
+
+    function readMddForm() {
+        return {
+            name: document.getElementById('mddName').value.trim(),
+            buy: parseFloat(document.getElementById('mddBuy').value),
+            high: parseFloat(document.getElementById('mddHigh').value),
+            current: parseFloat(document.getElementById('mddCurrent').value),
+            qty: parseFloat(document.getElementById('mddQty').value)
+        };
+    }
+
+    function fillMddForm(record) {
+        document.getElementById('mddName').value = record.name || '';
+        document.getElementById('mddBuy').value = record.buy || '';
+        document.getElementById('mddHigh').value = record.high || '';
+        document.getElementById('mddCurrent').value = record.current || '';
+        document.getElementById('mddQty').value = record.qty || '';
+    }
+
+    function clearMddForm() {
+        ['mddName', 'mddBuy', 'mddHigh', 'mddCurrent', 'mddQty'].forEach(function (id) {
+            document.getElementById(id).value = '';
+        });
+        lastMddSnapshot = null;
+        const result = document.getElementById('mddResult');
+        result.classList.remove('visible');
+        result.innerHTML = '';
+    }
+
+    function mddStatus(mdd) {
+        if (mdd > -10) return { key: 'safe', label: '안전 🌾', color: '#0f7b6c' };
+        if (mdd > -20) return { key: 'caution', label: '경미한 조정 ☁️', color: '#337ea9' };
+        if (mdd > -30) return { key: 'warning', label: '주의 🌧️', color: '#d9730d' };
+        if (mdd > -50) return { key: 'danger', label: '침수 경보 ⛈️', color: '#6940a5' };
+        return { key: 'crisis', label: '난파 위기 🚨', color: '#eb5757' };
+    }
+
+    function mddComment(mdd, recoveryPct) {
+        if (mdd > -10) return '마법 안경 분석: 이 정도 조정은 똔그리 가든이 무럭무럭 자라나는 자연스러운 과정일 뿐입니다. 🌾';
+        if (mdd > -20) return '가벼운 비바람입니다. 포지션 크기만 점검하고 무리한 추가 매수는 피하세요. ☁️';
+        if (mdd > -30) return '⚠️ 침수 위험 경보! 썬그리가 방수포를 지급합니다. 분산 투자 자산을 긴급 점검하세요! ⛈️';
+        if (mdd > -50) return `🚨 깊은 침수 구간입니다. 고점 회복까지 약 +${recoveryPct.toFixed(1)}%가 필요해요. 손절·분산·현금 비중을 다시 보세요!`;
+        return '🚨 계좌 난파 위기! 똔그리가 즉시 샘으로 대피령을 내렸습니다. 목탁 비트를 연타해 번뇌를 씻으세요! 🥁';
+    }
+
+    function formatWon(value) {
+        return Math.round(value).toLocaleString() + '원';
+    }
+
+    function formatPct(value, digits) {
+        const sign = value > 0 ? '+' : '';
+        return sign + value.toFixed(digits || 2) + '%';
+    }
+
+    function computeMddSnapshot(form) {
+        const name = form.name || '선택 종목';
+        const high = form.high;
+        const current = form.current;
+        const buy = form.buy;
+        const qty = form.qty;
+
+        if (!high || !current) {
+            alert('역대 최고가와 현재가를 입력하세요!');
+            return null;
+        }
+        if (high <= 0 || current <= 0) {
+            alert('가격은 0보다 커야 합니다!');
+            return null;
+        }
+        if (current > high) {
+            alert('현재가가 고점보다 높습니다. 고점·현재가를 다시 확인해 주세요.');
+            return null;
+        }
+
+        const mdd = ((current - high) / high) * 100;
+        const recoveryPct = ((high - current) / current) * 100;
+        const status = mddStatus(mdd);
+        const snapshot = {
+            name: name,
+            buy: buy > 0 ? buy : null,
+            high: high,
+            current: current,
+            qty: qty > 0 ? qty : null,
+            mdd: mdd,
+            recoveryPct: recoveryPct,
+            status: status
+        };
+
+        if (buy > 0) {
+            snapshot.pnlPct = ((current - buy) / buy) * 100;
+            snapshot.pnlAmount = qty > 0 ? (current - buy) * qty : null;
+            snapshot.breakEvenGap = high - buy > 0 ? ((high - buy) / buy) * 100 : 0;
+        }
+
+        return snapshot;
+    }
+
+    function renderMddResult(snapshot) {
+        const result = document.getElementById('mddResult');
+        const floodWidth = clamp(Math.abs(snapshot.mdd) * 2, 4, 100);
+
+        let statsHtml = `
+            <div class="mdd-stat">
+                <div class="mdd-stat-label">고점 대비 MDD</div>
+                <div class="mdd-stat-value loss">${formatPct(snapshot.mdd)}</div>
+            </div>
+            <div class="mdd-stat">
+                <div class="mdd-stat-label">고점 회복 필요</div>
+                <div class="mdd-stat-value">+${snapshot.recoveryPct.toFixed(1)}%</div>
+            </div>`;
+
+        if (snapshot.buy) {
+            const pnlClass = snapshot.pnlPct >= 0 ? 'gain' : 'loss';
+            statsHtml += `
+            <div class="mdd-stat">
+                <div class="mdd-stat-label">매수 대비 손익률</div>
+                <div class="mdd-stat-value ${pnlClass}">${formatPct(snapshot.pnlPct)}</div>
+            </div>`;
+            if (snapshot.pnlAmount !== null) {
+                statsHtml += `
+            <div class="mdd-stat">
+                <div class="mdd-stat-label">평가 손익</div>
+                <div class="mdd-stat-value ${pnlClass}">${formatWon(snapshot.pnlAmount)}</div>
+            </div>`;
+            } else {
+                statsHtml += `
+            <div class="mdd-stat">
+                <div class="mdd-stat-label">매수가 → 고점</div>
+                <div class="mdd-stat-value gain">+${snapshot.breakEvenGap.toFixed(1)}%</div>
+            </div>`;
+            }
+        }
+
+        result.innerHTML = `
+            ${weatherLoaded ? `<div class="mdd-weather-context">${escapeHtml(getWeatherContextText())} — ${escapeHtml(mddWeatherAdvice(snapshot.mdd))}</div>` : ''}
+            <div class="mdd-result-head">
+                <div class="mdd-result-name">${escapeHtml(snapshot.name)}</div>
+                <span class="mdd-status-badge ${snapshot.status.key}">${snapshot.status.label}</span>
+            </div>
+            <div class="mdd-flood-wrap">
+                <div class="mdd-flood-label">
+                    <span>침수 게이지</span>
+                    <span>${Math.abs(snapshot.mdd).toFixed(1)}% 하락</span>
+                </div>
+                <div class="mdd-flood-bar">
+                    <div class="mdd-flood-fill" style="width:${floodWidth}%; background:${snapshot.status.color};"></div>
+                </div>
+            </div>
+            <div class="mdd-stat-grid">${statsHtml}</div>
+            <div class="mdd-comment">💬 썬그리의 훈수: ${mddComment(snapshot.mdd, snapshot.recoveryPct)}</div>
+        `;
+        result.classList.add('visible');
+    }
+
+    function calculateMDD() {
+        const snapshot = computeMddSnapshot(readMddForm());
+        if (!snapshot) return;
+        lastMddSnapshot = snapshot;
+        renderMddResult(snapshot);
+    }
+
+    function saveMddHistory() {
+        localStorage.setItem('mddHistory', JSON.stringify(mddHistory));
+    }
+
+    function saveMddRecord() {
+        if (!lastMddSnapshot) {
+            const snapshot = computeMddSnapshot(readMddForm());
+            if (!snapshot) return;
+            lastMddSnapshot = snapshot;
+            renderMddResult(snapshot);
+        }
+
+        const record = Object.assign({}, lastMddSnapshot, {
+            id: Date.now(),
+            savedAt: todayISO(),
+            weatherScore: lastWeatherScore,
+            weatherLabel: lastWeatherTier ? lastWeatherTier.label : null
+        });
+        mddHistory = [record].concat(mddHistory.filter(function (item) {
+            return !(item.name === record.name && item.high === record.high && item.current === record.current);
+        })).slice(0, 8);
+        saveMddHistory();
+        renderMddHistory();
+    }
+
+    function loadMddRecord(index) {
+        const record = mddHistory[index];
+        if (!record) return;
+        fillMddForm(record);
+        lastMddSnapshot = computeMddSnapshot(record);
+        if (lastMddSnapshot) renderMddResult(lastMddSnapshot);
+    }
+
+    function deleteMddRecord(index) {
+        mddHistory.splice(index, 1);
+        saveMddHistory();
+        renderMddHistory();
+    }
+
+    function renderMddHistory() {
+        const list = document.getElementById('mddHistory');
+        if (!mddHistory.length) {
+            list.innerHTML = '<div class="mdd-history-empty">아직 저장된 기록이 없습니다. 분석 후 「기록 저장」을 눌러 보세요.</div>';
+            return;
+        }
+
+        list.innerHTML = mddHistory.map(function (item, index) {
+            const weatherMeta = item.weatherLabel
+                ? ` · 기상 ${item.weatherLabel}(${item.weatherScore}점)`
+                : '';
+            const meta = [
+                'MDD ' + formatPct(item.mdd),
+                formatWon(item.current),
+                item.savedAt + weatherMeta
+            ].join(' · ');
+            return `<div class="mdd-history-item">
+                <div class="mdd-history-main" onclick="loadMddRecord(${index})">
+                    <div class="mdd-history-name">${escapeHtml(item.name)}</div>
+                    <div class="mdd-history-meta">${meta}</div>
+                </div>
+                <span class="mdd-history-del" onclick="deleteMddRecord(${index})">삭제</span>
+            </div>`;
+        }).join('');
+    }
+
+    function saveBudget() {
+        localStorage.setItem('budgetGoal', document.getElementById('budgetGoal').value);
+        renderWeeds();
+    }
+
+    function addWeed() {
+        const desc = document.getElementById('weedDesc').value;
+        const amount = parseInt(document.getElementById('weedAmount').value, 10);
+        if (!desc || !amount) { alert("내용과 금액을 입력하세요!"); return; }
+        weeds.push({ desc, amount });
+        localStorage.setItem('weeds', JSON.stringify(weeds));
+        document.getElementById('weedDesc').value = '';
+        document.getElementById('weedAmount').value = '';
+        renderWeeds();
+    }
+
+    function deleteWeed(index) {
+        weeds.splice(index, 1);
+        localStorage.setItem('weeds', JSON.stringify(weeds));
+        renderWeeds();
+    }
+
+    function renderWeeds() {
+        const list = document.getElementById('weedList');
+        const goal = parseInt(localStorage.getItem('budgetGoal') || '0', 10);
+        const budgetAlert = document.getElementById('budgetAlert');
+        const budgetPanel = document.getElementById('budgetPanel');
+        list.innerHTML = '';
+        let totalCost = 0;
+        weeds.forEach((w, i) => {
+            totalCost += w.amount;
+            list.innerHTML += `<div class="weed-item"><span>🌱 ${escapeHtml(w.desc)} (${w.amount.toLocaleString()}원)</span><span class="weed-del" onclick="deleteWeed(${i})">제거</span></div>`;
+        });
+        document.getElementById('totalWeedCost').innerText = totalCost.toLocaleString();
+        const remain = goal - totalCost;
+        const remainEl = document.getElementById('remainBudget');
+        remainEl.innerText = remain.toLocaleString();
+
+        if (remain < 0) {
+            remainEl.style.color = '#eb5757';
+            if (budgetPanel) budgetPanel.classList.add('burst');
+            if (budgetAlert) {
+                budgetAlert.classList.add('visible');
+                budgetAlert.innerHTML = '<strong>[가계부 비상! 💢]</strong> 지갑에 과소비 잡초가 너무 무성합니다! 멧돼지 떼가 나타나 한 달 예산을 다 파헤쳐 놓았습니다! 자산 방수포 가동 불가능!';
+            }
+        } else {
+            remainEl.style.color = '#0f7b6c';
+            if (budgetPanel) budgetPanel.classList.remove('burst');
+            if (budgetAlert) {
+                budgetAlert.classList.remove('visible');
+                budgetAlert.innerHTML = '';
+            }
+        }
+    }
+
+    bindMddInputs();
+    loadMarketWeather();
+</script>
+</body>
+</html>
