@@ -9,6 +9,17 @@ import {
   normalizePageId,
   REVALIDATE_SECONDS,
 } from "@/lib/categories";
+import {
+  toProxiedMediaUrl,
+  wrapNotionGalleryCover,
+} from "@/lib/notion-media";
+
+export {
+  toProxiedBlockMediaUrl,
+  toProxiedImageUrl,
+  toProxiedMediaUrl,
+  toProxiedPageCoverUrl,
+} from "@/lib/notion-media";
 
 export { REVALIDATE_SECONDS };
 
@@ -112,42 +123,26 @@ function getCoverImage(page: PageObjectResponse): string | null {
   return null;
 }
 
-/** Stable proxy URL — resolves fresh Notion cover URL on each request. */
-export function toProxiedPageCoverUrl(pageId: string): string {
-  return `/api/notion-image?pageId=${encodeURIComponent(normalizePageId(pageId))}`;
+/** Notion file / image object → raw HTTPS URL */
+export function extractNotionFileUrl(
+  file:
+    | {
+        type?: string;
+        external?: { url?: string };
+        file?: { url?: string };
+      }
+    | null
+    | undefined
+): string | null {
+  if (!file) return null;
+  if (file.type === "external") return file.external?.url ?? null;
+  if (file.type === "file") return file.file?.url ?? null;
+  return file.external?.url ?? file.file?.url ?? null;
 }
 
-/** Stable proxy URL — resolves fresh block file URL on each request. */
-export function toProxiedBlockMediaUrl(blockId: string): string {
-  return `/api/notion-image?blockId=${encodeURIComponent(normalizePageId(blockId))}`;
-}
-
-/** @deprecated Prefer pageId/blockId proxies. Kept for legacy cached HTML. */
-export function toProxiedImageUrl(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  if (raw.startsWith("/api/notion-image")) return raw;
-  return `/api/notion-image?url=${encodeURIComponent(raw)}`;
-}
-
-/** Notion gallery preset covers (notion.so/images/page-cover/...) are not server-fetchable; use Oopy wrapper. */
-function wrapNotionGalleryCover(externalUrl: string, blockId: string): string | null {
-  try {
-    const u = new URL(externalUrl);
-    if (!u.hostname.toLowerCase().endsWith("notion.so")) return null;
-    if (!u.pathname.startsWith("/images/page-cover/")) return null;
-    const id = normalizePageId(blockId);
-    const params = new URLSearchParams({
-      src: u.pathname,
-      blockId: id,
-      width: "1024",
-    });
-    return `https://oopy.lazyrockets.com/api/v2/notion/image?${params.toString()}`;
-  } catch {
-    return null;
-  }
-}
-
-export async function resolvePageCoverSourceUrl(pageId: string): Promise<string | null> {
+export async function resolvePageCoverSourceUrl(
+  pageId: string
+): Promise<string | null> {
   const client = getClient();
   if (!client) return null;
 
@@ -160,7 +155,9 @@ export async function resolvePageCoverSourceUrl(pageId: string): Promise<string 
   return wrapNotionGalleryCover(raw, pageId) ?? raw;
 }
 
-export async function resolveBlockMediaSourceUrl(blockId: string): Promise<string | null> {
+export async function resolveBlockMediaSourceUrl(
+  blockId: string
+): Promise<string | null> {
   const client = getClient();
   if (!client) return null;
 
@@ -183,23 +180,6 @@ export async function resolveBlockMediaSourceUrl(blockId: string): Promise<strin
   return null;
 }
 
-/** Notion file / image object → raw HTTPS URL */
-export function extractNotionFileUrl(
-  file:
-    | {
-        type?: string;
-        external?: { url?: string };
-        file?: { url?: string };
-      }
-    | null
-    | undefined
-): string | null {
-  if (!file) return null;
-  if (file.type === "external") return file.external?.url ?? null;
-  if (file.type === "file") return file.file?.url ?? null;
-  return file.external?.url ?? file.file?.url ?? null;
-}
-
 function pageToArticle(page: PageObjectResponse, category: CategoryId): GardenArticle {
   const id = normalizePageId(page.id);
   return {
@@ -207,7 +187,7 @@ function pageToArticle(page: PageObjectResponse, category: CategoryId): GardenAr
     title: getTitle(page),
     category,
     summary: "",
-    coverImage: getCoverImage(page) ? toProxiedPageCoverUrl(id) : null,
+    coverImage: toProxiedMediaUrl(getCoverImage(page), id),
     date: page.last_edited_time?.slice(0, 10) ?? page.created_time?.slice(0, 10) ?? null,
     url: `/${id}`,
   };
@@ -328,6 +308,11 @@ export async function getArticleById(
 }
 
 export type NotionBlock = ListBlockChildrenResponse["results"][number];
+
+export function extractBlockImageUrl(block: NotionBlock): string | null {
+  if (!("type" in block) || block.type !== "image") return null;
+  return extractNotionFileUrl(block.image);
+}
 
 export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> {
   const client = getClient();

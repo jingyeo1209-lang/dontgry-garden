@@ -2,8 +2,10 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import type { NotionBlock } from "@/lib/notion";
 import {
+  extractNotionFileUrl,
   getBlockChildren,
   toProxiedBlockMediaUrl,
+  toProxiedMediaUrl,
 } from "@/lib/notion";
 import { normalizePageId } from "@/lib/categories";
 import { AdSlot } from "@/components/AdSlot";
@@ -56,6 +58,16 @@ async function ChildBlocks({
   const children = await getBlockChildren(block.id);
   if (!children.length) return null;
   return <NotionBlocks blocks={children} insertAdAfter={null} />;
+}
+
+function notionImageFallback(label: string, detail: string) {
+  return (
+    <figure className="notion-figure notion-figure-error">
+      <p className="notion-image-fallback">
+        {label}: {detail}
+      </p>
+    </figure>
+  );
 }
 
 async function Block({ block }: { block: NotionBlock }) {
@@ -130,9 +142,18 @@ async function Block({ block }: { block: NotionBlock }) {
     case "divider":
       return <hr className="notion-hr" />;
     case "image": {
-      const src = "id" in block ? toProxiedBlockMediaUrl(block.id) : null;
+      const blockId = "id" in block ? block.id : "";
+      const raw = extractNotionFileUrl(data);
+      const src =
+        (raw && blockId ? toProxiedMediaUrl(raw, blockId) : null) ??
+        (blockId ? toProxiedBlockMediaUrl(blockId) : null);
       const caption = renderRichText(data?.caption);
-      if (!src) return null;
+      if (!src) {
+        return notionImageFallback(
+          "이미지를 불러올 수 없습니다",
+          blockId ? `block ${blockId}` : "missing block id"
+        );
+      }
       return (
         <figure className="notion-figure">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -233,8 +254,18 @@ async function Block({ block }: { block: NotionBlock }) {
     }
     case "file":
     case "pdf": {
-      const href = "id" in block ? toProxiedBlockMediaUrl(block.id) : null;
+      const blockId = "id" in block ? block.id : "";
+      const raw = extractNotionFileUrl(data);
+      const href =
+        (raw && blockId ? toProxiedMediaUrl(raw, blockId) : null) ??
+        (blockId ? toProxiedBlockMediaUrl(blockId) : null);
       const name = data?.name || data?.caption?.[0]?.plain_text || "파일 다운로드";
+      if (!href) {
+        return notionImageFallback(
+          "파일을 불러올 수 없습니다",
+          blockId ? `block ${blockId}` : "missing block id"
+        );
+      }
       if (!href) return null;
       return (
         <p className="notion-p">

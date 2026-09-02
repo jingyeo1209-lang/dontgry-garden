@@ -509,6 +509,16 @@ a {
   text-align: center;
 }
 
+.notion-figure-error .notion-image-fallback {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #9b2c2c;
+  background: #fff5f5;
+  border: 1px dashed #feb2b2;
+  border-radius: 8px;
+}
+
 .notion-todo {
   display: flex;
   gap: 8px;
