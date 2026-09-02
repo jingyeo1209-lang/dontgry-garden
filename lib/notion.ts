@@ -112,10 +112,75 @@ function getCoverImage(page: PageObjectResponse): string | null {
   return null;
 }
 
+/** Stable proxy URL — resolves fresh Notion cover URL on each request. */
+export function toProxiedPageCoverUrl(pageId: string): string {
+  return `/api/notion-image?pageId=${encodeURIComponent(normalizePageId(pageId))}`;
+}
+
+/** Stable proxy URL — resolves fresh block file URL on each request. */
+export function toProxiedBlockMediaUrl(blockId: string): string {
+  return `/api/notion-image?blockId=${encodeURIComponent(normalizePageId(blockId))}`;
+}
+
+/** @deprecated Prefer pageId/blockId proxies. Kept for legacy cached HTML. */
 export function toProxiedImageUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;
   if (raw.startsWith("/api/notion-image")) return raw;
   return `/api/notion-image?url=${encodeURIComponent(raw)}`;
+}
+
+/** Notion gallery preset covers (notion.so/images/page-cover/...) are not server-fetchable; use Oopy wrapper. */
+function wrapNotionGalleryCover(externalUrl: string, blockId: string): string | null {
+  try {
+    const u = new URL(externalUrl);
+    if (!u.hostname.toLowerCase().endsWith("notion.so")) return null;
+    if (!u.pathname.startsWith("/images/page-cover/")) return null;
+    const id = normalizePageId(blockId);
+    const params = new URLSearchParams({
+      src: u.pathname,
+      blockId: id,
+      width: "1024",
+    });
+    return `https://oopy.lazyrockets.com/api/v2/notion/image?${params.toString()}`;
+  } catch {
+    return null;
+  }
+}
+
+export async function resolvePageCoverSourceUrl(pageId: string): Promise<string | null> {
+  const client = getClient();
+  if (!client) return null;
+
+  const page = await client.pages.retrieve({ page_id: normalizePageId(pageId) });
+  if (!isFullPage(page)) return null;
+
+  const raw = getCoverImage(page);
+  if (!raw) return null;
+
+  return wrapNotionGalleryCover(raw, pageId) ?? raw;
+}
+
+export async function resolveBlockMediaSourceUrl(blockId: string): Promise<string | null> {
+  const client = getClient();
+  if (!client) return null;
+
+  const block = await client.blocks.retrieve({ block_id: normalizePageId(blockId) });
+  if (!("type" in block)) return null;
+
+  if (block.type === "image") {
+    const raw = extractNotionFileUrl(block.image);
+    if (!raw) return null;
+    return wrapNotionGalleryCover(raw, blockId) ?? raw;
+  }
+
+  if (block.type === "file") {
+    return extractNotionFileUrl(block.file);
+  }
+  if (block.type === "pdf") {
+    return extractNotionFileUrl(block.pdf);
+  }
+
+  return null;
 }
 
 /** Notion file / image object → raw HTTPS URL */
@@ -142,7 +207,7 @@ function pageToArticle(page: PageObjectResponse, category: CategoryId): GardenAr
     title: getTitle(page),
     category,
     summary: "",
-    coverImage: toProxiedImageUrl(getCoverImage(page)),
+    coverImage: getCoverImage(page) ? toProxiedPageCoverUrl(id) : null,
     date: page.last_edited_time?.slice(0, 10) ?? page.created_time?.slice(0, 10) ?? null,
     url: `/${id}`,
   };

@@ -1,4 +1,8 @@
 import { NextRequest } from "next/server";
+import {
+  resolveBlockMediaSourceUrl,
+  resolvePageCoverSourceUrl,
+} from "@/lib/notion";
 
 function isAllowedImageHost(hostname: string): boolean {
   const host = hostname.toLowerCase();
@@ -35,12 +39,7 @@ function needsNotionAuth(hostname: string): boolean {
   );
 }
 
-export async function GET(request: NextRequest) {
-  const raw = request.nextUrl.searchParams.get("url");
-  if (!raw) {
-    return new Response("Missing url", { status: 400 });
-  }
-
+async function streamImageFromUrl(raw: string): Promise<Response> {
   let target: URL;
   try {
     target = new URL(raw);
@@ -58,30 +57,54 @@ export async function GET(request: NextRequest) {
     headers.Authorization = `Bearer ${token}`;
   }
 
+  const upstream = await fetch(target.toString(), {
+    headers,
+    redirect: "follow",
+    cache: "no-store",
+  });
+  if (!upstream.ok || !upstream.body) {
+    return new Response("Image fetch failed", { status: 502 });
+  }
+
+  const contentType = upstream.headers.get("content-type") || "";
+  const allowed =
+    contentType.startsWith("image/") || contentType === "application/pdf";
+  if (!allowed) {
+    return new Response("Image fetch failed", { status: 502 });
+  }
+
+  return new Response(upstream.body, {
+    status: 200,
+    headers: {
+      "Content-Type": contentType,
+      "Cache-Control": "public, max-age=60, s-maxage=300",
+    },
+  });
+}
+
+export async function GET(request: NextRequest) {
+  const pageId = request.nextUrl.searchParams.get("pageId");
+  const blockId = request.nextUrl.searchParams.get("blockId");
+  const legacyUrl = request.nextUrl.searchParams.get("url");
+
+  let sourceUrl: string | null = null;
+
+  if (pageId) {
+    sourceUrl = await resolvePageCoverSourceUrl(pageId);
+  } else if (blockId) {
+    sourceUrl = await resolveBlockMediaSourceUrl(blockId);
+  } else if (legacyUrl) {
+    sourceUrl = legacyUrl;
+  } else {
+    return new Response("Missing pageId, blockId, or url", { status: 400 });
+  }
+
+  if (!sourceUrl) {
+    return new Response("Image not found", { status: 404 });
+  }
+
   try {
-    const upstream = await fetch(target.toString(), {
-      headers,
-      redirect: "follow",
-      next: { revalidate: 60 },
-    });
-    if (!upstream.ok || !upstream.body) {
-      return new Response("Image fetch failed", { status: 502 });
-    }
-
-    const contentType = upstream.headers.get("content-type") || "";
-    const allowed =
-      contentType.startsWith("image/") || contentType === "application/pdf";
-    if (!allowed) {
-      return new Response("Image fetch failed", { status: 502 });
-    }
-
-    return new Response(upstream.body, {
-      status: 200,
-      headers: {
-        "Content-Type": contentType,
-        "Cache-Control": "public, max-age=60, s-maxage=3600",
-      },
-    });
+    return await streamImageFromUrl(sourceUrl);
   } catch {
     return new Response("Image fetch failed", { status: 502 });
   }

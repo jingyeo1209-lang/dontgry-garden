@@ -2,9 +2,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import type { NotionBlock } from "@/lib/notion";
 import {
-  extractNotionFileUrl,
   getBlockChildren,
-  toProxiedImageUrl,
+  toProxiedBlockMediaUrl,
 } from "@/lib/notion";
 import { normalizePageId } from "@/lib/categories";
 import { AdSlot } from "@/components/AdSlot";
@@ -131,7 +130,7 @@ async function Block({ block }: { block: NotionBlock }) {
     case "divider":
       return <hr className="notion-hr" />;
     case "image": {
-      const src = toProxiedImageUrl(extractNotionFileUrl(data));
+      const src = "id" in block ? toProxiedBlockMediaUrl(block.id) : null;
       const caption = renderRichText(data?.caption);
       if (!src) return null;
       return (
@@ -234,8 +233,7 @@ async function Block({ block }: { block: NotionBlock }) {
     }
     case "file":
     case "pdf": {
-      const raw = extractNotionFileUrl(data);
-      const href = raw ? toProxiedImageUrl(raw) : null;
+      const href = "id" in block ? toProxiedBlockMediaUrl(block.id) : null;
       const name = data?.name || data?.caption?.[0]?.plain_text || "파일 다운로드";
       if (!href) return null;
       return (
