@@ -15,7 +15,15 @@ export const revalidate = 60;
 
 type Params = { pageId: string };
 
-const RESERVED = new Set(["ttong", "pink", "oasis", "api", "magic-glasses", "privacy"]);
+const RESERVED = new Set([
+  "ttong",
+  "pink",
+  "oasis",
+  "api",
+  "magic-glasses",
+  "privacy",
+  "notion-image-diag",
+]);
 
 export async function generateStaticParams() {
   const { articles } = await getPublishedArticles();
