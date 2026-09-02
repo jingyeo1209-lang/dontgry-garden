@@ -577,11 +577,19 @@ async function getRawCoverFromPage(pageId: string): Promise<string | null> {
 }
 
 export async function buildNotionImageDiagReport(options?: {
-  titleIncludes?: string;
+  titleIncludes?: string | string[];
   maxPerCategory?: number;
 }): Promise<NotionImageDiagReport> {
   const config = getNotionConfigStatus();
-  const titleIncludes = options?.titleIncludes?.trim().toLowerCase();
+  const titleFilters = (
+    Array.isArray(options?.titleIncludes)
+      ? options.titleIncludes
+      : options?.titleIncludes
+        ? [options.titleIncludes]
+        : []
+  )
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
   const maxPerCategory = options?.maxPerCategory ?? 3;
 
   if (!config.hasToken) {
@@ -601,11 +609,13 @@ export async function buildNotionImageDiagReport(options?: {
       picks.push(...articles.slice(0, maxPerCategory));
     }
 
-    if (titleIncludes) {
+    if (titleFilters.length) {
       const { articles } = await getPublishedArticles();
-      const match = articles.find((a) => a.title.toLowerCase().includes(titleIncludes));
-      if (match && !picks.some((p) => p.id === match.id)) {
-        picks.unshift(match);
+      for (const filter of titleFilters) {
+        const match = articles.find((a) => a.title.toLowerCase().includes(filter));
+        if (match && !picks.some((p) => p.id === match.id)) {
+          picks.unshift(match);
+        }
       }
     }
 

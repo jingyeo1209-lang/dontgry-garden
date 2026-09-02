@@ -25,7 +25,9 @@ export async function GET(request: NextRequest) {
   }
 
   const report = await buildNotionImageDiagReport({
-    titleIncludes: titleIncludes ?? "금 모으기",
+    titleIncludes: titleIncludes
+      ? titleIncludes.split(",").map((s) => s.trim())
+      : ["금 모으기", "부자가 되는"],
     maxPerCategory: 3,
   });
 

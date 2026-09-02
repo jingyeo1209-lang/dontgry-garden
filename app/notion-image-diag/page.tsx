@@ -118,7 +118,7 @@ function TraceTable({ title, trace }: { title: string; trace: NotionImageDiagTra
 
 export default async function NotionImageDiagPage() {
   const report = await buildNotionImageDiagReport({
-    titleIncludes: "금 모으기",
+    titleIncludes: ["금 모으기", "부자가 되는"],
     maxPerCategory: 3,
   });
 

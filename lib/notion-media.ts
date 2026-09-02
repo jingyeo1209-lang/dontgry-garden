@@ -71,7 +71,8 @@ export function isAllowedImageHost(hostname: string): boolean {
     host.endsWith(".unsplash.com") ||
     host.endsWith(".ctfassets.net") ||
     host === "oopy.lazyrockets.com" ||
-    host.endsWith(".lazyrockets.com")
+    host.endsWith(".lazyrockets.com") ||
+    host === "postfiles.pstatic.net"
   );
 }
 
