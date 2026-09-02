@@ -1,24 +1,13 @@
 import { Client } from "@notionhq/client";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { normalizePageId } from "@/lib/categories";
-import {
-  extractBlockImageUrl,
-  extractNotionFileUrl,
-  getBlockChildren,
-  getNotionConfigStatus,
-  getPublishedArticles,
-  type GardenArticle,
-} from "@/lib/notion";
+import { extractNotionFileUrl } from "@/lib/notion";
 import {
   buildUpstreamFetchInit,
   isAllowedImageHost,
   isImageContentType,
-  isPresignedS3Url,
   normalizeUpstreamImageUrl,
   resolveMediaSourceUrl,
-  toProxiedBlockMediaUrl,
-  toProxiedImageUrl,
-  toProxiedPageCoverUrl,
   wrapNotionGalleryCover,
 } from "@/lib/notion-media";
 
@@ -35,17 +24,7 @@ export type NotionImageFailureStage =
   | "upstream-fetch-error"
   | "success";
 
-export type NotionRetrieveDiag = {
-  attempted: boolean;
-  ok: boolean;
-  error?: string;
-  entityType?: "page" | "block";
-  coverType?: string;
-  blockType?: string;
-  rawMediaHost?: string;
-};
-
-export type NotionImageDiagTrace = {
+export type NotionImageTrace = {
   received: boolean;
   mode: "url" | "pageId" | "blockId" | "none";
   pageId?: string | null;
@@ -53,17 +32,13 @@ export type NotionImageDiagTrace = {
   contextId?: string | null;
   inputUrl?: string | null;
   inputUrlHost?: string | null;
-  notionRetrieve?: NotionRetrieveDiag;
   galleryWrapped?: boolean;
   resolvedUrl?: string | null;
   resolvedUrlHost?: string | null;
-  proxyPath?: string | null;
   upstream?: {
     status: number;
     contentType: string;
     host: string;
-    presignedS3?: boolean;
-    authHeaderSent?: boolean;
   };
   finalStatus: number;
   failureStage: NotionImageFailureStage;
@@ -77,30 +52,6 @@ export type NotionImageRequestParams = {
   contextId?: string | null;
 };
 
-export type ArticleImageDiag = {
-  article: Pick<GardenArticle, "id" | "title" | "category" | "coverImage">;
-  cover: {
-    rawUrl: string | null;
-    rawUrlHost: string | null;
-    proxyUrlMode: NotionImageDiagTrace;
-    proxyPageIdMode: NotionImageDiagTrace;
-  };
-  imageBlocks: Array<{
-    blockId: string;
-    rawUrl: string | null;
-    rawUrlHost: string | null;
-    proxyUrlMode: NotionImageDiagTrace;
-    proxyBlockIdMode: NotionImageDiagTrace;
-  }>;
-};
-
-export type NotionImageDiagReport = {
-  generatedAt: string;
-  config: ReturnType<typeof getNotionConfigStatus>;
-  samples: ArticleImageDiag[];
-  error?: string;
-};
-
 export function formatMediaError(
   stage: NotionImageFailureStage,
   detail?: string
@@ -108,17 +59,13 @@ export function formatMediaError(
   return detail ? `${stage}:${detail}` : stage;
 }
 
-export function hostFromUrl(url: string | null | undefined): string | null {
+function hostFromUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   try {
     return new URL(url).hostname;
   } catch {
     return null;
   }
-}
-
-export function logNotionImageDiag(trace: NotionImageDiagTrace): void {
-  console.log("[notion-image-diag]", JSON.stringify(trace));
 }
 
 function isFullPage(page: unknown): page is PageObjectResponse {
@@ -131,30 +78,19 @@ function isFullPage(page: unknown): page is PageObjectResponse {
   );
 }
 
-function extractPageCoverRaw(page: PageObjectResponse): {
-  url: string | null;
-  coverType: string | null;
-} {
-  if (page.cover?.type === "external") {
-    return { url: page.cover.external.url, coverType: "page.cover.external" };
-  }
-  if (page.cover?.type === "file") {
-    return { url: page.cover.file.url, coverType: "page.cover.file" };
-  }
+function extractPageCoverRaw(page: PageObjectResponse): string | null {
+  if (page.cover?.type === "external") return page.cover.external.url;
+  if (page.cover?.type === "file") return page.cover.file.url;
 
   for (const value of Object.values(page.properties)) {
     if (value.type === "files" && value.files.length) {
       const first = value.files[0];
-      if (first.type === "file") {
-        return { url: first.file.url, coverType: "property.files.file" };
-      }
-      if (first.type === "external") {
-        return { url: first.external.url, coverType: "property.files.external" };
-      }
+      if (first.type === "file") return first.file.url;
+      if (first.type === "external") return first.external.url;
     }
   }
 
-  return { url: null, coverType: null };
+  return null;
 }
 
 function getNotionClient(): Client | null {
@@ -163,7 +99,7 @@ function getNotionClient(): Client | null {
   return new Client({ auth: token });
 }
 
-function initTrace(params: NotionImageRequestParams): NotionImageDiagTrace {
+function initTrace(params: NotionImageRequestParams): NotionImageTrace {
   return {
     received: true,
     mode: "none",
@@ -179,13 +115,12 @@ function initTrace(params: NotionImageRequestParams): NotionImageDiagTrace {
 
 async function resolveSourceUrl(
   params: NotionImageRequestParams,
-  trace: NotionImageDiagTrace
+  trace: NotionImageTrace
 ): Promise<string | null> {
   const { pageId, blockId, url, contextId } = params;
 
   if (url) {
     trace.mode = "url";
-    trace.proxyPath = toProxiedImageUrl(url, contextId ?? undefined);
 
     let source = url;
     if (contextId) {
@@ -205,11 +140,6 @@ async function resolveSourceUrl(
 
   const client = getNotionClient();
   if (!client) {
-    trace.notionRetrieve = {
-      attempted: false,
-      ok: false,
-      error: "NOTION_TOKEN missing",
-    };
     trace.failureStage = "resolve-no-client";
     trace.failureDetail = "no-token";
     return null;
@@ -217,33 +147,18 @@ async function resolveSourceUrl(
 
   if (pageId) {
     trace.mode = "pageId";
-    trace.proxyPath = toProxiedPageCoverUrl(pageId);
 
     try {
       const page = await client.pages.retrieve({
         page_id: normalizePageId(pageId),
       });
       if (!isFullPage(page)) {
-        trace.notionRetrieve = {
-          attempted: true,
-          ok: false,
-          error: "not-a-full-page",
-          entityType: "page",
-        };
         trace.failureStage = "resolve-notion-error";
         trace.failureDetail = "not-a-full-page";
         return null;
       }
 
-      const { url: raw, coverType } = extractPageCoverRaw(page);
-      trace.notionRetrieve = {
-        attempted: true,
-        ok: true,
-        entityType: "page",
-        coverType: coverType ?? undefined,
-        rawMediaHost: hostFromUrl(raw) ?? undefined,
-      };
-
+      const raw = extractPageCoverRaw(page);
       if (!raw) {
         trace.failureStage = "resolve-no-url";
         trace.failureDetail = "no-cover-on-page";
@@ -258,12 +173,6 @@ async function resolveSourceUrl(
       return source;
     } catch (err) {
       const message = err instanceof Error ? err.message : "notion-pages-retrieve-failed";
-      trace.notionRetrieve = {
-        attempted: true,
-        ok: false,
-        error: message,
-        entityType: "page",
-      };
       trace.failureStage = "resolve-notion-error";
       trace.failureDetail = message;
       return null;
@@ -272,19 +181,12 @@ async function resolveSourceUrl(
 
   if (blockId) {
     trace.mode = "blockId";
-    trace.proxyPath = toProxiedBlockMediaUrl(blockId);
 
     try {
       const block = await client.blocks.retrieve({
         block_id: normalizePageId(blockId),
       });
       if (!("type" in block)) {
-        trace.notionRetrieve = {
-          attempted: true,
-          ok: false,
-          error: "block-missing-type",
-          entityType: "block",
-        };
         trace.failureStage = "resolve-notion-error";
         trace.failureDetail = "block-missing-type";
         return null;
@@ -298,14 +200,6 @@ async function resolveSourceUrl(
       } else if (block.type === "pdf") {
         raw = extractNotionFileUrl(block.pdf);
       }
-
-      trace.notionRetrieve = {
-        attempted: true,
-        ok: true,
-        entityType: "block",
-        blockType: block.type,
-        rawMediaHost: hostFromUrl(raw) ?? undefined,
-      };
 
       if (!raw) {
         trace.failureStage = "resolve-no-url";
@@ -321,12 +215,6 @@ async function resolveSourceUrl(
       return source;
     } catch (err) {
       const message = err instanceof Error ? err.message : "notion-blocks-retrieve-failed";
-      trace.notionRetrieve = {
-        attempted: true,
-        ok: false,
-        error: message,
-        entityType: "block",
-      };
       trace.failureStage = "resolve-notion-error";
       trace.failureDetail = message;
       return null;
@@ -338,55 +226,9 @@ async function resolveSourceUrl(
   return null;
 }
 
-export async function probeUpstream(url: string): Promise<{
-  ok: boolean;
-  status: number;
-  contentType: string;
-  host: string;
-  error?: string;
-}> {
-  let hostname: string;
-  try {
-    hostname = new URL(url).hostname;
-  } catch {
-    return {
-      ok: false,
-      status: 0,
-      contentType: "",
-      host: "",
-      error: "malformed-url",
-    };
-  }
-
-  const { fetchUrl, headers, redirect, cache } = buildUpstreamFetchInit(url);
-
-  try {
-    const upstream = await fetch(fetchUrl, {
-      headers,
-      redirect,
-      cache,
-    });
-    const contentType = upstream.headers.get("content-type") || "";
-    return {
-      ok: upstream.ok,
-      status: upstream.status,
-      contentType,
-      host: hostname,
-    };
-  } catch (err) {
-    return {
-      ok: false,
-      status: 0,
-      contentType: "",
-      host: hostname,
-      error: err instanceof Error ? err.message : "fetch-error",
-    };
-  }
-}
-
 export async function runNotionImagePipeline(
   params: NotionImageRequestParams
-): Promise<{ trace: NotionImageDiagTrace; body?: ReadableStream; contentType?: string }> {
+): Promise<{ trace: NotionImageTrace; body?: ReadableStream; contentType?: string }> {
   const trace = initTrace(params);
 
   if (!params.url && !params.pageId && !params.blockId) {
@@ -407,8 +249,8 @@ export async function runNotionImagePipeline(
     return { trace };
   }
 
-  let target: URL;
   const fetchUrl = normalizeUpstreamImageUrl(sourceUrl);
+  let target: URL;
   try {
     target = new URL(fetchUrl);
   } catch {
@@ -434,9 +276,6 @@ export async function runNotionImagePipeline(
 
   const { fetchUrl: upstreamUrl, headers, redirect, cache } =
     buildUpstreamFetchInit(fetchUrl);
-  const authHeaderSent = Boolean(
-    headers && typeof headers === "object" && "Authorization" in headers
-  );
 
   try {
     const upstream = await fetch(upstreamUrl, {
@@ -450,8 +289,6 @@ export async function runNotionImagePipeline(
       status: upstream.status,
       contentType,
       host: target.hostname,
-      presignedS3: isPresignedS3Url(fetchUrl),
-      authHeaderSent,
     };
 
     if (!upstream.ok || !upstream.body) {
@@ -483,9 +320,8 @@ export async function runNotionImagePipeline(
   }
 }
 
-function traceToResponse(trace: NotionImageDiagTrace, message: string): Response {
+function traceToResponse(trace: NotionImageTrace, message: string): Response {
   const errorHeader = formatMediaError(trace.failureStage, trace.failureDetail);
-  logNotionImageDiag(trace);
   return new Response(message, {
     status: trace.finalStatus,
     headers: {
@@ -496,12 +332,11 @@ function traceToResponse(trace: NotionImageDiagTrace, message: string): Response
 }
 
 export function buildNotionImageResponse(result: {
-  trace: NotionImageDiagTrace;
+  trace: NotionImageTrace;
   body?: ReadableStream;
   contentType?: string;
 }): Response {
   const { trace, body, contentType } = result;
-  logNotionImageDiag(trace);
 
   if (trace.finalStatus !== 200 || !body) {
     const message =
@@ -511,11 +346,11 @@ export function buildNotionImageResponse(result: {
           ? "Image not found"
           : trace.failureStage === "upstream-protocol-denied"
             ? "Protocol not allowed"
-          : trace.failureStage === "upstream-host-denied"
-            ? "Host not allowed"
-            : trace.failureStage === "resolve-invalid-url"
-              ? "Invalid url"
-              : "Image fetch failed";
+            : trace.failureStage === "upstream-host-denied"
+              ? "Host not allowed"
+              : trace.failureStage === "resolve-invalid-url"
+                ? "Invalid url"
+                : "Image fetch failed";
     return traceToResponse(trace, message);
   }
 
@@ -527,134 +362,4 @@ export function buildNotionImageResponse(result: {
       "X-Notion-Media-Stage": "success",
     },
   });
-}
-
-export async function diagnoseRequest(
-  params: NotionImageRequestParams
-): Promise<NotionImageDiagTrace> {
-  const { trace } = await runNotionImagePipeline(params);
-  return trace;
-}
-
-async function diagnoseArticle(article: GardenArticle): Promise<ArticleImageDiag> {
-  const blocks = await getBlockChildren(article.id);
-  const imageBlocks = blocks.filter(
-    (block) => "type" in block && block.type === "image" && "id" in block
-  );
-
-  const rawCover = await getRawCoverFromPage(article.id);
-  const firstImage = imageBlocks[0];
-  const firstImageRaw =
-    firstImage && "id" in firstImage ? extractBlockImageUrl(firstImage) : null;
-  const firstImageBlockId =
-    firstImage && "id" in firstImage ? firstImage.id : null;
-  const effectiveRawCover = rawCover ?? firstImageRaw;
-
-  return {
-    article: {
-      id: article.id,
-      title: article.title,
-      category: article.category,
-      coverImage: article.coverImage,
-    },
-    cover: {
-      rawUrl: effectiveRawCover,
-      rawUrlHost: hostFromUrl(effectiveRawCover),
-      proxyUrlMode: effectiveRawCover
-        ? await diagnoseRequest({
-            url: effectiveRawCover,
-            contextId: rawCover ? article.id : firstImageBlockId ?? article.id,
-          })
-        : await diagnoseRequest({ pageId: article.id }),
-      proxyPageIdMode: await diagnoseRequest({ pageId: article.id }),
-    },
-    imageBlocks: await Promise.all(
-      imageBlocks.slice(0, 5).map(async (block) => {
-        const blockId = "id" in block ? block.id : "";
-        const raw = extractBlockImageUrl(block);
-        return {
-          blockId,
-          rawUrl: raw,
-          rawUrlHost: hostFromUrl(raw),
-          proxyUrlMode: raw
-            ? await diagnoseRequest({ url: raw, contextId: blockId })
-            : await diagnoseRequest({ blockId }),
-          proxyBlockIdMode: await diagnoseRequest({ blockId }),
-        };
-      })
-    ),
-  };
-}
-
-async function getRawCoverFromPage(pageId: string): Promise<string | null> {
-  const client = getNotionClient();
-  if (!client) return null;
-  try {
-    const page = await client.pages.retrieve({ page_id: normalizePageId(pageId) });
-    if (!isFullPage(page)) return null;
-    return extractPageCoverRaw(page).url;
-  } catch {
-    return null;
-  }
-}
-
-export async function buildNotionImageDiagReport(options?: {
-  titleIncludes?: string | string[];
-  maxPerCategory?: number;
-}): Promise<NotionImageDiagReport> {
-  const config = getNotionConfigStatus();
-  const titleFilters = (
-    Array.isArray(options?.titleIncludes)
-      ? options.titleIncludes
-      : options?.titleIncludes
-        ? [options.titleIncludes]
-        : []
-  )
-    .map((t) => t.trim().toLowerCase())
-    .filter(Boolean);
-  const maxPerCategory = options?.maxPerCategory ?? 3;
-
-  if (!config.hasToken) {
-    return {
-      generatedAt: new Date().toISOString(),
-      config,
-      samples: [],
-      error: "NOTION_TOKEN is not set",
-    };
-  }
-
-  try {
-    const picks: GardenArticle[] = [];
-
-    for (const category of ["ttong", "pink"] as const) {
-      const { articles } = await getPublishedArticles(category);
-      picks.push(...articles.slice(0, maxPerCategory));
-    }
-
-    if (titleFilters.length) {
-      const { articles } = await getPublishedArticles();
-      for (const filter of titleFilters) {
-        const match = articles.find((a) => a.title.toLowerCase().includes(filter));
-        if (match && !picks.some((p) => p.id === match.id)) {
-          picks.unshift(match);
-        }
-      }
-    }
-
-    const unique = Array.from(new Map(picks.map((a) => [a.id, a])).values());
-    const samples = await Promise.all(unique.map((article) => diagnoseArticle(article)));
-
-    return {
-      generatedAt: new Date().toISOString(),
-      config,
-      samples,
-    };
-  } catch (err) {
-    return {
-      generatedAt: new Date().toISOString(),
-      config,
-      samples: [],
-      error: err instanceof Error ? err.message : "diag-report-failed",
-    };
-  }
 }

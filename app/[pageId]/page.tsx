@@ -22,7 +22,6 @@ const RESERVED = new Set([
   "api",
   "magic-glasses",
   "privacy",
-  "notion-image-diag",
 ]);
 
 export async function generateStaticParams() {
