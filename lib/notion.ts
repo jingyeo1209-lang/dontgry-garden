@@ -123,6 +123,33 @@ function getCoverImage(page: PageObjectResponse): string | null {
   return null;
 }
 
+async function getFirstBodyImageFallback(
+  pageId: string
+): Promise<{ url: string; blockId: string } | null> {
+  const blocks = await getBlockChildren(pageId);
+  for (const block of blocks) {
+    if (!("type" in block) || block.type !== "image" || !("id" in block)) continue;
+    const url = extractNotionFileUrl(block.image);
+    if (url) {
+      return { url, blockId: normalizePageId(block.id) };
+    }
+  }
+  return null;
+}
+
+async function resolveArticleCoverImage(page: PageObjectResponse): Promise<string | null> {
+  const pageId = normalizePageId(page.id);
+  const pageCover = getCoverImage(page);
+  if (pageCover) {
+    return toProxiedMediaUrl(pageCover, pageId);
+  }
+
+  const fallback = await getFirstBodyImageFallback(pageId);
+  if (!fallback) return null;
+
+  return toProxiedMediaUrl(fallback.url, fallback.blockId);
+}
+
 /** Notion file / image object → raw HTTPS URL */
 export function extractNotionFileUrl(
   file:
@@ -180,14 +207,17 @@ export async function resolveBlockMediaSourceUrl(
   return null;
 }
 
-function pageToArticle(page: PageObjectResponse, category: CategoryId): GardenArticle {
+async function pageToArticle(
+  page: PageObjectResponse,
+  category: CategoryId
+): Promise<GardenArticle> {
   const id = normalizePageId(page.id);
   return {
     id,
     title: getTitle(page),
     category,
     summary: "",
-    coverImage: toProxiedMediaUrl(getCoverImage(page), id),
+    coverImage: await resolveArticleCoverImage(page),
     date: page.last_edited_time?.slice(0, 10) ?? page.created_time?.slice(0, 10) ?? null,
     url: `/${id}`,
   };
@@ -230,7 +260,7 @@ async function loadCategoryArticles(
   const databaseId = getDatabaseIdForCategory(category);
   if (!databaseId) return [];
   const pages = await queryAllPages(client, databaseId);
-  return pages.map((page) => pageToArticle(page, category));
+  return Promise.all(pages.map((page) => pageToArticle(page, category)));
 }
 
 export async function getPublishedArticles(
@@ -300,7 +330,7 @@ export async function getArticleById(
       return { article: null, page: null, config };
     }
 
-    return { article: pageToArticle(page, category), page, config };
+    return { article: await pageToArticle(page, category), page, config };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Notion API 오류";
     return { article: null, page: null, config, error: message };

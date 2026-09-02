@@ -543,6 +543,12 @@ async function diagnoseArticle(article: GardenArticle): Promise<ArticleImageDiag
   );
 
   const rawCover = await getRawCoverFromPage(article.id);
+  const firstImage = imageBlocks[0];
+  const firstImageRaw =
+    firstImage && "id" in firstImage ? extractBlockImageUrl(firstImage) : null;
+  const firstImageBlockId =
+    firstImage && "id" in firstImage ? firstImage.id : null;
+  const effectiveRawCover = rawCover ?? firstImageRaw;
 
   return {
     article: {
@@ -552,10 +558,13 @@ async function diagnoseArticle(article: GardenArticle): Promise<ArticleImageDiag
       coverImage: article.coverImage,
     },
     cover: {
-      rawUrl: rawCover,
-      rawUrlHost: hostFromUrl(rawCover),
-      proxyUrlMode: rawCover
-        ? await diagnoseRequest({ url: rawCover, contextId: article.id })
+      rawUrl: effectiveRawCover,
+      rawUrlHost: hostFromUrl(effectiveRawCover),
+      proxyUrlMode: effectiveRawCover
+        ? await diagnoseRequest({
+            url: effectiveRawCover,
+            contextId: rawCover ? article.id : firstImageBlockId ?? article.id,
+          })
         : await diagnoseRequest({ pageId: article.id }),
       proxyPageIdMode: await diagnoseRequest({ pageId: article.id }),
     },
