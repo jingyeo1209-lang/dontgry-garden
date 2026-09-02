@@ -29,6 +29,8 @@
             max-width: 100%;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
         }
 
         img { max-width: 100%; height: auto; display: block; }
@@ -536,6 +538,44 @@
             .wallet-zone { flex-direction: column; align-items: flex-start; }
             .shop-grid { grid-template-columns: 1fr; }
         }
+
+        .site-footer {
+            width: 100%;
+            margin-top: auto;
+            border-top: 1px solid #e9e9e7;
+            background: #fff;
+            color: #787774;
+        }
+        .site-footer-inner {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 22px clamp(14px, 4vw, 40px) 28px;
+            text-align: center;
+        }
+        .site-footer-copy {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .site-footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .site-footer-nav a {
+            color: #787774;
+            text-decoration: none;
+        }
+        .site-footer-nav a:hover {
+            color: #37352f;
+            text-decoration: underline;
+        }
+        .site-footer-sep { color: #c4c4c0; }
     </style>
 </head>
 <body>
@@ -653,6 +693,17 @@
         </div>
     </section>
 </main>
+
+<footer class="site-footer">
+    <div class="site-footer-inner">
+        <p class="site-footer-copy">© 2026 똔그리의 돼지런</p>
+        <nav class="site-footer-nav" aria-label="사이트 정보">
+            <a href="/privacy">개인정보처리방침</a>
+            <span class="site-footer-sep" aria-hidden="true">·</span>
+            <a href="mailto:jingyeo1209@gmail.com">문의하기</a>
+        </nav>
+    </div>
+</footer>
 
 <div class="modal-overlay" id="winModal">
     <div class="modal-content">

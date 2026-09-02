@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Script from "next/script";
+import { SiteFooter } from "@/components/SiteFooter";
 import { getAdsenseClient } from "@/lib/ads";
 import "./globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           />
         ) : null}
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

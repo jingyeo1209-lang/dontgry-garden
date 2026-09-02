@@ -15,7 +15,7 @@ export const revalidate = 60;
 
 type Params = { pageId: string };
 
-const RESERVED = new Set(["ttong", "pink", "oasis", "api", "magic-glasses"]);
+const RESERVED = new Set(["ttong", "pink", "oasis", "api", "magic-glasses", "privacy"]);
 
 export async function generateStaticParams() {
   const { articles } = await getPublishedArticles();
