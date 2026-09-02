@@ -118,6 +118,23 @@ export function toProxiedImageUrl(raw: string | null | undefined): string | null
   return `/api/notion-image?url=${encodeURIComponent(raw)}`;
 }
 
+/** Notion file / image object → raw HTTPS URL */
+export function extractNotionFileUrl(
+  file:
+    | {
+        type?: string;
+        external?: { url?: string };
+        file?: { url?: string };
+      }
+    | null
+    | undefined
+): string | null {
+  if (!file) return null;
+  if (file.type === "external") return file.external?.url ?? null;
+  if (file.type === "file") return file.file?.url ?? null;
+  return file.external?.url ?? file.file?.url ?? null;
+}
+
 function pageToArticle(page: PageObjectResponse, category: CategoryId): GardenArticle {
   const id = normalizePageId(page.id);
   return {

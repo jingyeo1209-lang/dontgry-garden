@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import type { NotionBlock } from "@/lib/notion";
-import { getBlockChildren, toProxiedImageUrl } from "@/lib/notion";
+import {
+  extractNotionFileUrl,
+  getBlockChildren,
+  toProxiedImageUrl,
+} from "@/lib/notion";
+import { normalizePageId } from "@/lib/categories";
 import { AdSlot } from "@/components/AdSlot";
 
 type RichText = {
@@ -14,6 +20,10 @@ type RichText = {
     code?: boolean;
   };
 };
+
+function blockHasChildren(block: NotionBlock): boolean {
+  return "has_children" in block && Boolean(block.has_children);
+}
 
 function renderRichText(items: RichText[] | undefined) {
   if (!items?.length) return null;
@@ -36,6 +46,19 @@ function renderRichText(items: RichText[] | undefined) {
   });
 }
 
+async function ChildBlocks({
+  block,
+  skip = false,
+}: {
+  block: NotionBlock;
+  skip?: boolean;
+}) {
+  if (skip || !blockHasChildren(block) || !("id" in block)) return null;
+  const children = await getBlockChildren(block.id);
+  if (!children.length) return null;
+  return <NotionBlocks blocks={children} insertAdAfter={null} />;
+}
+
 async function Block({ block }: { block: NotionBlock }) {
   if (!("type" in block)) return null;
   const type = block.type;
@@ -44,7 +67,12 @@ async function Block({ block }: { block: NotionBlock }) {
 
   switch (type) {
     case "paragraph":
-      return <p className="notion-p">{renderRichText(data?.rich_text)}</p>;
+      return (
+        <>
+          <p className="notion-p">{renderRichText(data?.rich_text)}</p>
+          <ChildBlocks block={block} />
+        </>
+      );
     case "heading_1":
       return <h1 className="notion-h1">{renderRichText(data?.rich_text)}</h1>;
     case "heading_2":
@@ -52,24 +80,47 @@ async function Block({ block }: { block: NotionBlock }) {
     case "heading_3":
       return <h3 className="notion-h3">{renderRichText(data?.rich_text)}</h3>;
     case "bulleted_list_item":
-      return <li className="notion-li">{renderRichText(data?.rich_text)}</li>;
+      return (
+        <li className="notion-li">
+          {renderRichText(data?.rich_text)}
+          <ChildBlocks block={block} />
+        </li>
+      );
     case "numbered_list_item":
-      return <li className="notion-li">{renderRichText(data?.rich_text)}</li>;
+      return (
+        <li className="notion-li">
+          {renderRichText(data?.rich_text)}
+          <ChildBlocks block={block} />
+        </li>
+      );
     case "to_do":
       return (
-        <label className="notion-todo">
-          <input type="checkbox" checked={Boolean(data?.checked)} readOnly />
-          <span>{renderRichText(data?.rich_text)}</span>
-        </label>
+        <>
+          <label className="notion-todo">
+            <input type="checkbox" checked={Boolean(data?.checked)} readOnly />
+            <span>{renderRichText(data?.rich_text)}</span>
+          </label>
+          <ChildBlocks block={block} />
+        </>
       );
     case "quote":
-      return <blockquote className="notion-quote">{renderRichText(data?.rich_text)}</blockquote>;
+      return (
+        <>
+          <blockquote className="notion-quote">{renderRichText(data?.rich_text)}</blockquote>
+          <ChildBlocks block={block} />
+        </>
+      );
     case "callout":
       return (
-        <div className="notion-callout">
-          <span className="notion-callout-icon">{data?.icon?.emoji || "💡"}</span>
-          <div>{renderRichText(data?.rich_text)}</div>
-        </div>
+        <>
+          <div className="notion-callout">
+            <span className="notion-callout-icon">{data?.icon?.emoji || "💡"}</span>
+            <div>
+              {renderRichText(data?.rich_text)}
+              <ChildBlocks block={block} />
+            </div>
+          </div>
+        </>
       );
     case "code":
       return (
@@ -80,13 +131,7 @@ async function Block({ block }: { block: NotionBlock }) {
     case "divider":
       return <hr className="notion-hr" />;
     case "image": {
-      const raw =
-        data?.type === "external"
-          ? data.external?.url
-          : data?.type === "file"
-            ? data.file?.url
-            : null;
-      const src = toProxiedImageUrl(raw);
+      const src = toProxiedImageUrl(extractNotionFileUrl(data));
       const caption = renderRichText(data?.caption);
       if (!src) return null;
       return (
@@ -102,7 +147,7 @@ async function Block({ block }: { block: NotionBlock }) {
       return data?.url ? (
         <p className="notion-p">
           <a href={data.url} target="_blank" rel="noopener noreferrer">
-            {data.url}
+            {renderRichText(data?.caption) || data.url}
           </a>
         </p>
       ) : null;
@@ -120,10 +165,7 @@ async function Block({ block }: { block: NotionBlock }) {
         </p>
       ) : null;
     case "toggle": {
-      const children =
-        "has_children" in block && block.has_children
-          ? await getBlockChildren(block.id)
-          : [];
+      const children = blockHasChildren(block) ? await getBlockChildren(block.id) : [];
       return (
         <details className="notion-toggle">
           <summary>{renderRichText(data?.rich_text)}</summary>
@@ -133,11 +175,93 @@ async function Block({ block }: { block: NotionBlock }) {
         </details>
       );
     }
+    case "column_list": {
+      const columns = blockHasChildren(block) ? await getBlockChildren(block.id) : [];
+      return (
+        <div className="notion-columns">
+          {await Promise.all(columns.map((col) => <Block key={col.id} block={col} />))}
+        </div>
+      );
+    }
+    case "column": {
+      const children = blockHasChildren(block) ? await getBlockChildren(block.id) : [];
+      return (
+        <div className="notion-column">
+          <NotionBlocks blocks={children} insertAdAfter={null} />
+        </div>
+      );
+    }
+    case "table": {
+      const rows = blockHasChildren(block) ? await getBlockChildren(block.id) : [];
+      const hasColumnHeader = Boolean(data?.has_column_header);
+      return (
+        <div className="notion-table-wrap">
+          <table className="notion-table">
+            <tbody>
+              {rows.map((row, rowIndex) => {
+                if (!("type" in row) || row.type !== "table_row") return null;
+                const cells = row.table_row?.cells ?? [];
+                return (
+                  <tr key={row.id}>
+                    {cells.map((cell: RichText[], cellIndex: number) => {
+                      const CellTag =
+                        hasColumnHeader && rowIndex === 0 ? "th" : "td";
+                      return (
+                        <CellTag key={cellIndex}>{renderRichText(cell)}</CellTag>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "synced_block": {
+      const sourceId = data?.synced_from?.block_id;
+      const children = await getBlockChildren(sourceId ?? block.id);
+      return <NotionBlocks blocks={children} insertAdAfter={null} />;
+    }
+    case "link_to_page": {
+      const pageId = data?.page_id;
+      if (!pageId) return null;
+      return (
+        <p className="notion-p">
+          <Link href={`/${normalizePageId(pageId)}`}>관련 페이지 보기</Link>
+        </p>
+      );
+    }
+    case "file":
+    case "pdf": {
+      const raw = extractNotionFileUrl(data);
+      const href = raw ? toProxiedImageUrl(raw) : null;
+      const name = data?.name || data?.caption?.[0]?.plain_text || "파일 다운로드";
+      if (!href) return null;
+      return (
+        <p className="notion-p">
+          <a href={href} target="_blank" rel="noopener noreferrer">
+            {name}
+          </a>
+        </p>
+      );
+    }
+    case "equation":
+      return (
+        <p className="notion-p notion-equation">
+          <code>{data?.expression}</code>
+        </p>
+      );
     default:
       if (data?.rich_text) {
-        return <p className="notion-p">{renderRichText(data.rich_text)}</p>;
+        return (
+          <>
+            <p className="notion-p">{renderRichText(data.rich_text)}</p>
+            <ChildBlocks block={block} />
+          </>
+        );
       }
-      return null;
+      return <ChildBlocks block={block} />;
   }
 }
 
@@ -179,20 +303,20 @@ export async function NotionBlocks({ blocks, insertAdAfter = 3 }: Props) {
     if (group.kind === "ul") {
       out.push(
         <ul key={`ul-${gi}`} className="notion-ul">
-          {await Promise.all(group.items.map(async (b) => <Block key={"id" in b ? b.id : gi} block={b} />))}
+          {await Promise.all(group.items.map(async (b) => <Block key={b.id} block={b} />))}
         </ul>
       );
       renderedBlocks += group.items.length;
     } else if (group.kind === "ol") {
       out.push(
         <ol key={`ol-${gi}`} className="notion-ol">
-          {await Promise.all(group.items.map(async (b) => <Block key={"id" in b ? b.id : gi} block={b} />))}
+          {await Promise.all(group.items.map(async (b) => <Block key={b.id} block={b} />))}
         </ol>
       );
       renderedBlocks += group.items.length;
     } else {
       const b = group.items[0];
-      out.push(<Block key={"id" in b ? b.id : gi} block={b} />);
+      out.push(<Block key={b.id} block={b} />);
       renderedBlocks += 1;
     }
 

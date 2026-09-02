@@ -530,6 +530,45 @@ a {
   text-decoration: underline;
 }
 
+.notion-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 1em;
+}
+
+.notion-column {
+  min-width: 0;
+}
+
+.notion-table-wrap {
+  overflow-x: auto;
+  margin: 0 0 1em;
+}
+
+.notion-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.notion-table th,
+.notion-table td {
+  border: 1px solid #e9e9e7;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.notion-table th {
+  background: #f7f6f3;
+  font-weight: 600;
+}
+
+.notion-equation code {
+  font-size: 0.95em;
+}
+
 .site-footer {
   width: 100%;
   margin-top: auto;

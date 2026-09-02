@@ -9,9 +9,13 @@ function isAllowedImageHost(hostname: string): boolean {
     host === "www.notion.com" ||
     host === "notion.com" ||
     host.endsWith(".notion.com") ||
+    host === "notionusercontent.com" ||
+    host.endsWith(".notionusercontent.com") ||
+    host === "secure.notion-static.com" ||
     host.endsWith(".amazonaws.com") ||
     host === "images.unsplash.com" ||
     host.endsWith(".unsplash.com") ||
+    host.endsWith(".ctfassets.net") ||
     host === "oopy.lazyrockets.com" ||
     host.endsWith(".lazyrockets.com")
   );
@@ -24,7 +28,10 @@ function needsNotionAuth(hostname: string): boolean {
     host.endsWith(".notion.so") ||
     host === "notion.so" ||
     host.endsWith(".notion.com") ||
-    host === "notion.com"
+    host === "notion.com" ||
+    host === "notionusercontent.com" ||
+    host.endsWith(".notionusercontent.com") ||
+    host === "secure.notion-static.com"
   );
 }
 
@@ -54,13 +61,20 @@ export async function GET(request: NextRequest) {
   try {
     const upstream = await fetch(target.toString(), {
       headers,
+      redirect: "follow",
       next: { revalidate: 60 },
     });
     if (!upstream.ok || !upstream.body) {
       return new Response("Image fetch failed", { status: 502 });
     }
 
-    const contentType = upstream.headers.get("content-type") || "image/jpeg";
+    const contentType = upstream.headers.get("content-type") || "";
+    const allowed =
+      contentType.startsWith("image/") || contentType === "application/pdf";
+    if (!allowed) {
+      return new Response("Image fetch failed", { status: 502 });
+    }
+
     return new Response(upstream.body, {
       status: 200,
       headers: {
