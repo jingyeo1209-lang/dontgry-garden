@@ -54,6 +54,23 @@ export function toProxiedBlockMediaUrl(blockId: string): string {
   return `/api/notion-image?blockId=${encodeURIComponent(normalizePageId(blockId))}`;
 }
 
+const HTTP_TO_HTTPS_HOSTS = new Set(["postfiles.pstatic.net"]);
+
+/** Notion often embeds Naver images as http://; upgrade only known-safe hosts. */
+export function normalizeUpstreamImageUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    if (parsed.protocol === "http:" && HTTP_TO_HTTPS_HOSTS.has(host)) {
+      parsed.protocol = "https:";
+      return parsed.href;
+    }
+  } catch {
+    // keep original string for downstream error handling
+  }
+  return url;
+}
+
 export function isAllowedImageHost(hostname: string): boolean {
   const host = hostname.toLowerCase();
   return (

@@ -14,6 +14,7 @@ import {
   isAllowedImageHost,
   isImageContentType,
   isPresignedS3Url,
+  normalizeUpstreamImageUrl,
   resolveMediaSourceUrl,
   toProxiedBlockMediaUrl,
   toProxiedImageUrl,
@@ -27,6 +28,7 @@ export type NotionImageFailureStage =
   | "resolve-notion-error"
   | "resolve-no-url"
   | "resolve-invalid-url"
+  | "upstream-protocol-denied"
   | "upstream-host-denied"
   | "upstream-fetch-failed"
   | "upstream-bad-content-type"
@@ -406,8 +408,9 @@ export async function runNotionImagePipeline(
   }
 
   let target: URL;
+  const fetchUrl = normalizeUpstreamImageUrl(sourceUrl);
   try {
-    target = new URL(sourceUrl);
+    target = new URL(fetchUrl);
   } catch {
     trace.failureStage = "resolve-invalid-url";
     trace.failureDetail = "malformed-resolved-url";
@@ -415,20 +418,28 @@ export async function runNotionImagePipeline(
     return { trace };
   }
 
-  if (target.protocol !== "https:" || !isAllowedImageHost(target.hostname)) {
+  if (target.protocol !== "https:") {
+    trace.failureStage = "upstream-protocol-denied";
+    trace.failureDetail = `${target.protocol}//${target.hostname}`;
+    trace.finalStatus = 400;
+    return { trace };
+  }
+
+  if (!isAllowedImageHost(target.hostname)) {
     trace.failureStage = "upstream-host-denied";
     trace.failureDetail = target.hostname;
     trace.finalStatus = 400;
     return { trace };
   }
 
-  const { fetchUrl, headers, redirect, cache } = buildUpstreamFetchInit(sourceUrl);
+  const { fetchUrl: upstreamUrl, headers, redirect, cache } =
+    buildUpstreamFetchInit(fetchUrl);
   const authHeaderSent = Boolean(
     headers && typeof headers === "object" && "Authorization" in headers
   );
 
   try {
-    const upstream = await fetch(fetchUrl, {
+    const upstream = await fetch(upstreamUrl, {
       headers,
       redirect,
       cache,
@@ -439,7 +450,7 @@ export async function runNotionImagePipeline(
       status: upstream.status,
       contentType,
       host: target.hostname,
-      presignedS3: isPresignedS3Url(sourceUrl),
+      presignedS3: isPresignedS3Url(fetchUrl),
       authHeaderSent,
     };
 
@@ -450,7 +461,7 @@ export async function runNotionImagePipeline(
       return { trace };
     }
 
-    if (!isImageContentType(contentType, sourceUrl)) {
+    if (!isImageContentType(contentType, fetchUrl)) {
       trace.failureStage = "upstream-bad-content-type";
       trace.failureDetail = contentType || "empty";
       trace.finalStatus = 502;
@@ -498,6 +509,8 @@ export function buildNotionImageResponse(result: {
         ? "Missing pageId, blockId, or url"
         : trace.failureStage === "resolve-no-url"
           ? "Image not found"
+          : trace.failureStage === "upstream-protocol-denied"
+            ? "Protocol not allowed"
           : trace.failureStage === "upstream-host-denied"
             ? "Host not allowed"
             : trace.failureStage === "resolve-invalid-url"
