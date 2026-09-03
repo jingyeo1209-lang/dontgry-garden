@@ -358,6 +358,20 @@ export function extractBlockImageUrl(block: NotionBlock): string | null {
   return extractNotionFileUrl(block.image);
 }
 
+async function resolveFullBlock(
+  client: Client,
+  block: NotionBlock
+): Promise<NotionBlock> {
+  if ("type" in block) return block;
+  if (!("id" in block)) return block;
+  try {
+    const full = await client.blocks.retrieve({ block_id: block.id });
+    return full as NotionBlock;
+  } catch {
+    return block;
+  }
+}
+
 export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> {
   const client = getClient();
   if (!client) return [];
@@ -371,7 +385,9 @@ export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> 
       start_cursor: cursor,
       page_size: 100,
     });
-    blocks.push(...response.results);
+    for (const block of response.results) {
+      blocks.push(await resolveFullBlock(client, block));
+    }
     cursor = response.has_more ? response.next_cursor ?? undefined : undefined;
   } while (cursor);
 

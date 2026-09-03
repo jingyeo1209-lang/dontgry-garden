@@ -11,8 +11,19 @@ import { normalizePageId } from "@/lib/categories";
 import { AdSlot } from "@/components/AdSlot";
 import { renderNotionRichText, type NotionRichTextItem } from "@/components/NotionRichText";
 
-function blockHasChildren(block: NotionBlock): boolean {
-  return "has_children" in block && Boolean(block.has_children);
+async function renderNestedBlocks(
+  blockId: string,
+  skipImageBlockIds: string[] = []
+) {
+  const children = await getBlockChildren(blockId);
+  if (!children.length) return null;
+  return (
+    <NotionBlocks
+      blocks={children}
+      insertAdAfter={null}
+      skipImageBlockIds={skipImageBlockIds}
+    />
+  );
 }
 
 async function ChildBlocks({
@@ -22,16 +33,8 @@ async function ChildBlocks({
   block: NotionBlock;
   skipImageBlockIds?: string[];
 }) {
-  if (!blockHasChildren(block) || !("id" in block)) return null;
-  const children = await getBlockChildren(block.id);
-  if (!children.length) return null;
-  return (
-    <NotionBlocks
-      blocks={children}
-      insertAdAfter={null}
-      skipImageBlockIds={skipImageBlockIds}
-    />
-  );
+  if (!("id" in block)) return null;
+  return renderNestedBlocks(block.id, skipImageBlockIds);
 }
 
 function notionImageFallback(label: string, detail: string) {
@@ -57,13 +60,18 @@ async function Block({
   const data = block[type];
 
   switch (type) {
-    case "paragraph":
+    case "paragraph": {
+      const rich = renderNotionRichText(data?.rich_text);
+      const nested =
+        "id" in block ? await renderNestedBlocks(block.id, skipImageBlockIds) : null;
+      if (!rich && !nested) return null;
       return (
         <>
-          <p className="notion-p">{renderNotionRichText(data?.rich_text)}</p>
-          <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
+          {rich ? <p className="notion-p">{rich}</p> : null}
+          {nested}
         </>
       );
+    }
     case "heading_1":
       return <h1 className="notion-h1">{renderNotionRichText(data?.rich_text)}</h1>;
     case "heading_2":
@@ -101,18 +109,19 @@ async function Block({
           <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
         </>
       );
-    case "callout":
+    case "callout": {
+      const nested =
+        "id" in block ? await renderNestedBlocks(block.id, skipImageBlockIds) : null;
       return (
-        <>
-          <div className="notion-callout">
-            <span className="notion-callout-icon">{data?.icon?.emoji || "💡"}</span>
-            <div>
-              {renderNotionRichText(data?.rich_text)}
-              <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
-            </div>
+        <div className="notion-callout">
+          <span className="notion-callout-icon">{data?.icon?.emoji || "💡"}</span>
+          <div>
+            {renderNotionRichText(data?.rich_text)}
+            {nested}
           </div>
-        </>
+        </div>
       );
+    }
     case "code":
       return (
         <pre className="notion-code">
@@ -166,7 +175,7 @@ async function Block({
         </p>
       ) : null;
     case "toggle": {
-      const children = blockHasChildren(block) ? await getBlockChildren(block.id) : [];
+      const children = "id" in block ? await getBlockChildren(block.id) : [];
       return (
         <details className="notion-toggle">
           <summary>{renderNotionRichText(data?.rich_text)}</summary>
@@ -181,7 +190,7 @@ async function Block({
       );
     }
     case "column_list": {
-      const columns = blockHasChildren(block) ? await getBlockChildren(block.id) : [];
+      const columns = "id" in block ? await getBlockChildren(block.id) : [];
       return (
         <div className="notion-columns">
           {await Promise.all(
@@ -193,7 +202,7 @@ async function Block({
       );
     }
     case "column": {
-      const children = blockHasChildren(block) ? await getBlockChildren(block.id) : [];
+      const children = "id" in block ? await getBlockChildren(block.id) : [];
       return (
         <div className="notion-column">
           <NotionBlocks
@@ -205,7 +214,7 @@ async function Block({
       );
     }
     case "table": {
-      const rows = blockHasChildren(block) ? await getBlockChildren(block.id) : [];
+      const rows = "id" in block ? await getBlockChildren(block.id) : [];
       const hasColumnHeader = Boolean(data?.has_column_header);
       return (
         <div className="notion-table-wrap">
