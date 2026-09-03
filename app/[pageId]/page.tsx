@@ -5,13 +5,11 @@ import { AdSlot } from "@/components/AdSlot";
 import { NotionBlocks } from "@/components/NotionBlocks";
 import { NotionStatusNote } from "@/components/NotionStatusNote";
 import { CATEGORIES, isCategoryId, normalizePageId } from "@/lib/categories";
-import {
-  getArticleById,
-  getBlockChildren,
-  getPublishedArticles,
-} from "@/lib/notion";
+import { getArticleById, getBlockChildren } from "@/lib/notion";
 
+/** On-demand ISR: do not prerender all Notion articles at build (avoids API 429). */
 export const revalidate = 60;
+export const dynamicParams = true;
 
 type Params = { pageId: string };
 
@@ -23,11 +21,6 @@ const RESERVED = new Set([
   "magic-glasses",
   "privacy",
 ]);
-
-export async function generateStaticParams() {
-  const { articles } = await getPublishedArticles();
-  return articles.map((a) => ({ pageId: a.id }));
-}
 
 export async function generateMetadata({
   params,
