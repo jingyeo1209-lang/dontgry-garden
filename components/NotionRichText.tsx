@@ -33,7 +33,7 @@ export function renderNotionRichText(items: NotionRichTextItem[] | undefined) {
   return items.map((t, i) => {
     let node: ReactNode = t.plain_text;
     const a = t.annotations;
-    if (a?.code) node = <code>{node}</code>;
+    if (a?.code) node = <code className="notion-inline-code">{node}</code>;
     if (a?.bold) node = <strong>{node}</strong>;
     if (a?.italic) node = <em>{node}</em>;
     if (a?.strikethrough) node = <s>{node}</s>;
