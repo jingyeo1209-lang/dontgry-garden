@@ -5,6 +5,7 @@ import { GalleryList } from "@/components/GalleryList";
 import { NotionStatusNote } from "@/components/NotionStatusNote";
 import { CATEGORIES, type CategoryId } from "@/lib/categories";
 import { getPublishedArticles } from "@/lib/notion";
+import { isPublicArticleFilterOn } from "@/lib/public-articles";
 
 type Props = {
   category: CategoryId;
@@ -43,7 +44,11 @@ export async function CategoryPage({ category }: Props) {
         error={error}
         articleCount={articles.length}
         category={category}
-        emptyMessage="이 카테고리에 글이 없습니다. Notion 갤러리에 글이 있는지, Integration 연결을 확인해 주세요."
+        emptyMessage={
+          isPublicArticleFilterOn()
+            ? "다른 글은 준비 중이에요. 곧 공개할게요."
+            : "이 카테고리에 글이 없습니다. Notion 갤러리에 글이 있는지, Integration 연결을 확인해 주세요."
+        }
       />
 
       {articles.length > 0 ? (

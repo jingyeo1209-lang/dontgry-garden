@@ -6,6 +6,7 @@ import { NotionBlocks } from "@/components/NotionBlocks";
 import { NotionStatusNote } from "@/components/NotionStatusNote";
 import { CATEGORIES, isCategoryId, normalizePageId } from "@/lib/categories";
 import { getArticleById, getBlockChildren } from "@/lib/notion";
+import { isPublicArticleId } from "@/lib/public-articles";
 
 /** On-demand ISR: do not prerender all Notion articles at build (avoids API 429). */
 export const revalidate = 60;
@@ -29,6 +30,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { pageId } = await params;
   if (RESERVED.has(pageId)) return {};
+  if (!isPublicArticleId(pageId)) {
+    return { title: "준비 중이에요" };
+  }
   const { article } = await getArticleById(pageId);
   if (!article) {
     return { title: "글을 찾을 수 없습니다" };
@@ -47,6 +51,18 @@ export async function generateMetadata({
 export default async function ArticlePage({ params }: { params: Promise<Params> }) {
   const { pageId } = await params;
   if (RESERVED.has(pageId) || isCategoryId(pageId)) notFound();
+
+  if (!isPublicArticleId(pageId)) {
+    return (
+      <main className="page page-narrow">
+        <Link href="/" className="back-link">
+          ← 대문으로 돌아가기
+        </Link>
+        <h1 className="page-title">준비 중이에요</h1>
+        <p className="page-desc">다른 글은 곧 공개할게요.</p>
+      </main>
+    );
+  }
 
   const { article, config, error } = await getArticleById(pageId);
   if (!article) {

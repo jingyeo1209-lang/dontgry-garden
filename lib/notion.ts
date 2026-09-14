@@ -14,6 +14,7 @@ import {
   toProxiedMediaUrl,
   wrapNotionGalleryCover,
 } from "@/lib/notion-media";
+import { filterPublicArticles } from "@/lib/public-articles";
 
 export {
   toProxiedBlockMediaUrl,
@@ -306,7 +307,7 @@ export async function getPublishedArticles(
         ["notion-articles", category],
         { revalidate: REVALIDATE_SECONDS }
       )();
-      return { articles, config };
+      return { articles: filterPublicArticles(articles), config };
     }
 
     const categories: CategoryId[] = ["ttong", "pink", "oasis"];
@@ -321,7 +322,7 @@ export async function getPublishedArticles(
     );
     const articles = nested.flat();
     articles.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-    return { articles, config };
+    return { articles: filterPublicArticles(articles), config };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Notion API 오류";
     return { articles: [], config, error: message };
