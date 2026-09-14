@@ -653,11 +653,16 @@ a {
 }
 
 .notion-tree-root-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px 10px;
+  column-gap: 10px;
+}
+
+.notion-tree-root-row .notion-tree-box {
+  grid-column: 2;
+  width: max-content;
+  min-width: 132px;
 }
 
 .notion-tree-box {
@@ -669,11 +674,12 @@ a {
   line-height: 1.4;
   color: #37352f;
   min-width: 0;
-  width: 100%;
-  max-width: 148px;
+  box-sizing: border-box;
 }
 
 .notion-tree-note {
+  grid-column: 3;
+  justify-self: start;
   font-size: 14px;
   line-height: 1.4;
   color: #37352f;
@@ -706,14 +712,24 @@ a {
 .notion-tree-col {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   min-width: 0;
+}
+
+.notion-tree-col .notion-tree-box {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 3.35em;
 }
 
 .notion-tree-col::before {
   content: "";
   width: 1px;
   height: 14px;
+  margin: 0 auto;
   background: #37352f;
 }
 
@@ -722,6 +738,7 @@ a {
   line-height: 1;
   margin: 1px 0 4px;
   color: #37352f;
+  text-align: center;
 }
 
 @media (max-width: 560px) {
