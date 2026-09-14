@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { normalizePageId } from "@/lib/categories";
 
 export type NotionRichTextItem = {
   plain_text: string;
@@ -18,6 +19,15 @@ function notionAnnotationClass(color: string | undefined): string | undefined {
   return `notion-annot-${color.replace(/_/g, "-")}`;
 }
 
+/** Notion heading mentions use /p/pageId#blockId — rewrite to an in-page anchor. */
+export function toInPageHeadingHref(href: string): string | null {
+  const hash = href.split("#")[1]?.split("?")[0]?.trim();
+  if (!hash) return null;
+  const id = normalizePageId(hash);
+  if (id.replace(/-/g, "").length !== 32) return null;
+  return `#${id}`;
+}
+
 export function renderNotionRichText(items: NotionRichTextItem[] | undefined) {
   if (!items?.length) return null;
   return items.map((t, i) => {
@@ -29,7 +39,10 @@ export function renderNotionRichText(items: NotionRichTextItem[] | undefined) {
     if (a?.strikethrough) node = <s>{node}</s>;
     if (a?.underline) node = <u>{node}</u>;
     if (t.href) {
-      node = (
+      const inPage = toInPageHeadingHref(t.href);
+      node = inPage ? (
+        <a href={inPage}>{node}</a>
+      ) : (
         <a href={t.href} target="_blank" rel="noopener noreferrer">
           {node}
         </a>

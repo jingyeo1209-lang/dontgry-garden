@@ -84,7 +84,12 @@ async function Block({
           : null;
       return (
         <>
-          <Tag className={cls}>{renderNotionRichText(data?.rich_text)}</Tag>
+          <Tag
+            id={"id" in block ? normalizePageId(block.id) : undefined}
+            className={cls}
+          >
+            {renderNotionRichText(data?.rich_text)}
+          </Tag>
           {nested}
         </>
       );
