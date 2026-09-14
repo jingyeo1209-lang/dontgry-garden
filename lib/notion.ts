@@ -4,6 +4,7 @@ import type {
   QueryDatabaseResponse,
   ListBlockChildrenResponse,
 } from "@notionhq/client/build/src/api-endpoints";
+import { unstable_cache } from "next/cache";
 import {
   type CategoryId,
   normalizePageId,
@@ -82,10 +83,23 @@ export function getNotionConfigStatus(): NotionConfigStatus {
   };
 }
 
+async function notionFetch(url: string, init?: RequestInit): Promise<Response> {
+  const maxAttempts = 5;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const res = await fetch(url, init);
+    if (res.status !== 429 || attempt === maxAttempts - 1) return res;
+    const retryAfter = Number(res.headers.get("retry-after"));
+    const waitMs =
+      Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 500 * 2 ** attempt;
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+  }
+  return fetch(url, init);
+}
+
 function getClient(): Client | null {
   const token = process.env.NOTION_TOKEN?.trim();
   if (!token) return null;
-  return new Client({ auth: token });
+  return new Client({ auth: token, fetch: notionFetch });
 }
 
 function isFullPage(page: unknown): page is PageObjectResponse {
@@ -267,12 +281,10 @@ async function queryAllPages(client: Client, databaseId: string): Promise<PageOb
   return pages;
 }
 
-async function loadCategoryArticles(
-  client: Client,
-  category: CategoryId
-): Promise<GardenArticle[]> {
+async function loadCategoryArticles(category: CategoryId): Promise<GardenArticle[]> {
+  const client = getClient();
   const databaseId = getDatabaseIdForCategory(category);
-  if (!databaseId) return [];
+  if (!client || !databaseId) return [];
   const pages = await queryAllPages(client, databaseId);
   return Promise.all(pages.map((page) => pageToArticle(page, category)));
 }
@@ -285,18 +297,27 @@ export async function getPublishedArticles(
     return { articles: [], config };
   }
 
-  const client = getClient();
-  if (!client) return { articles: [], config };
+  if (!getClient()) return { articles: [], config };
 
   try {
     if (category) {
-      const articles = await loadCategoryArticles(client, category);
+      const articles = await unstable_cache(
+        () => loadCategoryArticles(category),
+        ["notion-articles", category],
+        { revalidate: REVALIDATE_SECONDS }
+      )();
       return { articles, config };
     }
 
     const categories: CategoryId[] = ["ttong", "pink", "oasis"];
     const nested = await Promise.all(
-      categories.map((id) => loadCategoryArticles(client, id))
+      categories.map((id) =>
+        unstable_cache(
+          () => loadCategoryArticles(id),
+          ["notion-articles", id],
+          { revalidate: REVALIDATE_SECONDS }
+        )()
+      )
     );
     const articles = nested.flat();
     articles.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
@@ -372,7 +393,7 @@ async function resolveFullBlock(
   }
 }
 
-export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> {
+async function fetchBlockChildren(blockId: string): Promise<NotionBlock[]> {
   const client = getClient();
   if (!client) return [];
 
@@ -381,7 +402,7 @@ export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> 
 
   do {
     const response = await client.blocks.children.list({
-      block_id: normalizePageId(blockId),
+      block_id: blockId,
       start_cursor: cursor,
       page_size: 100,
     });
@@ -392,4 +413,13 @@ export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> 
   } while (cursor);
 
   return blocks;
+}
+
+export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> {
+  const id = normalizePageId(blockId);
+  return unstable_cache(
+    () => fetchBlockChildren(id),
+    ["notion-block-children", id],
+    { revalidate: REVALIDATE_SECONDS }
+  )();
 }
