@@ -15,7 +15,7 @@ export type NotionRichTextItem = {
 };
 
 function notionAnnotationClass(color: string | undefined): string | undefined {
-  if (!color || color === "default") return undefined;
+  if (!color || color === "default" || color === "default_background") return undefined;
   return `notion-annot-${color.replace(/_/g, "-")}`;
 }
 
