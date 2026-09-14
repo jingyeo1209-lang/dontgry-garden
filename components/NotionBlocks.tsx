@@ -22,6 +22,7 @@ async function renderNestedBlocks(
       blocks={children}
       insertAdAfter={null}
       skipImageBlockIds={skipImageBlockIds}
+      nested
     />
   );
 }
@@ -64,20 +65,29 @@ async function Block({
       const rich = renderNotionRichText(data?.rich_text);
       const nested =
         "id" in block ? await renderNestedBlocks(block.id, skipImageBlockIds) : null;
-      if (!rich && !nested) return null;
       return (
         <>
-          {rich ? <p className="notion-p">{rich}</p> : null}
+          <p className={rich ? "notion-p" : "notion-p notion-p-empty"}>{rich}</p>
           {nested}
         </>
       );
     }
     case "heading_1":
-      return <h1 className="notion-h1">{renderNotionRichText(data?.rich_text)}</h1>;
     case "heading_2":
-      return <h2 className="notion-h2">{renderNotionRichText(data?.rich_text)}</h2>;
-    case "heading_3":
-      return <h3 className="notion-h3">{renderNotionRichText(data?.rich_text)}</h3>;
+    case "heading_3": {
+      const Tag = type === "heading_1" ? "h1" : type === "heading_2" ? "h2" : "h3";
+      const cls = type === "heading_1" ? "notion-h1" : type === "heading_2" ? "notion-h2" : "notion-h3";
+      const nested =
+        "id" in block && "has_children" in block && block.has_children
+          ? await renderNestedBlocks(block.id, skipImageBlockIds)
+          : null;
+      return (
+        <>
+          <Tag className={cls}>{renderNotionRichText(data?.rich_text)}</Tag>
+          {nested}
+        </>
+      );
+    }
     case "bulleted_list_item":
       return (
         <li className="notion-li">
@@ -112,10 +122,15 @@ async function Block({
     case "callout": {
       const nested =
         "id" in block ? await renderNestedBlocks(block.id, skipImageBlockIds) : null;
+      const color = typeof data?.color === "string" ? data.color : "gray_background";
+      const colorClass =
+        color && color !== "default"
+          ? `notion-callout-${color.replace(/_/g, "-")}`
+          : "notion-callout-gray-background";
       return (
-        <div className="notion-callout">
+        <div className={`notion-callout ${colorClass}`}>
           <span className="notion-callout-icon">{data?.icon?.emoji || "💡"}</span>
-          <div>
+          <div className="notion-callout-body">
             {renderNotionRichText(data?.rich_text)}
             {nested}
           </div>
@@ -184,6 +199,7 @@ async function Block({
               blocks={children}
               insertAdAfter={null}
               skipImageBlockIds={skipImageBlockIds}
+              nested
             />
           </div>
         </details>
@@ -209,6 +225,7 @@ async function Block({
             blocks={children}
             insertAdAfter={null}
             skipImageBlockIds={skipImageBlockIds}
+            nested
           />
         </div>
       );
@@ -248,6 +265,7 @@ async function Block({
           blocks={children}
           insertAdAfter={null}
           skipImageBlockIds={skipImageBlockIds}
+          nested
         />
       );
     }
@@ -330,12 +348,15 @@ type Props = {
   insertAdAfter?: number | null;
   /** Body image blocks already shown as cover fallback — omit from article body. */
   skipImageBlockIds?: string[];
+  /** Nested renderer: skip the outer `.notion-body` wrapper. */
+  nested?: boolean;
 };
 
 export async function NotionBlocks({
   blocks,
   insertAdAfter = 3,
   skipImageBlockIds = [],
+  nested = false,
 }: Props) {
   const groups = groupListItems(blocks);
   const out: ReactNode[] = [];
@@ -376,5 +397,6 @@ export async function NotionBlocks({
     }
   }
 
+  if (nested) return <>{out}</>;
   return <div className="notion-body">{out}</div>;
 }
