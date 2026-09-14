@@ -514,6 +514,8 @@ a {
   padding: 4px 14px;
   color: inherit;
   margin: 4px 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .notion-quote .notion-p,
@@ -605,6 +607,11 @@ a {
   padding: 16px 12px;
   background: rgb(241, 241, 239);
   border-radius: 4px;
+}
+
+.notion-code-fit {
+  overflow: hidden;
+  width: 100%;
 }
 
 .notion-code {
