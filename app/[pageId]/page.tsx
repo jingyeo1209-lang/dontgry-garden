@@ -65,6 +65,8 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
 
   const blocks = await getBlockChildren(normalizePageId(article.id));
   const category = CATEGORIES[article.category];
+  const hasBodyImage = blocks.some((block) => "type" in block && block.type === "image");
+  const showHero = Boolean(article.coverImage) && !hasBodyImage;
 
   return (
     <main className="page page-narrow">
@@ -74,7 +76,7 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
       <h1 className="page-title">{article.title}</h1>
       {article.date ? <p className="article-meta">{article.date}</p> : null}
 
-      {article.coverImage ? (
+      {showHero && article.coverImage ? (
         <div className="article-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={article.coverImage} alt="" />
@@ -87,7 +89,11 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
         blocks={blocks}
         insertAdAfter={3}
         skipImageBlockIds={
-          article.coverFallbackBlockId ? [article.coverFallbackBlockId] : []
+          hasBodyImage
+            ? []
+            : article.coverFallbackBlockId
+              ? [article.coverFallbackBlockId]
+              : []
         }
       />
 

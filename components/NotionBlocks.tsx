@@ -128,9 +128,13 @@ async function Block({
         color && color !== "default"
           ? `notion-callout-${color.replace(/_/g, "-")}`
           : "notion-callout-gray-background";
+      const emoji =
+        typeof data?.icon?.emoji === "string" && data.icon.emoji.trim()
+          ? data.icon.emoji
+          : null;
       return (
-        <div className={`notion-callout ${colorClass}`}>
-          <span className="notion-callout-icon">{data?.icon?.emoji || "💡"}</span>
+        <div className={`notion-callout ${colorClass}${emoji ? "" : " notion-callout-plain"}`}>
+          {emoji ? <span className="notion-callout-icon">{emoji}</span> : null}
           <div className="notion-callout-body">
             {renderNotionRichText(data?.rich_text)}
             {nested}
@@ -139,7 +143,13 @@ async function Block({
       );
     }
     case "code":
-      return <NotionCode>{renderNotionRichText(data?.rich_text)}</NotionCode>;
+      return (
+        <NotionCode
+          text={(data?.rich_text || [])
+            .map((item: NotionRichTextItem) => item.plain_text || "")
+            .join("")}
+        />
+      );
     case "divider":
       return <hr className="notion-hr" />;
     case "image": {

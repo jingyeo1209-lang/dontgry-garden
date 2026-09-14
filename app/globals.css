@@ -581,6 +581,11 @@ a {
   font-size: 16px;
 }
 
+.notion-callout-plain {
+  gap: 0;
+  padding-left: 16px;
+}
+
 .notion-callout-body {
   min-width: 0;
   flex: 1;
@@ -621,12 +626,21 @@ a {
   overflow: visible;
   width: max-content;
   max-width: none;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
-    monospace;
+  font-family: "Nanum Gothic Coding", "D2Coding", ui-monospace, SFMono-Regular,
+    Menlo, Consolas, monospace;
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.4;
   white-space: pre;
   font-variant-ligatures: none;
+  font-variant-emoji: unicode;
+}
+
+.notion-code-emoji {
+  display: inline-block;
+  width: 2ch;
+  text-align: center;
+  overflow: hidden;
+  vertical-align: -0.15em;
 }
 
 .notion-hr {
