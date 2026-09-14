@@ -511,8 +511,16 @@ a {
 
 .notion-quote {
   border-left: 3px solid currentcolor;
-  padding: 3px 14px;
+  padding: 4px 14px;
   color: inherit;
+  margin: 4px 0;
+}
+
+.notion-quote .notion-p,
+.notion-quote .notion-p-empty {
+  margin: 0;
+  padding: 1px 0;
+  min-height: 0;
 }
 
 .notion-callout {
@@ -591,13 +599,27 @@ a {
   padding: 2px 0;
 }
 
-.notion-code {
-  padding: 12px 14px;
-  background: rgb(247, 246, 243);
+.notion-code-wrap {
+  overflow: hidden;
+  margin: 4px 0;
+  padding: 16px 12px;
+  background: rgb(241, 241, 239);
   border-radius: 4px;
-  overflow-x: auto;
-  font-size: 0.85em;
-  line-height: 1.45;
+}
+
+.notion-code {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: visible;
+  width: max-content;
+  max-width: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 13px;
+  line-height: 1.35;
+  white-space: pre;
+  font-variant-ligatures: none;
 }
 
 .notion-hr {

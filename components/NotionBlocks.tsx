@@ -9,6 +9,7 @@ import {
 } from "@/lib/notion";
 import { normalizePageId } from "@/lib/categories";
 import { AdSlot } from "@/components/AdSlot";
+import { NotionCode } from "@/components/NotionCode";
 import { renderNotionRichText, type NotionRichTextItem } from "@/components/NotionRichText";
 
 async function renderNestedBlocks(
@@ -114,10 +115,10 @@ async function Block({
       );
     case "quote":
       return (
-        <>
-          <blockquote className="notion-quote">{renderNotionRichText(data?.rich_text)}</blockquote>
+        <blockquote className="notion-quote">
+          {renderNotionRichText(data?.rich_text)}
           <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
-        </>
+        </blockquote>
       );
     case "callout": {
       const nested =
@@ -138,11 +139,7 @@ async function Block({
       );
     }
     case "code":
-      return (
-        <pre className="notion-code">
-          <code>{renderNotionRichText(data?.rich_text)}</code>
-        </pre>
-      );
+      return <NotionCode>{renderNotionRichText(data?.rich_text)}</NotionCode>;
     case "divider":
       return <hr className="notion-hr" />;
     case "image": {
