@@ -4,7 +4,7 @@ import { normalizePageId } from "@/lib/categories";
  * If this list has IDs, only those articles appear on the site.
  * Set to `[]` to show every published Notion article again.
  */
-export const PUBLIC_ARTICLE_IDS = ["38f8faf1-d42b-8062-a006-cd9cf2c05960"];
+export const PUBLIC_ARTICLE_IDS: string[] = [];
 
 export function isPublicArticleFilterOn() {
   return PUBLIC_ARTICLE_IDS.length > 0;
