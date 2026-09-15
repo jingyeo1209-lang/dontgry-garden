@@ -400,6 +400,8 @@ export function buildNotionImageResponse(result: {
     headers: {
       "Content-Type": contentType || "image/jpeg",
       "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+      "CDN-Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+      "Vercel-CDN-Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
       "X-Notion-Media-Stage": "success",
     },
   });
