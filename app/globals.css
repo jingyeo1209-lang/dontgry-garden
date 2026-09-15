@@ -875,6 +875,16 @@ a {
   display: flex;
   gap: 8px;
   align-items: flex-start;
+  cursor: pointer;
+}
+
+.notion-todo input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #37352f;
 }
 
 .notion-toggle summary {

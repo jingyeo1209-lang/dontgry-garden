@@ -10,6 +10,7 @@ import {
 import { normalizePageId } from "@/lib/categories";
 import { AdSlot } from "@/components/AdSlot";
 import { NotionCode } from "@/components/NotionCode";
+import { NotionTodo } from "@/components/NotionTodo";
 import { renderNotionRichText, type NotionRichTextItem } from "@/components/NotionRichText";
 
 type ImagePriority = { used: boolean };
@@ -129,10 +130,12 @@ async function Block({ block, ctx }: { block: NotionBlock; ctx: RenderCtx }) {
     case "to_do":
       return (
         <>
-          <label className="notion-todo">
-            <input type="checkbox" checked={Boolean(data?.checked)} readOnly />
-            <span>{renderNotionRichText(data?.rich_text)}</span>
-          </label>
+          <NotionTodo
+            blockId={blockIdOf(block) || ""}
+            defaultChecked={Boolean(data?.checked)}
+          >
+            {renderNotionRichText(data?.rich_text)}
+          </NotionTodo>
           <ChildBlocks block={block} ctx={ctx} />
         </>
       );
