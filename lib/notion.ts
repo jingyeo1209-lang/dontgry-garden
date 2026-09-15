@@ -5,6 +5,7 @@ import type {
   ListBlockChildrenResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { unstable_cache } from "next/cache";
+import { cache } from "react";
 import {
   type CategoryId,
   normalizePageId,
@@ -85,16 +86,26 @@ export function getNotionConfigStatus(): NotionConfigStatus {
 }
 
 async function notionFetch(url: string, init?: RequestInit): Promise<Response> {
+  const method = String(init?.method || "GET").toUpperCase();
+  // Next 15 does not cache Authorization fetches unless we opt in — without this
+  // the article route becomes fully dynamic (`private, no-store`) on every click.
+  const cachedInit = {
+    ...init,
+    ...(method === "GET"
+      ? { cache: "force-cache" as const, next: { revalidate: REVALIDATE_SECONDS } }
+      : {}),
+  };
+
   const maxAttempts = 5;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const res = await fetch(url, init);
+    const res = await fetch(url, cachedInit);
     if (res.status !== 429 || attempt === maxAttempts - 1) return res;
     const retryAfter = Number(res.headers.get("retry-after"));
     const waitMs =
       Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 500 * 2 ** attempt;
     await new Promise((resolve) => setTimeout(resolve, waitMs));
   }
-  return fetch(url, init);
+  return fetch(url, cachedInit);
 }
 
 function getClient(): Client | null {
@@ -155,7 +166,8 @@ async function getFirstBodyImageFallback(
 }
 
 async function resolveArticleCoverImage(
-  page: PageObjectResponse
+  page: PageObjectResponse,
+  options?: { resolveBodyCover?: boolean }
 ): Promise<{ coverImage: string | null; coverFallbackBlockId: string | null }> {
   const pageId = normalizePageId(page.id);
   const pageCover = getCoverImage(page);
@@ -164,6 +176,11 @@ async function resolveArticleCoverImage(
       coverImage: toProxiedMediaUrl(pageCover, pageId),
       coverFallbackBlockId: null,
     };
+  }
+
+  // Detail pages already load the block tree; skip a second children.list here.
+  if (options?.resolveBodyCover === false) {
+    return { coverImage: null, coverFallbackBlockId: null };
   }
 
   const fallback = await getFirstBodyImageFallback(pageId);
@@ -236,10 +253,11 @@ export async function resolveBlockMediaSourceUrl(
 
 async function pageToArticle(
   page: PageObjectResponse,
-  category: CategoryId
+  category: CategoryId,
+  options?: { resolveBodyCover?: boolean }
 ): Promise<GardenArticle> {
   const id = normalizePageId(page.id);
-  const cover = await resolveArticleCoverImage(page);
+  const cover = await resolveArticleCoverImage(page, options);
   return {
     id,
     title: getTitle(page),
@@ -329,51 +347,62 @@ export async function getPublishedArticles(
   }
 }
 
-export async function getArticleById(
-  pageId: string
-): Promise<{
+async function loadArticleById(id: string): Promise<{
   article: GardenArticle | null;
   page: PageObjectResponse | null;
-  config: NotionConfigStatus;
   error?: string;
 }> {
-  const config = getNotionConfigStatus();
-  if (!config.hasToken) {
-    return { article: null, page: null, config };
-  }
-
   const client = getClient();
-  if (!client) return { article: null, page: null, config };
+  if (!client) return { article: null, page: null };
 
   try {
-    const id = normalizePageId(pageId);
     const page = await client.pages.retrieve({ page_id: id });
     if (!isFullPage(page)) {
-      return { article: null, page: null, config, error: "페이지를 찾을 수 없습니다." };
+      return { article: null, page: null, error: "페이지를 찾을 수 없습니다." };
     }
 
     if (page.parent.type !== "database_id") {
-      return { article: null, page: null, config };
+      return { article: null, page: null };
     }
 
     const category = categoryFromParentDatabaseId(page.parent.database_id);
     if (!category) {
       // Not one of the three CMS databases (e.g. magic-glasses gallery).
-      return { article: null, page: null, config };
+      return { article: null, page: null };
     }
 
     if (!getDatabaseIdForCategory(category)) {
-      return { article: null, page: null, config };
+      return { article: null, page: null };
     }
 
-    return { article: await pageToArticle(page, category), page, config };
+    return {
+      article: await pageToArticle(page, category, { resolveBodyCover: false }),
+      page,
+    };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Notion API 오류";
-    return { article: null, page: null, config, error: message };
+    return { article: null, page: null, error: message };
   }
 }
 
+export const getArticleById = cache(async (pageId: string) => {
+  const config = getNotionConfigStatus();
+  if (!config.hasToken) {
+    return { article: null, page: null, config };
+  }
+
+  const id = normalizePageId(pageId);
+  const cached = await unstable_cache(
+    () => loadArticleById(id),
+    ["notion-article-by-id", id],
+    { revalidate: REVALIDATE_SECONDS }
+  )();
+
+  return { ...cached, config };
+});
+
 export type NotionBlock = ListBlockChildrenResponse["results"][number];
+export type NotionChildMap = Record<string, NotionBlock[]>;
 
 export function extractBlockImageUrl(block: NotionBlock): string | null {
   if (!("type" in block) || block.type !== "image") return null;
@@ -407,13 +436,39 @@ async function fetchBlockChildren(blockId: string): Promise<NotionBlock[]> {
       start_cursor: cursor,
       page_size: 100,
     });
-    for (const block of response.results) {
-      blocks.push(await resolveFullBlock(client, block));
-    }
+    const resolved = await Promise.all(
+      response.results.map((block) => resolveFullBlock(client, block))
+    );
+    blocks.push(...resolved);
     cursor = response.has_more ? response.next_cursor ?? undefined : undefined;
   } while (cursor);
 
   return blocks;
+}
+
+function blockHasChildren(block: NotionBlock): boolean {
+  return Boolean("has_children" in block && block.has_children && "id" in block);
+}
+
+async function fetchBlockTree(rootId: string): Promise<{
+  blocks: NotionBlock[];
+  childMap: NotionChildMap;
+}> {
+  const childMap: NotionChildMap = {};
+
+  async function walk(blockId: string): Promise<NotionBlock[]> {
+    const id = normalizePageId(blockId);
+    const blocks = await fetchBlockChildren(id);
+    childMap[id] = blocks;
+    const nested = blocks.filter(blockHasChildren);
+    await Promise.all(
+      nested.map((block) => walk(normalizePageId((block as { id: string }).id)))
+    );
+    return blocks;
+  }
+
+  const blocks = await walk(rootId);
+  return { blocks, childMap };
 }
 
 export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> {
@@ -424,3 +479,13 @@ export async function getBlockChildren(blockId: string): Promise<NotionBlock[]> 
     { revalidate: REVALIDATE_SECONDS }
   )();
 }
+
+/** One cached tree walk: top-level blocks plus nested children (skip has_children=false). */
+export const getBlockTree = cache(async (blockId: string) => {
+  const id = normalizePageId(blockId);
+  return unstable_cache(
+    () => fetchBlockTree(id),
+    ["notion-block-tree", id],
+    { revalidate: REVALIDATE_SECONDS }
+  )();
+});

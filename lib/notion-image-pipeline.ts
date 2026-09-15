@@ -1,6 +1,7 @@
 import { Client } from "@notionhq/client";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import { normalizePageId } from "@/lib/categories";
+import { unstable_cache } from "next/cache";
+import { normalizePageId, REVALIDATE_SECONDS } from "@/lib/categories";
 import { extractNotionFileUrl } from "@/lib/notion";
 import {
   buildUpstreamFetchInit,
@@ -226,6 +227,46 @@ async function resolveSourceUrl(
   return null;
 }
 
+async function resolveSourceUrlCached(
+  params: NotionImageRequestParams,
+  trace: NotionImageTrace
+): Promise<string | null> {
+  if (params.url) {
+    return resolveSourceUrl(params, trace);
+  }
+
+  const kind = params.pageId ? "page" : params.blockId ? "block" : null;
+  const id = params.pageId || params.blockId;
+  if (!kind || !id) {
+    return resolveSourceUrl(params, trace);
+  }
+
+  const normalized = normalizePageId(id);
+  const source = await unstable_cache(
+    async () => {
+      const inner = initTrace({
+        pageId: kind === "page" ? normalized : null,
+        blockId: kind === "block" ? normalized : null,
+      });
+      return resolveSourceUrl(
+        kind === "page" ? { pageId: normalized } : { blockId: normalized },
+        inner
+      );
+    },
+    ["notion-image-source", kind, normalized],
+    { revalidate: REVALIDATE_SECONDS }
+  )();
+
+  trace.mode = kind === "page" ? "pageId" : "blockId";
+  trace.resolvedUrl = source;
+  trace.resolvedUrlHost = hostFromUrl(source);
+  if (!source && trace.failureStage === "success") {
+    trace.failureStage = "resolve-no-url";
+    trace.failureDetail = "cached-empty-source";
+  }
+  return source;
+}
+
 export async function runNotionImagePipeline(
   params: NotionImageRequestParams
 ): Promise<{ trace: NotionImageTrace; body?: ReadableStream; contentType?: string }> {
@@ -238,7 +279,7 @@ export async function runNotionImagePipeline(
     return { trace };
   }
 
-  const sourceUrl = await resolveSourceUrl(params, trace);
+  const sourceUrl = await resolveSourceUrlCached(params, trace);
   if (!sourceUrl) {
     trace.finalStatus =
       trace.failureStage === "resolve-no-client"
@@ -358,7 +399,7 @@ export function buildNotionImageResponse(result: {
     status: 200,
     headers: {
       "Content-Type": contentType || "image/jpeg",
-      "Cache-Control": "public, max-age=60, s-maxage=300",
+      "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
       "X-Notion-Media-Stage": "success",
     },
   });

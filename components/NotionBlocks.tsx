@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import type { NotionBlock } from "@/lib/notion";
+import type { NotionBlock, NotionChildMap } from "@/lib/notion";
 import {
   extractNotionFileUrl,
   getBlockChildren,
@@ -12,31 +12,55 @@ import { AdSlot } from "@/components/AdSlot";
 import { NotionCode } from "@/components/NotionCode";
 import { renderNotionRichText, type NotionRichTextItem } from "@/components/NotionRichText";
 
-async function renderNestedBlocks(
-  blockId: string,
-  skipImageBlockIds: string[] = []
-) {
-  const children = await getBlockChildren(blockId);
+type ImagePriority = { used: boolean };
+
+type RenderCtx = {
+  childMap?: NotionChildMap;
+  skipImageBlockIds: string[];
+  imagePriority: ImagePriority;
+};
+
+function blockIdOf(block: NotionBlock): string | null {
+  return "id" in block ? normalizePageId(block.id) : null;
+}
+
+function blockHasChildren(block: NotionBlock): boolean {
+  return Boolean("has_children" in block && block.has_children);
+}
+
+async function loadChildren(
+  block: NotionBlock,
+  ctx: RenderCtx,
+  sourceId?: string
+): Promise<NotionBlock[]> {
+  const id = sourceId ? normalizePageId(sourceId) : blockIdOf(block);
+  if (!id) return [];
+  if (ctx.childMap && id in ctx.childMap) return ctx.childMap[id];
+  if (!sourceId && !blockHasChildren(block)) return [];
+  return getBlockChildren(id);
+}
+
+async function renderNestedBlocks(block: NotionBlock, ctx: RenderCtx, sourceId?: string) {
+  const children = await loadChildren(block, ctx, sourceId);
   if (!children.length) return null;
   return (
     <NotionBlocks
       blocks={children}
       insertAdAfter={null}
-      skipImageBlockIds={skipImageBlockIds}
+      skipImageBlockIds={ctx.skipImageBlockIds}
+      childMap={ctx.childMap}
+      imagePriority={ctx.imagePriority}
       nested
     />
   );
 }
 
-async function ChildBlocks({
-  block,
-  skipImageBlockIds = [],
-}: {
-  block: NotionBlock;
-  skipImageBlockIds?: string[];
-}) {
-  if (!("id" in block)) return null;
-  return renderNestedBlocks(block.id, skipImageBlockIds);
+async function ChildBlocks({ block, ctx }: { block: NotionBlock; ctx: RenderCtx }) {
+  if (!blockHasChildren(block)) {
+    const id = blockIdOf(block);
+    if (!id || !ctx.childMap?.[id]?.length) return null;
+  }
+  return renderNestedBlocks(block, ctx);
 }
 
 function notionImageFallback(label: string, detail: string) {
@@ -49,13 +73,7 @@ function notionImageFallback(label: string, detail: string) {
   );
 }
 
-async function Block({
-  block,
-  skipImageBlockIds = [],
-}: {
-  block: NotionBlock;
-  skipImageBlockIds?: string[];
-}) {
+async function Block({ block, ctx }: { block: NotionBlock; ctx: RenderCtx }) {
   if (!("type" in block)) return null;
   const type = block.type;
   // @ts-expect-error Notion block union
@@ -64,8 +82,9 @@ async function Block({
   switch (type) {
     case "paragraph": {
       const rich = renderNotionRichText(data?.rich_text);
-      const nested =
-        "id" in block ? await renderNestedBlocks(block.id, skipImageBlockIds) : null;
+      const nested = blockHasChildren(block)
+        ? await renderNestedBlocks(block, ctx)
+        : null;
       return (
         <>
           <p className={rich ? "notion-p" : "notion-p notion-p-empty"}>{rich}</p>
@@ -78,14 +97,13 @@ async function Block({
     case "heading_3": {
       const Tag = type === "heading_1" ? "h1" : type === "heading_2" ? "h2" : "h3";
       const cls = type === "heading_1" ? "notion-h1" : type === "heading_2" ? "notion-h2" : "notion-h3";
-      const nested =
-        "id" in block && "has_children" in block && block.has_children
-          ? await renderNestedBlocks(block.id, skipImageBlockIds)
-          : null;
+      const nested = blockHasChildren(block)
+        ? await renderNestedBlocks(block, ctx)
+        : null;
       return (
         <>
           <Tag
-            id={"id" in block ? normalizePageId(block.id) : undefined}
+            id={blockIdOf(block) ?? undefined}
             className={cls}
           >
             {renderNotionRichText(data?.rich_text)}
@@ -98,14 +116,14 @@ async function Block({
       return (
         <li className="notion-li">
           {renderNotionRichText(data?.rich_text)}
-          <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
+          <ChildBlocks block={block} ctx={ctx} />
         </li>
       );
     case "numbered_list_item":
       return (
         <li className="notion-li">
           {renderNotionRichText(data?.rich_text)}
-          <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
+          <ChildBlocks block={block} ctx={ctx} />
         </li>
       );
     case "to_do":
@@ -115,19 +133,20 @@ async function Block({
             <input type="checkbox" checked={Boolean(data?.checked)} readOnly />
             <span>{renderNotionRichText(data?.rich_text)}</span>
           </label>
-          <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
+          <ChildBlocks block={block} ctx={ctx} />
         </>
       );
     case "quote":
       return (
         <blockquote className="notion-quote">
           {renderNotionRichText(data?.rich_text)}
-          <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
+          <ChildBlocks block={block} ctx={ctx} />
         </blockquote>
       );
     case "callout": {
-      const nested =
-        "id" in block ? await renderNestedBlocks(block.id, skipImageBlockIds) : null;
+      const nested = blockHasChildren(block)
+        ? await renderNestedBlocks(block, ctx)
+        : null;
       const color = typeof data?.color === "string" ? data.color : "gray_background";
       const colorClass =
         color && color !== "default"
@@ -158,8 +177,8 @@ async function Block({
     case "divider":
       return <hr className="notion-hr" />;
     case "image": {
-      const blockId = "id" in block ? normalizePageId(block.id) : "";
-      if (blockId && skipImageBlockIds.includes(blockId)) return null;
+      const blockId = blockIdOf(block) || "";
+      if (blockId && ctx.skipImageBlockIds.includes(blockId)) return null;
       const raw = extractNotionFileUrl(data);
       const src =
         (raw && blockId ? toProxiedMediaUrl(raw, blockId) : null) ??
@@ -171,10 +190,18 @@ async function Block({
           blockId ? `block ${blockId}` : "missing block id"
         );
       }
+      const priority = !ctx.imagePriority.used;
+      if (priority) ctx.imagePriority.used = true;
       return (
         <figure className="notion-figure">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt="" loading="lazy" />
+          <img
+            src={src}
+            alt=""
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+            fetchPriority={priority ? "high" : "auto"}
+          />
           {caption ? <figcaption>{caption}</figcaption> : null}
         </figure>
       );
@@ -194,15 +221,14 @@ async function Block({
         <p className="notion-p">
           <a
             href={data.external?.url || data.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            target="_blank" rel="noopener noreferrer"
           >
             미디어 열기
           </a>
         </p>
       ) : null;
     case "toggle": {
-      const children = "id" in block ? await getBlockChildren(block.id) : [];
+      const children = await loadChildren(block, ctx);
       return (
         <details className="notion-toggle">
           <summary>{renderNotionRichText(data?.rich_text)}</summary>
@@ -210,7 +236,9 @@ async function Block({
             <NotionBlocks
               blocks={children}
               insertAdAfter={null}
-              skipImageBlockIds={skipImageBlockIds}
+              skipImageBlockIds={ctx.skipImageBlockIds}
+              childMap={ctx.childMap}
+              imagePriority={ctx.imagePriority}
               nested
             />
           </div>
@@ -218,32 +246,34 @@ async function Block({
       );
     }
     case "column_list": {
-      const columns = "id" in block ? await getBlockChildren(block.id) : [];
+      const columns = await loadChildren(block, ctx);
       return (
         <div className="notion-columns">
           {await Promise.all(
             columns.map((col) => (
-              <Block key={col.id} block={col} skipImageBlockIds={skipImageBlockIds} />
+              <Block key={"id" in col ? col.id : undefined} block={col} ctx={ctx} />
             ))
           )}
         </div>
       );
     }
     case "column": {
-      const children = "id" in block ? await getBlockChildren(block.id) : [];
+      const children = await loadChildren(block, ctx);
       return (
         <div className="notion-column">
           <NotionBlocks
             blocks={children}
             insertAdAfter={null}
-            skipImageBlockIds={skipImageBlockIds}
+            skipImageBlockIds={ctx.skipImageBlockIds}
+            childMap={ctx.childMap}
+            imagePriority={ctx.imagePriority}
             nested
           />
         </div>
       );
     }
     case "table": {
-      const rows = "id" in block ? await getBlockChildren(block.id) : [];
+      const rows = await loadChildren(block, ctx);
       const hasColumnHeader = Boolean(data?.has_column_header);
       return (
         <div className="notion-table-wrap">
@@ -271,12 +301,14 @@ async function Block({
     }
     case "synced_block": {
       const sourceId = data?.synced_from?.block_id;
-      const children = await getBlockChildren(sourceId ?? block.id);
+      const children = await loadChildren(block, ctx, sourceId ?? undefined);
       return (
         <NotionBlocks
           blocks={children}
           insertAdAfter={null}
-          skipImageBlockIds={skipImageBlockIds}
+          skipImageBlockIds={ctx.skipImageBlockIds}
+          childMap={ctx.childMap}
+          imagePriority={ctx.imagePriority}
           nested
         />
       );
@@ -304,7 +336,6 @@ async function Block({
           blockId ? `block ${blockId}` : "missing block id"
         );
       }
-      if (!href) return null;
       return (
         <p className="notion-p">
           <a href={href} target="_blank" rel="noopener noreferrer">
@@ -324,11 +355,11 @@ async function Block({
         return (
           <>
             <p className="notion-p">{renderNotionRichText(data.rich_text)}</p>
-            <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />
+            <ChildBlocks block={block} ctx={ctx} />
           </>
         );
       }
-      return <ChildBlocks block={block} skipImageBlockIds={skipImageBlockIds} />;
+      return <ChildBlocks block={block} ctx={ctx} />;
   }
 }
 
@@ -362,6 +393,9 @@ type Props = {
   skipImageBlockIds?: string[];
   /** Nested renderer: skip the outer `.notion-body` wrapper. */
   nested?: boolean;
+  /** Preloaded children by block id — avoids a Notion request per block. */
+  childMap?: NotionChildMap;
+  imagePriority?: ImagePriority;
 };
 
 export async function NotionBlocks({
@@ -369,7 +403,14 @@ export async function NotionBlocks({
   insertAdAfter = 3,
   skipImageBlockIds = [],
   nested = false,
+  childMap,
+  imagePriority,
 }: Props) {
+  const ctx: RenderCtx = {
+    childMap,
+    skipImageBlockIds,
+    imagePriority: imagePriority ?? { used: false },
+  };
   const groups = groupListItems(blocks);
   const out: ReactNode[] = [];
   let renderedBlocks = 0;
@@ -381,7 +422,7 @@ export async function NotionBlocks({
         <ul key={`ul-${gi}`} className="notion-ul">
           {await Promise.all(
             group.items.map(async (b) => (
-              <Block key={b.id} block={b} skipImageBlockIds={skipImageBlockIds} />
+              <Block key={"id" in b ? b.id : gi} block={b} ctx={ctx} />
             ))
           )}
         </ul>
@@ -392,7 +433,7 @@ export async function NotionBlocks({
         <ol key={`ol-${gi}`} className="notion-ol">
           {await Promise.all(
             group.items.map(async (b) => (
-              <Block key={b.id} block={b} skipImageBlockIds={skipImageBlockIds} />
+              <Block key={"id" in b ? b.id : gi} block={b} ctx={ctx} />
             ))
           )}
         </ol>
@@ -400,7 +441,9 @@ export async function NotionBlocks({
       renderedBlocks += group.items.length;
     } else {
       const b = group.items[0];
-      out.push(<Block key={b.id} block={b} skipImageBlockIds={skipImageBlockIds} />);
+      out.push(
+        <Block key={"id" in b ? b.id : gi} block={b} ctx={ctx} />
+      );
       renderedBlocks += 1;
     }
 

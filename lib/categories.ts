@@ -1,4 +1,5 @@
-export const REVALIDATE_SECONDS = 60;
+/** CMS pages are not breaking news — 5 minutes is fresh enough and keeps ISR warm. */
+export const REVALIDATE_SECONDS = 300;
 
 export type CategoryId = "ttong" | "pink" | "oasis";
 

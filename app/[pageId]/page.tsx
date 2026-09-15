@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { AdSlot } from "@/components/AdSlot";
 import { NotionBlocks } from "@/components/NotionBlocks";
 import { NotionStatusNote } from "@/components/NotionStatusNote";
 import { CATEGORIES, isCategoryId, normalizePageId } from "@/lib/categories";
-import { getArticleById, getBlockChildren } from "@/lib/notion";
+import { getArticleById, getBlockTree, type GardenArticle } from "@/lib/notion";
 import { isPublicArticleId } from "@/lib/public-articles";
 
 /** On-demand ISR: do not prerender all Notion articles at build (avoids API 429). */
-export const revalidate = 60;
+export const revalidate = 300;
+export const dynamic = "force-static";
+export const fetchCache = "force-cache";
 export const dynamicParams = true;
+
+export function generateStaticParams() {
+  return [];
+}
 
 type Params = { pageId: string };
 
@@ -48,6 +55,46 @@ export async function generateMetadata({
   };
 }
 
+async function ArticleBody({ article }: { article: GardenArticle }) {
+  const { blocks, childMap } = await getBlockTree(normalizePageId(article.id));
+  const hasBodyImage = blocks.some((block) => "type" in block && block.type === "image");
+  const showHero = Boolean(article.coverImage) && !hasBodyImage;
+
+  return (
+    <>
+      {showHero && article.coverImage ? (
+        <div className="article-hero">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={article.coverImage}
+            alt=""
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
+        </div>
+      ) : null}
+
+      <AdSlot unit="banner" />
+
+      <NotionBlocks
+        blocks={blocks}
+        childMap={childMap}
+        insertAdAfter={3}
+        skipImageBlockIds={
+          hasBodyImage
+            ? []
+            : article.coverFallbackBlockId
+              ? [article.coverFallbackBlockId]
+              : []
+        }
+      />
+
+      <AdSlot unit="footer" />
+    </>
+  );
+}
+
 export default async function ArticlePage({ params }: { params: Promise<Params> }) {
   const { pageId } = await params;
   if (RESERVED.has(pageId) || isCategoryId(pageId)) notFound();
@@ -79,10 +126,7 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
     notFound();
   }
 
-  const blocks = await getBlockChildren(normalizePageId(article.id));
   const category = CATEGORIES[article.category];
-  const hasBodyImage = blocks.some((block) => "type" in block && block.type === "image");
-  const showHero = Boolean(article.coverImage) && !hasBodyImage;
 
   return (
     <main className="page page-narrow">
@@ -92,28 +136,9 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
       <h1 className="page-title">{article.title}</h1>
       {article.date ? <p className="article-meta">{article.date}</p> : null}
 
-      {showHero && article.coverImage ? (
-        <div className="article-hero">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={article.coverImage} alt="" />
-        </div>
-      ) : null}
-
-      <AdSlot unit="banner" />
-
-      <NotionBlocks
-        blocks={blocks}
-        insertAdAfter={3}
-        skipImageBlockIds={
-          hasBodyImage
-            ? []
-            : article.coverFallbackBlockId
-              ? [article.coverFallbackBlockId]
-              : []
-        }
-      />
-
-      <AdSlot unit="footer" />
+      <Suspense fallback={<div className="notion-body" />}>
+        <ArticleBody article={article} />
+      </Suspense>
     </main>
   );
 }

@@ -2,7 +2,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { HOME_ZONE_TITLES } from "@/lib/categories";
 import Link from "next/link";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export default function HomePage() {
   return (
