@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { AdSlot } from "@/components/AdSlot";
 import { NotionBlocks } from "@/components/NotionBlocks";
 import { NotionStatusNote } from "@/components/NotionStatusNote";
+import { TodoChecklistRuntime } from "@/components/TodoChecklistRuntime";
 import { CATEGORIES, isCategoryId, normalizePageId } from "@/lib/categories";
 import { getArticleById, getBlockTree, type GardenArticle } from "@/lib/notion";
 import { isPublicArticleId } from "@/lib/public-articles";
@@ -135,6 +136,7 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
       </Link>
       <h1 className="page-title">{article.title}</h1>
       {article.date ? <p className="article-meta">{article.date}</p> : null}
+      <TodoChecklistRuntime />
 
       <Suspense fallback={<div className="notion-body" />}>
         <ArticleBody article={article} />
